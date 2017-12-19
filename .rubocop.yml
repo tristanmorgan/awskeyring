@@ -1,6 +1,12 @@
 Metrics/LineLength:
   Max: 120
 
-AllCops:
-  Includes:
+Naming/FileName:
+  Exclude:
+    - Gemfile
     - Rakefile
+    - aws-keychain-util.gemspec
+
+AllCops:
+  Exclude:
+    - bin/*
