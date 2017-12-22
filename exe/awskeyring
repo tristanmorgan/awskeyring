@@ -2,4 +2,9 @@
 
 require_relative '../lib/awskeyring_command'
 
+trap('SIGINT') do
+  warn "\nExecution aborted.\n"
+  exit 1
+end
+
 AwskeyringCommand.start
