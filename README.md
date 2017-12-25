@@ -1,28 +1,38 @@
 # Awskeyring
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/awskeyring`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Awskeyring is a small tool to manage AWS account keys in the macOS Keychain.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'awskeyring'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
+Install it with:
 
     $ gem install awskeyring
 
 ## Usage
 
-TODO: Write usage instructions here
+The CLI is using [Thor](http://whatisthor.com) with help provided interactivly.
+
+    Commands:
+    awskeyring --version, -v               # Prints the version
+    awskeyring add ACCOUNT                 # Adds an ACCOUNT to the keyring
+    awskeyring add-role ROLE               # Adds a ROLE to the keyring
+    awskeyring console ACCOUNT             # Open the AWS Console for the ACCOUNT
+    awskeyring env ACCOUNT                 # Outputs bourne shell environment exports for an ACCOUNT
+    awskeyring help [COMMAND]              # Describe available commands or one specific command
+    awskeyring initialise                  # Initialises a new KEYCHAIN
+    awskeyring list                        # Prints a list of accounts in the keyring
+    awskeyring list-role                   # Prints a list of roles in the keyring
+    awskeyring remove ACCOUNT              # Removes an ACCOUNT from the keyring
+    awskeyring remove-role ROLE            # Removes a ROLE from the keyring
+    awskeyring token ACCOUNT [ROLE] [MFA]  # Create an STS Token from a ROLE or an MFA code
+
+and autocomplete that can be installed with:
+
+    $ complete -C /usr/local/bin/aws-creds aws-creds
+
+To set your environment easily the following function helps:
+
+    awsenv() { eval "$(awskeyring env $1)"; }
 
 ## Development
 
@@ -32,7 +42,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/awskeyring. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/tristanmorgan/awskeyring. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 
 ## License

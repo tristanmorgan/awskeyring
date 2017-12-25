@@ -96,8 +96,8 @@ module Awskeyring
   end
 
   def self.get_pair(account)
-    session_key = Awskeyring.get_item("session-key #{account}")
-    session_token = Awskeyring.get_item("session-token #{account}") if session_key
+    session_key = all_items.where(label: "session-key #{account}").first
+    session_token = all_items.where(label: "session-token #{account}").first if session_key
     [session_key, session_token]
   end
 
@@ -110,7 +110,7 @@ module Awskeyring
   end
 
   def self.delete_expired(key, token)
-    expires_at = Time.at(key.attributes[:comment].to_i)
+    expires_at = Time.at(token.attributes[:account].to_i)
     if expires_at < Time.now
       delete_pair(key, token, '# Removing expired session credentials')
       key = nil

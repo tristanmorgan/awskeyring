@@ -1,5 +1,9 @@
-require 'thor'
+require 'aws-sdk-iam'
+require 'cgi'
 require 'highline'
+require 'json'
+require 'open-uri'
+require 'thor'
 
 require_relative 'awskeyring'
 
@@ -103,18 +107,14 @@ class AwskeyringCommand < Thor
   def remove(account = nil)
     account ||= ask(message: 'account name')
     cred, temp_cred = get_valid_item_pair(account: account)
-    Awskeyring.delete_pair(cred, temp_cred, '# Removing credentials')
+    Awskeyring.delete_pair(cred, temp_cred, "# Removing account #{account}")
   end
 
   map 'remove-role' => :remove_role
   desc 'remove-role ROLE', 'Removes a ROLE from the keyring'
   def remove_role(role = nil)
     role ||= ask(message: 'role name')
-    session_key = Awskeyring.get_item("session-key #{account}")
-    session_token = Awskeyring.get_item("session-token #{account}") if session_key
-    Awskeyring.delete_pair(session_key, session_token, '# Removing role session') if role_key
-
-    item_role = Awskeyring.get_role(role_name)
+    item_role = Awskeyring.get_role(role)
     Awskeyring.delete_pair(item_role, nil, "# Removing role #{role}")
   end
 
@@ -183,10 +183,66 @@ class AwskeyringCommand < Thor
     puts "Authentication valid until #{response.credentials[:expiration]}"
   end
 
+  desc 'console ACCOUNT', 'Open the AWS Console for the ACCOUNT'
+  def console(account = nil)
+    account ||= ask(message: 'account name')
+    cred, temp_cred = get_valid_item_pair(account: account)
+    token = temp_cred.password unless temp_cred.nil?
+
+    console_url = 'https://console.aws.amazon.com/console/home'
+    signin_url = 'https://signin.aws.amazon.com/federation'
+    policy_json = {
+      Version: '2012-10-17',
+      Statement: [{
+        Action: '*',
+        Resource: '*',
+        Effect: 'Allow'
+      }]
+    }.to_json
+
+    if temp_cred
+      session_json = {
+        sessionId: cred.attributes[:account],
+        sessionKey: cred.password,
+        sessionToken: token
+      }.to_json
+    else
+      sts = Aws::STS::Client.new(access_key_id: cred.attributes[:account],
+                                 secret_access_key: cred.password)
+
+      session = sts.get_federation_token(name: ENV['USER'],
+                                         policy: policy_json,
+                                         duration_seconds: (60 * 60 * 12))
+      session_json = {
+        sessionId: session.credentials[:access_key_id],
+        sessionKey: session.credentials[:secret_access_key],
+        sessionToken: session.credentials[:session_token]
+      }.to_json
+
+    end
+    get_signin_token_url = signin_url + '?Action=getSigninToken' \
+                           '&Session=' + CGI.escape(session_json)
+
+    returned_content = open(get_signin_token_url).read
+
+    signin_token = JSON.parse(returned_content)['SigninToken']
+    signin_token_param = '&SigninToken=' + CGI.escape(signin_token)
+    destination_param = '&Destination=' + CGI.escape(console_url)
+
+    login_url = signin_url + '?Action=login' + signin_token_param + destination_param
+
+    pid = spawn("open \"#{login_url}\"")
+    Process.wait pid
+  end
+
   # autocomplete
   desc 'awskeyring CURR PREV', 'Autocompletion for bourne shells', hide: true
   def awskeyring(curr, prev)
     comp_line = ENV['COMP_LINE']
+    unless comp_line
+      warn "enable autocomplete with 'complete -C /path-to-command/awskeyring awskeyring'"
+      exit 1
+    end
     comp_len = comp_line.split.length
     comp_len += 1 if curr == ''
 
@@ -196,6 +252,8 @@ class AwskeyringCommand < Thor
     when 3
       if prev == 'help'
         puts list_commands.select { |elem| elem.start_with?(curr) }.join("\n")
+      elsif prev == 'remove-role'
+        puts Awskeyring.list_role_names.select { |elem| elem.start_with?(curr) }.join("\n")
       else
         puts Awskeyring.list_item_names.select { |elem| elem.start_with?(curr) }.join("\n")
       end
