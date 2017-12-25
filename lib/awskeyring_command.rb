@@ -6,6 +6,10 @@ require_relative 'awskeyring'
 # AWS Key-ring command line interface.
 class AwskeyringCommand < Thor
   map %w[--version -v] => :__version
+  map ['ls'] => :list
+  map ['lsr'] => :list_role
+  map ['rm'] => :remove
+  map ['rmr'] => :remove_role
 
   desc '--version, -v', 'Prints the version'
   def __version
@@ -13,14 +17,15 @@ class AwskeyringCommand < Thor
   end
 
   desc 'initialise', 'Initialises a new KEYCHAIN'
-  method_option :keychain, type: :string, aliases: '-k', desc: 'Name of KEYCHAIN to initialise.'
+  method_option :keychain, type: :string, aliases: '-n', desc: 'Name of KEYCHAIN to initialise.'
   def initialise
     unless Awskeyring.prefs.empty?
       puts "#{Awskeyring::PREFS_FILE} exists. no need to initialise."
       exit 1
     end
 
-    keychain ||= ask(message: "Name for new keychain (default: 'awskeyring'): ")
+    keychain ||= options[:keychain]
+    keychain ||= ask(message: "Name for new keychain (default: 'awskeyring')")
     keychain = 'awskeyring' if keychain.empty?
 
     puts 'Creating a new Keychain, you will be prompted for a password for it.'
@@ -45,7 +50,8 @@ class AwskeyringCommand < Thor
   end
 
   desc 'env ACCOUNT', 'Outputs bourne shell environment exports for an ACCOUNT'
-  def env(account)
+  def env(account = nil)
+    account ||= ask(message: 'account name')
     cred, temp_cred = get_valid_item_pair(account: account)
     token = temp_cred.password unless temp_cred.nil?
     put_env_string(
@@ -60,10 +66,14 @@ class AwskeyringCommand < Thor
   method_option :key, type: :string, aliases: '-k', desc: 'AWS account key id.'
   method_option :secret, type: :string, aliases: '-s', desc: 'AWS account secret.'
   method_option :mfa, type: :string, aliases: '-m', desc: 'AWS virtual mfa arn.'
-  def add(account)
-    key ||= ask(message: '     access key id: ')
-    secret ||= ask(message: ' secret_access_key: ', secure: true)
-    mfa ||= ask(message: '(optional) mfa arn: ')
+  def add(account = nil)
+    account ||= ask(message: 'account name')
+    key ||= options[:key]
+    key ||= ask(message: 'access key id')
+    secret ||= options[:secret]
+    secret ||= ask(message: 'secret access key', secure: true)
+    mfa ||= options[:mfa]
+    mfa ||= ask(message: 'mfa arn', optional: true)
 
     Awskeyring.add_item(
       account: account,
@@ -76,9 +86,11 @@ class AwskeyringCommand < Thor
   map 'add-role' => :add_role
   desc 'add-role ROLE', 'Adds a ROLE to the keyring'
   method_option :arn, type: :string, aliases: '-a', desc: 'AWS role arn.'
-  def add_role(role)
-    arn ||= ask(message: '          role arn: ')
-    account ||= ask(message: '(optional) account: ')
+  def add_role(role = nil)
+    role ||= ask(message: 'role name')
+    arn ||= options[:arn]
+    arn ||= ask(message: 'role arn')
+    account ||= ask(message: 'account', optional: true)
 
     Awskeyring.add_role(
       role: role,
@@ -88,14 +100,16 @@ class AwskeyringCommand < Thor
   end
 
   desc 'remove ACCOUNT', 'Removes an ACCOUNT from the keyring'
-  def remove(account)
+  def remove(account = nil)
+    account ||= ask(message: 'account name')
     cred, temp_cred = get_valid_item_pair(account: account)
     Awskeyring.delete_pair(cred, temp_cred, '# Removing credentials')
   end
 
   map 'remove-role' => :remove_role
   desc 'remove-role ROLE', 'Removes a ROLE from the keyring'
-  def remove_role(role)
+  def remove_role(role = nil)
+    role ||= ask(message: 'role name')
     session_key = Awskeyring.get_item("session-key #{account}")
     session_token = Awskeyring.get_item("session-token #{account}") if session_key
     Awskeyring.delete_pair(session_key, session_token, '# Removing role session') if role_key
@@ -104,9 +118,76 @@ class AwskeyringCommand < Thor
     Awskeyring.delete_pair(item_role, nil, "# Removing role #{role}")
   end
 
+  desc 'token ACCOUNT [ROLE] [MFA]', 'Create an STS Token from a ROLE or an MFA code'
+  method_option :role, type: :string, aliases: '-r', desc: 'The ROLE to assume.'
+  method_option :code, type: :string, aliases: '-c', desc: 'Virtual mfa CODE.'
+  method_option :duration, type: :string, aliases: '-d', desc: 'Session DURATION in seconds.'
+  def token(account = nil, role = nil, code = nil)
+    account ||= ask(message: 'account name')
+    role ||= options[:role]
+    code ||= options[:code]
+    duration = options[:duration]
+    duration ||= (60 * 60 * 1).to_s if role
+    duration ||= (60 * 60 * 12).to_s if code
+
+    if !role && !code
+      warn 'Please use either a role or a code'
+      exit 2
+    end
+
+    session_key, session_token = Awskeyring.get_pair(account)
+    Awskeyring.delete_pair(session_key, session_token, '# Removing STS credentials') if session_key
+
+    item = Awskeyring.get_item(account)
+    item_role = Awskeyring.get_role(role) if role
+
+    sts = Aws::STS::Client.new(access_key_id: item.attributes[:account], secret_access_key: item.password)
+
+    begin
+      response =
+        if code && role
+          sts.assume_role(
+            duration_seconds: duration.to_i,
+            role_arn: item_role.attributes[:account],
+            role_session_name: ENV['USER'],
+            serial_number: item.attributes[:comment],
+            token_code: code
+          )
+        elsif role
+          sts.assume_role(
+            duration_seconds: duration.to_i,
+            role_arn: item_role.attributes[:account],
+            role_session_name: ENV['USER']
+          )
+        elsif code
+          sts.get_session_token(
+            duration_seconds: duration.to_i,
+            serial_number: item.attributes[:comment],
+            token_code: code
+          )
+        end
+    rescue Aws::STS::Errors::AccessDenied => e
+      puts e.to_s
+      exit 1
+    end
+
+    Awskeyring.add_pair(
+      account: account,
+      key: response.credentials[:access_key_id],
+      secret: response.credentials[:secret_access_key],
+      token: response.credentials[:session_token],
+      expiry: response.credentials[:expiration].to_i.to_s,
+      role: role
+    )
+
+    puts "Authentication valid until #{response.credentials[:expiration]}"
+  end
+
+  # autocomplete
   desc 'awskeyring CURR PREV', 'Autocompletion for bourne shells', hide: true
   def awskeyring(curr, prev)
-    comp_len = ENV['COMP_LINE'].split.length
+    comp_line = ENV['COMP_LINE']
+    comp_len = comp_line.split.length
     comp_len += 1 if curr == ''
 
     case comp_len
@@ -132,8 +213,7 @@ class AwskeyringCommand < Thor
   end
 
   def get_valid_item_pair(account:)
-    session_key = Awskeyring.get_item("session-key #{account}")
-    session_token = Awskeyring.get_item("session-token #{account}") if session_key
+    session_key, session_token = Awskeyring.get_pair(account)
     session_key, session_token = Awskeyring.delete_expired(session_key, session_token) if session_key
 
     if session_key && session_token
@@ -164,11 +244,13 @@ class AwskeyringCommand < Thor
     end
   end
 
-  def ask(message:, secure: false)
+  def ask(message:, secure: false, optional: false)
     if secure
-      HighLine.new.ask(message) { |q| q.echo = '*' }
+      HighLine.new.ask(message.rjust(20) + ': ') { |q| q.echo = '*' }
+    elsif optional
+      HighLine.new.ask((message + ' (optional)').rjust(20) + ': ')
     else
-      HighLine.new.ask(message)
+      HighLine.new.ask(message.rjust(20) + ': ')
     end
   end
 end

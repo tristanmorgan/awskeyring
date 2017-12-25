@@ -76,12 +76,29 @@ module Awskeyring
     )
   end
 
+  def self.add_pair(account:, key:, secret:, token:, expiry:, role:)
+    all_items.create(label: "session-key #{account}",
+                     account: key,
+                     password: secret,
+                     comment: "#{ROLE_PREFIX}#{role}")
+    all_items.create(label: "session-token #{account}",
+                     account: expiry,
+                     password: token,
+                     comment: "#{ROLE_PREFIX}#{role}")
+  end
+
   def self.get_item(account)
     all_items.where(label: "#{ACCOUNT_PREFIX}#{account}").first
   end
 
   def self.get_role(name)
-    get_item("#{ROLE_PREFIX}#{name}")
+    all_items.where(label: "#{ROLE_PREFIX}#{name}").first
+  end
+
+  def self.get_pair(account)
+    session_key = Awskeyring.get_item("session-key #{account}")
+    session_token = Awskeyring.get_item("session-token #{account}") if session_key
+    [session_key, session_token]
   end
 
   def self.list_item_names
