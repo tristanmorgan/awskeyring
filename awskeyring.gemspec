@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.authors       = ['Tristan Morgan']
   spec.email         = ['tristanmorgan@users.noreply.github.com']
 
-  spec.summary       = 'Manages AWS credentials in the OS X keychain'
-  spec.description   = 'Manages AWS credentials in the OS X keychain'
+  spec.summary       = 'Manages AWS credentials in the macOS keychain'
+  spec.description   = 'Manages AWS credentials in the macOS keychain'
   spec.homepage      = 'https://github.com/tristanmorgan/awskeyring'
   spec.license       = 'MIT'
 

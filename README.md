@@ -2,6 +2,14 @@
 
 Awskeyring is a small tool to manage AWS account keys in the macOS Keychain.
 
+## Motivation
+
+The motivation of this application is to provide a local secure store of AWS
+credentials using specifically in the macOS Keychain, to have them easily accessed
+from the Terminal, and to provide useful functions like assuming roles.
+For Enterprise environments there are better suited tools to use
+like [HashiCorp Vault](https://vaultproject.io/).
+
 ## Installation
 
 Install it with:
@@ -10,7 +18,7 @@ Install it with:
 
 ## Usage
 
-The CLI is using [Thor](http://whatisthor.com) with help provided interactivly.
+The CLI is using [Thor](http://whatisthor.com) with help provided interactively.
 
     Commands:
     awskeyring --version, -v               # Prints the version
@@ -28,22 +36,21 @@ The CLI is using [Thor](http://whatisthor.com) with help provided interactivly.
 
 and autocomplete that can be installed with:
 
-    $ complete -C /usr/local/bin/aws-creds aws-creds
+    $ complete -C /usr/local/bin/awskeyring awskeyring
 
-To set your environment easily the following function helps:
+To set your environment easily the following bash function helps:
 
     awsenv() { eval "$(awskeyring env $1)"; }
 
 ## Development
 
-After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment. Run `bundle exec awskeyring` to use the gem in this directory, ignoring other installed copies of this gem.
+After checking out the repo, run `bundle update` to install dependencies. Then, run `rake` to run the tests. Run `bundle exec awskeyring` to use the gem in this directory, ignoring other installed copies of this gem.
 
 To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
 
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/tristanmorgan/awskeyring. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
-
 
 ## License
 
