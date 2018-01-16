@@ -1,5 +1,11 @@
 # Awskeyring
 
+* [![Build Status](https://travis-ci.org/tristanmorgan/awskeyring.svg?branch=master)](https://travis-ci.org/tristanmorgan/awskeyring)
+* [![Gem Version](https://badge.fury.io/rb/awskeyring.svg)](https://badge.fury.io/rb/awskeyring)
+* [![license MIT](http://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
+* [![All Downloads](http://ruby-gem-downloads-badge.herokuapp.com/awskeyring?type=total)](https://rubygems.org/gems/awskeyring)
+* [![Version Downloads](http://ruby-gem-downloads-badge.herokuapp.com/awskeyring?label=downloads-current-version)](https://rubygems.org/gems/awskeyring)
+
 Awskeyring is a small tool to manage AWS account keys in the macOS Keychain.
 
 ## Motivation
