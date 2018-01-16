@@ -1,13 +1,6 @@
-Metrics/AbcSize:
-  Max: 31
-
 Metrics/LineLength:
   Max: 120
 
-Metrics/ClassLength:
-  Exclude:
-    - lib/awskeyring_command.rb
-    
 Metrics/MethodLength:
   Max: 16
 

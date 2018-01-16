@@ -1,8 +1,6 @@
 require 'keychain'
 require 'aws-sdk-iam'
 
-require 'awskeyring/version'
-
 # Aws Key-ring logical object,
 # gives you an interface to access keychains and items.
 module Awskeyring
@@ -76,15 +74,15 @@ module Awskeyring
     )
   end
 
-  def self.add_pair(account:, key:, secret:, token:, expiry:, role:)
-    all_items.create(label: "session-key #{account}",
-                     account: key,
-                     password: secret,
-                     comment: "#{ROLE_PREFIX}#{role}")
-    all_items.create(label: "session-token #{account}",
-                     account: expiry,
-                     password: token,
-                     comment: "#{ROLE_PREFIX}#{role}")
+  def self.add_pair(params = {})
+    all_items.create(label: "session-key #{params[:account]}",
+                     account: params[:key],
+                     password: params[:secret],
+                     comment: "#{ROLE_PREFIX}#{params[:role]}")
+    all_items.create(label: "session-token #{params[:account]}",
+                     account: params[:expiry],
+                     password: params[:token],
+                     comment: "#{ROLE_PREFIX}#{params[:role]}")
   end
 
   def self.get_item(account)

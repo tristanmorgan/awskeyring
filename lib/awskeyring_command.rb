@@ -6,9 +6,10 @@ require 'open-uri'
 require 'thor'
 
 require_relative 'awskeyring'
+require 'awskeyring/version'
 
 # AWS Key-ring command line interface.
-class AwskeyringCommand < Thor
+class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   map %w[--version -v] => :__version
   map ['ls'] => :list
   map ['lsr'] => :list_role
@@ -22,14 +23,13 @@ class AwskeyringCommand < Thor
 
   desc 'initialise', 'Initialises a new KEYCHAIN'
   method_option :keychain, type: :string, aliases: '-n', desc: 'Name of KEYCHAIN to initialise.'
-  def initialise
+  def initialise # rubocop:disable  Metrics/AbcSize
     unless Awskeyring.prefs.empty?
       puts "#{Awskeyring::PREFS_FILE} exists. no need to initialise."
       exit 1
     end
 
-    keychain ||= options[:keychain]
-    keychain ||= ask(message: "Name for new keychain (default: 'awskeyring')")
+    keychain = ask_missing(existing: options[:keychain], message: "Name for new keychain (default: 'awskeyring')")
     keychain = 'awskeyring' if keychain.empty?
 
     puts 'Creating a new Keychain, you will be prompted for a password for it.'
@@ -55,7 +55,7 @@ class AwskeyringCommand < Thor
 
   desc 'env ACCOUNT', 'Outputs bourne shell environment exports for an ACCOUNT'
   def env(account = nil)
-    account ||= ask(message: 'account name')
+    account = ask_missing(existing: account, message: 'account name')
     cred, temp_cred = get_valid_item_pair(account: account)
     token = temp_cred.password unless temp_cred.nil?
     put_env_string(
@@ -71,13 +71,10 @@ class AwskeyringCommand < Thor
   method_option :secret, type: :string, aliases: '-s', desc: 'AWS account secret.'
   method_option :mfa, type: :string, aliases: '-m', desc: 'AWS virtual mfa arn.'
   def add(account = nil)
-    account ||= ask(message: 'account name')
-    key ||= options[:key]
-    key ||= ask(message: 'access key id')
-    secret ||= options[:secret]
-    secret ||= ask(message: 'secret access key', secure: true)
-    mfa ||= options[:mfa]
-    mfa ||= ask(message: 'mfa arn', optional: true)
+    account = ask_missing(existing: account, message: 'account name')
+    key = ask_missing(existing: options[:key], message: 'access key id')
+    secret = ask_missing(existing: options[:secret], message: 'secret access key', secure: true)
+    mfa = ask_missing(existing: options[:mfa], message: 'mfa arn', optional: true)
 
     Awskeyring.add_item(
       account: account,
@@ -91,10 +88,9 @@ class AwskeyringCommand < Thor
   desc 'add-role ROLE', 'Adds a ROLE to the keyring'
   method_option :arn, type: :string, aliases: '-a', desc: 'AWS role arn.'
   def add_role(role = nil)
-    role ||= ask(message: 'role name')
-    arn ||= options[:arn]
-    arn ||= ask(message: 'role arn')
-    account ||= ask(message: 'account', optional: true)
+    role = ask_missing(existing: role, message: 'role name')
+    arn = ask_missing(existing: options[:arn], message: 'role arn')
+    account = ask_missing(existing: account, message: 'account', optional: true)
 
     Awskeyring.add_role(
       role: role,
@@ -105,7 +101,7 @@ class AwskeyringCommand < Thor
 
   desc 'remove ACCOUNT', 'Removes an ACCOUNT from the keyring'
   def remove(account = nil)
-    account ||= ask(message: 'account name')
+    account = ask_missing(existing: account, message: 'account name')
     cred, temp_cred = get_valid_item_pair(account: account)
     Awskeyring.delete_pair(cred, temp_cred, "# Removing account #{account}")
   end
@@ -113,7 +109,7 @@ class AwskeyringCommand < Thor
   map 'remove-role' => :remove_role
   desc 'remove-role ROLE', 'Removes a ROLE from the keyring'
   def remove_role(role = nil)
-    role ||= ask(message: 'role name')
+    role = ask_missing(existing: role, message: 'role name')
     item_role = Awskeyring.get_role(role)
     Awskeyring.delete_pair(item_role, nil, "# Removing role #{role}")
   end
@@ -122,8 +118,8 @@ class AwskeyringCommand < Thor
   method_option :role, type: :string, aliases: '-r', desc: 'The ROLE to assume.'
   method_option :code, type: :string, aliases: '-c', desc: 'Virtual mfa CODE.'
   method_option :duration, type: :string, aliases: '-d', desc: 'Session DURATION in seconds.'
-  def token(account = nil, role = nil, code = nil)
-    account ||= ask(message: 'account name')
+  def token(account = nil, role = nil, code = nil) # rubocop:disable all
+    account = ask_missing(existing: account, message: 'account name')
     role ||= options[:role]
     code ||= options[:code]
     duration = options[:duration]
@@ -184,8 +180,8 @@ class AwskeyringCommand < Thor
   end
 
   desc 'console ACCOUNT', 'Open the AWS Console for the ACCOUNT'
-  def console(account = nil)
-    account ||= ask(message: 'account name')
+  def console(account = nil) # rubocop:disable all
+    account = ask_missing(existing: account, message: 'account name')
     cred, temp_cred = get_valid_item_pair(account: account)
     token = temp_cred.password unless temp_cred.nil?
 
@@ -246,25 +242,25 @@ class AwskeyringCommand < Thor
     comp_len = comp_line.split.length
     comp_len += 1 if curr == ''
 
-    case comp_len
+    comp_len = 2 if prev == 'help'
+    comp_len = 4 if prev == 'remove-role'
+    print_auto_resp(curr, comp_len)
+  end
+
+  private
+
+  def print_auto_resp(curr, len) # rubocop:disable  Metrics/AbcSize
+    case len
     when 2
       puts list_commands.select { |elem| elem.start_with?(curr) }.join("\n")
     when 3
-      if prev == 'help'
-        puts list_commands.select { |elem| elem.start_with?(curr) }.join("\n")
-      elsif prev == 'remove-role'
-        puts Awskeyring.list_role_names.select { |elem| elem.start_with?(curr) }.join("\n")
-      else
-        puts Awskeyring.list_item_names.select { |elem| elem.start_with?(curr) }.join("\n")
-      end
+      puts Awskeyring.list_item_names.select { |elem| elem.start_with?(curr) }.join("\n")
     when 4
       puts Awskeyring.list_role_names.select { |elem| elem.start_with?(curr) }.join("\n")
     else
       exit 1
     end
   end
-
-  private
 
   def list_commands
     self.class.all_commands.keys.map { |elem| elem.tr('_', '-') }
@@ -300,6 +296,10 @@ class AwskeyringCommand < Thor
       puts 'unset AWS_SECURITY_TOKEN'
       puts 'unset AWS_SESSION_TOKEN'
     end
+  end
+
+  def ask_missing(existing:, message:, secure: false, optional: false)
+    existing || ask(message: message, secure: secure, optional: optional)
   end
 
   def ask(message:, secure: false, optional: false)
