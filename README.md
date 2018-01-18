@@ -1,6 +1,6 @@
 # Awskeyring
 
-* [![Build Status](https://travis-ci.org/tristanmorgan/awskeyring.svg?branch=master)](https://travis-ci.org/tristanmorgan/awskeyring)
+* [![Build Status](https://travis-ci.org/vibrato/awskeyring.svg?branch=master)](https://travis-ci.org/vibrato/awskeyring)
 * [![Gem Version](https://badge.fury.io/rb/awskeyring.svg)](https://badge.fury.io/rb/awskeyring)
 * [![license MIT](http://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 * [![All Downloads](http://ruby-gem-downloads-badge.herokuapp.com/awskeyring?type=total)](https://rubygems.org/gems/awskeyring)
@@ -56,7 +56,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/tristanmorgan/awskeyring. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/vibrato/awskeyring. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 ## License
 

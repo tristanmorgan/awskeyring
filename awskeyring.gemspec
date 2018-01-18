@@ -6,11 +6,11 @@ Gem::Specification.new do |spec|
   spec.name          = 'awskeyring'
   spec.version       = Awskeyring::VERSION
   spec.authors       = ['Tristan Morgan']
-  spec.email         = ['tristanmorgan@users.noreply.github.com']
+  spec.email         = ['tristan@vibrato.com.au']
 
   spec.summary       = 'Manages AWS credentials in the macOS keychain'
   spec.description   = 'Manages AWS credentials in the macOS keychain'
-  spec.homepage      = 'https://github.com/tristanmorgan/awskeyring'
+  spec.homepage      = 'https://github.com/vibrato/awskeyring'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^(test|spec|features)/}) }
