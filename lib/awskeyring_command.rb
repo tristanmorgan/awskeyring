@@ -66,6 +66,20 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     )
   end
 
+  desc 'exec ACCOUNT command...', 'Execute a COMMAND with the environment set for an ACCOUNT'
+  def exec(account, *command)
+    cred, temp_cred = get_valid_item_pair(account: account)
+    token = temp_cred.password unless temp_cred.nil?
+    env_vars = env_vars(
+      account: cred.attributes[:label],
+      key: cred.attributes[:account],
+      secret: cred.password,
+      token: token
+    )
+    pid = spawn(env_vars, command.join(' '))
+    Process.wait pid
+  end
+
   desc 'add ACCOUNT', 'Adds an ACCOUNT to the keyring'
   method_option :key, type: :string, aliases: '-k', desc: 'AWS account key id.'
   method_option :secret, type: :string, aliases: '-s', desc: 'AWS account secret.'
@@ -283,19 +297,26 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     [item, nil]
   end
 
-  def put_env_string(account:, key:, secret:, token:)
-    puts "export AWS_ACCOUNT_NAME=\"#{account}\""
-    puts "export AWS_ACCESS_KEY_ID=\"#{key}\""
-    puts "export AWS_ACCESS_KEY=\"#{key}\""
-    puts "export AWS_SECRET_ACCESS_KEY=\"#{secret}\""
-    puts "export AWS_SECRET_KEY=\"#{secret}\""
+  def env_vars(account:, key:, secret:, token:)
+    env_var = {}
+    env_var['AWS_ACCOUNT_NAME'] = account
+    env_var['AWS_ACCESS_KEY_ID'] = key
+    env_var['AWS_ACCESS_KEY'] = key
+    env_var['AWS_SECRET_ACCESS_KEY'] = secret
+    env_var['AWS_SECRET_KEY'] = secret
     if token
-      puts "export AWS_SECURITY_TOKEN=\"#{token}\""
-      puts "export AWS_SESSION_TOKEN=\"#{token}\""
-    else
-      puts 'unset AWS_SECURITY_TOKEN'
-      puts 'unset AWS_SESSION_TOKEN'
+      env_var['AWS_SECURITY_TOKEN'] = token
+      env_var['AWS_SESSION_TOKEN'] = token
     end
+    env_var
+  end
+
+  def put_env_string(account:, key:, secret:, token:)
+    env_var = env_vars(account: account, key: key, secret: secret, token: token)
+    env_var.each { |var, value| puts "export #{var}=\"#{value}\"" }
+
+    puts 'unset AWS_SECURITY_TOKEN' unless token
+    puts 'unset AWS_SESSION_TOKEN' unless token
   end
 
   def ask_missing(existing:, message:, secure: false, optional: false)
