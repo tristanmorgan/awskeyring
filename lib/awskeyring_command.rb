@@ -250,7 +250,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   def awskeyring(curr, prev)
     comp_line = ENV['COMP_LINE']
     unless comp_line
-      warn "enable autocomplete with 'complete -C /path-to-command/awskeyring awskeyring'"
+      exec_name = File.basename($PROGRAM_NAME)
+      warn "enable autocomplete with 'complete -C /path-to-command/#{exec_name} #{exec_name}'"
       exit 1
     end
     comp_len = comp_line.split.length
