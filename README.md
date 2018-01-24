@@ -39,6 +39,7 @@ The CLI is using [Thor](http://whatisthor.com) with help provided interactively.
       awskeyring list-role                   # Prints a list of roles in the keyring
       awskeyring remove ACCOUNT              # Removes an ACCOUNT from the keyring
       awskeyring remove-role ROLE            # Removes a ROLE from the keyring
+      awskeyring remove-token ACCOUNT        # Removes a token for ACCOUNT from the keyring
       awskeyring token ACCOUNT [ROLE] [MFA]  # Create an STS Token from a ROLE or an MFA code
 
 and autocomplete that can be installed with:
