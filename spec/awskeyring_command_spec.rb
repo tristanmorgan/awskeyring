@@ -2,7 +2,7 @@ require 'spec_helper'
 require 'thor'
 require_relative '../lib/awskeyring_command'
 
-describe AwskeyringCommand do # rubocop:disable Metrics/BlockLength
+describe AwskeyringCommand do
   it 'outputs help text' do
     expect { AwskeyringCommand.start([]) }
       .to output(/^  \w+ --version, -v\s+# Prints the version/).to_stdout
@@ -70,6 +70,7 @@ describe AwskeyringCommand do # rubocop:disable Metrics/BlockLength
       )
     )
 
+    ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
     expect { AwskeyringCommand.start(%w[env test]) }
       .to output(%(export AWS_ACCOUNT_NAME="account test"
 export AWS_ACCESS_KEY_ID="AKIATESTTEST"
@@ -99,8 +100,10 @@ unset AWS_SESSION_TOKEN
 
     expect(Awskeyring).to_not receive(:get_item)
 
+    ENV['AWS_DEFAULT_REGION'] = nil
     expect { AwskeyringCommand.start(%w[env test]) }
       .to output(%(# Using temporary session credentials
+export AWS_DEFAULT_REGION="us-east-1"
 export AWS_ACCOUNT_NAME="session-key test"
 export AWS_ACCESS_KEY_ID="ASIATESTTEST"
 export AWS_ACCESS_KEY="ASIATESTTEST"

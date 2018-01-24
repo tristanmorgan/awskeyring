@@ -11,6 +11,7 @@ require 'awskeyring/version'
 # AWS Key-ring command line interface.
 class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   map %w[--version -v] => :__version
+  map ['init'] => :initialise
   map ['ls'] => :list
   map ['lsr'] => :list_role
   map ['rm'] => :remove
@@ -300,6 +301,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   def env_vars(account:, key:, secret:, token:)
     env_var = {}
+    env_var['AWS_DEFAULT_REGION'] = 'us-east-1' unless ENV['AWS_DEFAULT_REGION']
     env_var['AWS_ACCOUNT_NAME'] = account
     env_var['AWS_ACCESS_KEY_ID'] = key
     env_var['AWS_ACCESS_KEY'] = key
