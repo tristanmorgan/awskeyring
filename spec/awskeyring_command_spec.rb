@@ -60,6 +60,28 @@ describe AwskeyringCommand do
     AwskeyringCommand.start(%w[remove-role test])
   end
 
+  it 'removes a token' do
+    session_key = double(
+      attributes: { label: 'session-key test', account: 'ASIATESTTEST' },
+      password: 'bigerlongbase64'
+    )
+    session_token = double(
+      attributes: { label: 'session-token test', account: 0 },
+      password: 'evenlongerbase64token'
+    )
+
+    expect(Awskeyring).to receive(:get_pair).with('test').and_return(
+      [session_key, session_token]
+    )
+    allow(Awskeyring).to receive(:delete_expired).with(session_key, session_token)
+                                                 .and_return([session_key, session_token])
+
+    expect(Awskeyring).to_not receive(:get_item)
+
+    expect(Awskeyring).to receive(:delete_pair).with(session_key, session_token, '# Removing token for account test')
+    AwskeyringCommand.start(%w[remove-token test])
+  end
+
   it 'export an AWS Access key' do
     allow(Awskeyring).to receive(:get_pair).with('test').and_return(nil, nil)
     expect(Awskeyring).not_to receive(:delete_expired)

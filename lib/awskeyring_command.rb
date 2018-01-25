@@ -16,6 +16,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   map ['lsr'] => :list_role
   map ['rm'] => :remove
   map ['rmr'] => :remove_role
+  map ['rmt'] => :remove_token
 
   desc '--version, -v', 'Prints the version'
   def __version
@@ -119,6 +120,14 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     account = ask_missing(existing: account, message: 'account name')
     cred, temp_cred = get_valid_item_pair(account: account)
     Awskeyring.delete_pair(cred, temp_cred, "# Removing account #{account}")
+  end
+
+  desc 'remove-token ACCOUNT', 'Removes a token for ACCOUNT from the keyring'
+  def remove_token(account = nil)
+    account = ask_missing(existing: account, message: 'account name')
+    session_key, session_token = Awskeyring.get_pair(account)
+    session_key, session_token = Awskeyring.delete_expired(session_key, session_token) if session_key
+    Awskeyring.delete_pair(session_key, session_token, "# Removing token for account #{account}") if session_key
   end
 
   map 'remove-role' => :remove_role
