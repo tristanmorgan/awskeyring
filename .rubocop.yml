@@ -4,11 +4,14 @@ Metrics/LineLength:
 Metrics/MethodLength:
   Max: 16
 
+Metrics/BlockLength:
+  Exclude:
+    - spec/*
+
 Naming/FileName:
   Exclude:
     - Gemfile
     - Rakefile
-    - aws-keychain-util.gemspec
 
 AllCops:
   Exclude:

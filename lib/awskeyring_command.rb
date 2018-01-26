@@ -11,10 +11,12 @@ require 'awskeyring/version'
 # AWS Key-ring command line interface.
 class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   map %w[--version -v] => :__version
+  map ['init'] => :initialise
   map ['ls'] => :list
   map ['lsr'] => :list_role
   map ['rm'] => :remove
   map ['rmr'] => :remove_role
+  map ['rmt'] => :remove_token
 
   desc '--version, -v', 'Prints the version'
   def __version
@@ -118,6 +120,14 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     account = ask_missing(existing: account, message: 'account name')
     cred, temp_cred = get_valid_item_pair(account: account)
     Awskeyring.delete_pair(cred, temp_cred, "# Removing account #{account}")
+  end
+
+  desc 'remove-token ACCOUNT', 'Removes a token for ACCOUNT from the keyring'
+  def remove_token(account = nil)
+    account = ask_missing(existing: account, message: 'account name')
+    session_key, session_token = Awskeyring.get_pair(account)
+    session_key, session_token = Awskeyring.delete_expired(session_key, session_token) if session_key
+    Awskeyring.delete_pair(session_key, session_token, "# Removing token for account #{account}") if session_key
   end
 
   map 'remove-role' => :remove_role
@@ -250,7 +260,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   def awskeyring(curr, prev)
     comp_line = ENV['COMP_LINE']
     unless comp_line
-      warn "enable autocomplete with 'complete -C /path-to-command/awskeyring awskeyring'"
+      exec_name = File.basename($PROGRAM_NAME)
+      warn "enable autocomplete with 'complete -C /path-to-command/#{exec_name} #{exec_name}'"
       exit 1
     end
     comp_len = comp_line.split.length
@@ -299,6 +310,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   def env_vars(account:, key:, secret:, token:)
     env_var = {}
+    env_var['AWS_DEFAULT_REGION'] = 'us-east-1' unless ENV['AWS_DEFAULT_REGION']
     env_var['AWS_ACCOUNT_NAME'] = account
     env_var['AWS_ACCESS_KEY_ID'] = key
     env_var['AWS_ACCESS_KEY'] = key
