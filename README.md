@@ -16,6 +16,22 @@ from the Terminal, and to provide useful functions like assuming roles.
 For Enterprise environments there are better suited tools to use
 like [HashiCorp Vault](https://vaultproject.io/).
 
+## Quick start
+
+First you need to initialise your keychain to hold your AWS credentials.
+
+    awskeyring initialise
+
+Then add your keys to it.
+
+    awskeyring add personal-aws
+
+Now your keys are stored safely in the macOS keychain. To print environment variables run...
+
+    awskeyring env personal-aws
+
+See below and in the wiki for more details on usage.
+
 ## Installation
 
 Install it with:

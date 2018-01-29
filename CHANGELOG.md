@@ -1,7 +1,7 @@
 # Change Log
 
-## [0.0.3](https://github.com/vibrato/awskeyring/tree/0.0.3) (2018-01-29)
-[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.0.2...0.0.3)
+## [v0.0.3](https://github.com/vibrato/awskeyring/tree/v0.0.3) (2018-01-28)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.0.2...v0.0.3)
 
 **Implemented enhancements:**
 
