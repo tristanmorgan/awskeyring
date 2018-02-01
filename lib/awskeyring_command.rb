@@ -78,7 +78,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       secret: cred.password,
       token: token
     )
-    pid = spawn(env_vars, command.join(' '))
+    pid = Process.spawn(env_vars, command.join(' '))
     Process.wait pid
   end
 
@@ -204,12 +204,15 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   desc 'console ACCOUNT', 'Open the AWS Console for the ACCOUNT'
+  method_option :path, type: :string, aliases: '-p', desc: 'The service PATH to open.'
   def console(account = nil) # rubocop:disable all
     account = ask_missing(existing: account, message: 'account name')
     cred, temp_cred = get_valid_item_pair(account: account)
     token = temp_cred.password unless temp_cred.nil?
 
-    console_url = 'https://console.aws.amazon.com/console/home'
+    path = options[:path] || 'console'
+
+    console_url = "https://console.aws.amazon.com/#{path}/home"
     signin_url = 'https://signin.aws.amazon.com/federation'
     policy_json = {
       Version: '2012-10-17',
@@ -251,7 +254,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
     login_url = signin_url + '?Action=login' + signin_token_param + destination_param
 
-    pid = spawn("open \"#{login_url}\"")
+    pid = Process.spawn("open \"#{login_url}\"")
     Process.wait pid
   end
 
