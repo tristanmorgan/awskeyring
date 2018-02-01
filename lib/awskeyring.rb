@@ -26,8 +26,8 @@ module Awskeyring
   end
 
   def self.load_keychain
-    unless File.exist?(Awskeyring::PREFS_FILE) || prefs.empty?
-      warn "Config missing, run `#{$PROGRAM_NAME} initialise` to recreate."
+    unless File.exist?(Awskeyring::PREFS_FILE) && !prefs.empty?
+      warn "Config missing, run `#{File.basename($PROGRAM_NAME)} initialise` to recreate."
       exit 1
     end
 
