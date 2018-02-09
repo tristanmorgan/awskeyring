@@ -127,4 +127,109 @@ describe AwskeyringCommand do
       end.to raise_error(SystemExit).and output(/Invalid Role ARN/).to_stderr
     end
   end
+
+  context 'when we try to rotate keys' do
+    let(:old_item) do
+      double(
+        attributes: { label: 'account test', account: 'AKIATESTTEST' },
+        password: 'biglongbase64'
+      )
+    end
+
+    before do
+      allow(Awskeyring).to receive(:get_pair).with('test').and_return(nil, nil)
+      allow(Awskeyring).to receive(:get_item).with('test').and_return(old_item)
+      allow(Awskeyring).to receive(:update_item).and_return(true)
+      allow_any_instance_of(Keychain::Item).to receive(:save).and_return(true)
+
+      # https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/STS/Client.html
+      # Aws::IAM::Client#list_access_keys user_name =
+      allow_any_instance_of(Aws::IAM::Client).to receive(:list_access_keys).and_return(
+        access_key_metadata: [
+          {
+            access_key_id: 'AKIATESTTEST',
+            create_date: Time.parse('2016-12-01T22:19:58Z'),
+            status: 'Active',
+            user_name: 'Alice'
+          }
+        ]
+      )
+
+      # Create an access key, using Aws::IAM::Client#create_access_key.
+      allow_any_instance_of(Aws::IAM::Client).to receive(:create_access_key).and_return(
+        access_key: {
+          access_key_id: 'AKIAIOSFODNN7EXAMPLE',
+          create_date: Time.parse('2015-03-09T18:39:23.411Z'),
+          secret_access_key: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+          status: 'Active',
+          user_name: 'Bob'
+        }
+      )
+
+      # Delete the access key, using Aws::IAM::Client#delete_access_key.
+      allow_any_instance_of(Aws::IAM::Client).to receive(:delete_access_key).and_return({})
+    end
+
+    it 'calls the rotate method' do
+      expect(Awskeyring).to receive(:get_item).with('test').and_return(old_item)
+      expect(Awskeyring).to receive(:update_item).with(
+        account: 'test',
+        key: 'AKIAIOSFODNN7EXAMPLE',
+        secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY'
+      )
+
+      expect do
+        AwskeyringCommand.start(%w[rotate test])
+      end.to output(/# Updated account test/).to_stdout
+    end
+  end
+
+  context 'when we try to rotate too many keys' do
+    let(:old_item) do
+      double(
+        attributes: { label: 'account test', account: 'AKIATESTTEST' },
+        password: 'biglongbase64'
+      )
+    end
+
+    before do
+      allow(Awskeyring).to receive(:get_pair).with('test').and_return(nil, nil)
+      allow(Awskeyring).to receive(:get_item).with('test').and_return(old_item)
+      allow(Awskeyring).to receive(:update_item).and_return(true)
+      allow_any_instance_of(Keychain::Item).to receive(:save).and_return(true)
+
+      # https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/STS/Client.html
+      # Aws::IAM::Client#list_access_keys user_name =
+      allow_any_instance_of(Aws::IAM::Client).to receive(:list_access_keys).and_return(
+        access_key_metadata: [
+          {
+            access_key_id: 'AKIATESTTEST',
+            create_date: Time.parse('2016-12-01T22:19:58Z'),
+            status: 'Active',
+            user_name: 'Alice'
+          },
+          {
+            access_key_id: 'AKIA222222222EXAMPLE',
+            create_date: Time.parse('2016-12-01T22:20:01Z'),
+            status: 'Active',
+            user_name: 'Alice'
+          }
+        ]
+      )
+    end
+
+    it 'calls the rotate method and fails' do
+      expect(Awskeyring).to receive(:get_item).with('test').and_return(old_item)
+      expect(Awskeyring).to_not receive(:update_item)
+      # Create an access key, using Aws::IAM::Client#create_access_key.
+      expect_any_instance_of(Aws::IAM::Client).to_not receive(:create_access_key)
+
+      # Delete the access key, using Aws::IAM::Client#delete_access_key.
+      expect_any_instance_of(Aws::IAM::Client).to_not receive(:delete_access_key)
+
+      expect do
+        AwskeyringCommand.start(%w[rotate test])
+      end.to raise_error(SystemExit).and output(/You have two access keys for account test/).to_stderr
+    end
+  end
 end
