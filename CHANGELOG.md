@@ -1,5 +1,19 @@
 # Change Log
 
+## [v0.0.5](https://github.com/vibrato/awskeyring/tree/v0.0.5) (2018-02-15)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.0.4...v0.0.5)
+
+**Closed issues:**
+
+- Issue on add [\#7](https://github.com/vibrato/awskeyring/issues/7)
+
+**Merged pull requests:**
+
+- fix issue \#7 and add a path to open console. [\#8](https://github.com/vibrato/awskeyring/pull/8) ([tristanmorgan](https://github.com/tristanmorgan))
+
+## [v0.0.4](https://github.com/vibrato/awskeyring/tree/v0.0.4) (2018-01-29)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.0.3...v0.0.4)
+
 ## [v0.0.3](https://github.com/vibrato/awskeyring/tree/v0.0.3) (2018-01-28)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.0.2...v0.0.3)
 

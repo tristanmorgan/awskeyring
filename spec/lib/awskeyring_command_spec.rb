@@ -32,6 +32,10 @@ describe AwskeyringCommand do
       expect { AwskeyringCommand.start(%w[list]) }.to raise_error(SystemExit)
         .and output(/Config missing, run `\w+ initialise` to recreate./).to_stderr
     end
+
+    it 'tells you it could not find the command test' do
+      expect { AwskeyringCommand.start(%w[test]) }.to output(/Could not find command "test"./).to_stderr
+    end
   end
 
   context 'When accounts and roles are set' do
