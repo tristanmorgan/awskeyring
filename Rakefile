@@ -13,4 +13,18 @@ end
 
 RSpec::Core::RakeTask.new(:spec)
 
-task default: %i[rubocop spec]
+desc 'Check filemode bits'
+task :filemode do
+  files = Dir.glob('**/*')
+  failure = false
+  files.each do |file|
+    mode = File.stat(file).mode
+    if (mode & 0x7) != (mode >> 3 & 0x7)
+      puts file
+      failure = true
+    end
+  end
+  abort 'Error: Incorrect file mode found' if failure
+end
+
+task default: %i[filemode rubocop spec]
