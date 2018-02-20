@@ -86,11 +86,16 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option :key, type: :string, aliases: '-k', desc: 'AWS account key id.'
   method_option :secret, type: :string, aliases: '-s', desc: 'AWS account secret.'
   method_option :mfa, type: :string, aliases: '-m', desc: 'AWS virtual mfa arn.'
-  def add(account = nil)
-    account = ask_missing(existing: account, message: 'account name')
-    key = ask_missing(existing: options[:key], message: 'access key id')
-    secret = ask_missing(existing: options[:secret], message: 'secret access key', secure: true)
-    mfa = ask_missing(existing: options[:mfa], message: 'mfa arn', optional: true)
+  def add(account = nil) # rubocop:disable Metrics/AbcSize
+    account = try_ask_missing(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
+    key = try_ask_missing(existing: options[:key], message: 'access key id', validator: Awskeyring.method(:access_key))
+    secret = try_ask_missing(
+      existing: options[:secret], message: 'secret access key',
+      secure: true, validator: Awskeyring.method(:secret_access_key)
+    )
+    mfa = try_ask_missing(
+      existing: options[:mfa], message: 'mfa arn', optional: true, validator: Awskeyring.method(:mfa_arn)
+    )
 
     Awskeyring.add_item(
       account: account,
@@ -98,6 +103,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       secret: secret,
       comment: mfa
     )
+    puts "# Added account #{account}"
   end
 
   map 'add-role' => :add_role
@@ -332,6 +338,18 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
     puts 'unset AWS_SECURITY_TOKEN' unless token
     puts 'unset AWS_SESSION_TOKEN' unless token
+  end
+
+  def try_ask_missing(existing:, message:, secure: false, optional: false, validator: nil)
+    retries ||= 3
+    begin
+      value = validator.call(ask_missing(existing: existing, message: message, secure: secure, optional: optional))
+    rescue RuntimeError => e
+      warn e.message
+      retry unless (retries -= 1).zero?
+      exit 1
+    end
+    value
   end
 
   def ask_missing(existing:, message:, secure: false, optional: false)
