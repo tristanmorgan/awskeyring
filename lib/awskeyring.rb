@@ -1,5 +1,6 @@
 require 'keychain'
 require 'aws-sdk-iam'
+require 'awskeyring/validate'
 
 # Aws Key-ring logical object,
 # gives you an interface to access keychains and items.
