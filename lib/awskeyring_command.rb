@@ -59,7 +59,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   desc 'env ACCOUNT', 'Outputs bourne shell environment exports for an ACCOUNT'
   def env(account = nil)
-    account = try_ask_missing(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
+    account = ask_check(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
     cred, temp_cred = get_valid_item_pair(account: account)
     token = temp_cred.password unless temp_cred.nil?
     put_env_string(
@@ -89,13 +89,13 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option :secret, type: :string, aliases: '-s', desc: 'AWS account secret.'
   method_option :mfa, type: :string, aliases: '-m', desc: 'AWS virtual mfa arn.'
   def add(account = nil) # rubocop:disable Metrics/AbcSize
-    account = try_ask_missing(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
-    key = try_ask_missing(existing: options[:key], message: 'access key id', validator: Awskeyring.method(:access_key))
-    secret = try_ask_missing(
+    account = ask_check(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
+    key = ask_check(existing: options[:key], message: 'access key id', validator: Awskeyring.method(:access_key))
+    secret = ask_check(
       existing: options[:secret], message: 'secret access key',
       secure: true, validator: Awskeyring.method(:secret_access_key)
     )
-    mfa = try_ask_missing(
+    mfa = ask_check(
       existing: options[:mfa], message: 'mfa arn', optional: true, validator: Awskeyring.method(:mfa_arn)
     )
 
@@ -112,9 +112,9 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   desc 'add-role ROLE', 'Adds a ROLE to the keyring'
   method_option :arn, type: :string, aliases: '-a', desc: 'AWS role arn.'
   def add_role(role = nil)
-    role = try_ask_missing(existing: role, message: 'role name', validator: Awskeyring.method(:role_name))
-    arn = try_ask_missing(existing: options[:arn], message: 'role arn', validator: Awskeyring.method(:role_arn))
-    account = try_ask_missing(
+    role = ask_check(existing: role, message: 'role name', validator: Awskeyring.method(:role_name))
+    arn = ask_check(existing: options[:arn], message: 'role arn', validator: Awskeyring.method(:role_arn))
+    account = ask_check(
       existing: account, message: 'account', optional: true, validator: Awskeyring.method(:account_name)
     )
 
@@ -128,14 +128,14 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   desc 'remove ACCOUNT', 'Removes an ACCOUNT from the keyring'
   def remove(account = nil)
-    account = try_ask_missing(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
+    account = ask_check(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
     cred, temp_cred = get_valid_item_pair(account: account)
     Awskeyring.delete_pair(cred, temp_cred, "# Removing account #{account}")
   end
 
   desc 'remove-token ACCOUNT', 'Removes a token for ACCOUNT from the keyring'
   def remove_token(account = nil)
-    account = try_ask_missing(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
+    account = ask_check(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
     session_key, session_token = Awskeyring.get_pair(account)
     session_key, session_token = Awskeyring.delete_expired(session_key, session_token) if session_key
     Awskeyring.delete_pair(session_key, session_token, "# Removing token for account #{account}") if session_key
@@ -144,7 +144,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   map 'remove-role' => :remove_role
   desc 'remove-role ROLE', 'Removes a ROLE from the keyring'
   def remove_role(role = nil)
-    role = try_ask_missing(existing: role, message: 'role name', validator: Awskeyring.method(:role_name))
+    role = ask_check(existing: role, message: 'role name', validator: Awskeyring.method(:role_name))
     item_role = Awskeyring.get_role(role)
     Awskeyring.delete_pair(item_role, nil, "# Removing role #{role}")
   end
@@ -154,7 +154,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option :code, type: :string, aliases: '-c', desc: 'Virtual mfa CODE.'
   method_option :duration, type: :string, aliases: '-d', desc: 'Session DURATION in seconds.'
   def token(account = nil, role = nil, code = nil) # rubocop:disable all
-    account = try_ask_missing(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
+    account = ask_check(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
     role ||= options[:role]
     code ||= options[:code]
     duration = options[:duration]
@@ -217,7 +217,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   desc 'console ACCOUNT', 'Open the AWS Console for the ACCOUNT'
   method_option :path, type: :string, aliases: '-p', desc: 'The service PATH to open.'
   def console(account = nil) # rubocop:disable all
-    account = try_ask_missing(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
+    account = ask_check(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
     cred, temp_cred = get_valid_item_pair(account: account)
     token = temp_cred.password unless temp_cred.nil?
 
@@ -345,7 +345,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     puts 'unset AWS_SESSION_TOKEN' unless token
   end
 
-  def try_ask_missing(existing:, message:, secure: false, optional: false, validator: nil)
+  def ask_check(existing:, message:, secure: false, optional: false, validator: nil)
     retries ||= 3
     begin
       value = validator.call(ask_missing(existing: existing, message: message, secure: secure, optional: optional))
