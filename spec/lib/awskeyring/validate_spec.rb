@@ -25,4 +25,27 @@ describe Awskeyring do
       expect { subject.secret_access_key(test_broken_secret) }.to raise_error('Secret Access Key is not 40 chars')
     end
   end
+
+  context 'When validating inputs ARNs' do
+    let(:mfa_arn) { 'arn:aws:iam::012345678901:mfa/ec2-user' }
+    let(:bad_mfa_arn) { 'arn:azure:iamnot::ABCD45678901:Administrators' }
+    let(:role_arn) { 'arn:aws:iam::012345678901:role/readonly' }
+    let(:bad_role_arn) { 'arn:azure:iamnot::ABCD45678901:Administrators' }
+
+    it 'validates an MFA ARN' do
+      expect { subject.mfa_arn(mfa_arn) }.to_not raise_error
+    end
+
+    it 'invalidates an MFA ARN' do
+      expect { subject.mfa_arn(bad_mfa_arn) }.to raise_error('Invalid MFA ARN')
+    end
+
+    it 'validates an Role ARN' do
+      expect { subject.role_arn(role_arn) }.to_not raise_error
+    end
+
+    it 'invalidates an Role ARN' do
+      expect { subject.role_arn(bad_role_arn) }.to raise_error('Invalid Role ARN')
+    end
+  end
 end

@@ -16,12 +16,17 @@ module Awskeyring
   end
 
   def self.mfa_arn(mfa_arn)
-    raise 'Invalid ARN' unless mfa_arn =~ %r(\Aarn:aws:iam::[0-9]{12}:mfa\/\S*\z)
+    raise 'Invalid MFA ARN' unless mfa_arn =~ %r(\Aarn:aws:iam::[0-9]{12}:mfa\/\S*\z)
     mfa_arn
   end
 
+  def self.role_name(account_name)
+    raise 'Invalid Role Name' unless account_name =~ /\S+/
+    account_name
+  end
+
   def self.role_arn(role_arn)
-    raise 'Invalid ARN' unless role_arn =~ %r(\Aarn:aws:iam::[0-9]{12}:role\/\S*\z)
+    raise 'Invalid Role ARN' unless role_arn =~ %r(\Aarn:aws:iam::[0-9]{12}:role\/\S*\z)
     role_arn
   end
 end
