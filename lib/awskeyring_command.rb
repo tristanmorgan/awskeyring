@@ -161,15 +161,19 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     end
 
     new_key = iam.create_access_key
+    iam = Aws::IAM::Client.new(
+      access_key_id: new_key[:access_key][:access_key_id],
+      secret_access_key: new_key[:access_key][:secret_access_key]
+    )
+    iam.delete_access_key(
+      access_key_id: item.attributes[:account]
+    )
     Awskeyring.update_item(
       account: account,
       key: new_key[:access_key][:access_key_id],
       secret: new_key[:access_key][:secret_access_key]
     )
 
-    iam.delete_access_key(
-      access_key_id: item.attributes[:account]
-    )
     puts "# Updated account #{account}"
   end
 

@@ -140,10 +140,9 @@ describe AwskeyringCommand do
       allow(Awskeyring).to receive(:get_pair).with('test').and_return(nil, nil)
       allow(Awskeyring).to receive(:get_item).with('test').and_return(old_item)
       allow(Awskeyring).to receive(:update_item).and_return(true)
+
       allow_any_instance_of(Keychain::Item).to receive(:save).and_return(true)
 
-      # https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/STS/Client.html
-      # Aws::IAM::Client#list_access_keys user_name =
       allow_any_instance_of(Aws::IAM::Client).to receive(:list_access_keys).and_return(
         access_key_metadata: [
           {
@@ -154,8 +153,6 @@ describe AwskeyringCommand do
           }
         ]
       )
-
-      # Create an access key, using Aws::IAM::Client#create_access_key.
       allow_any_instance_of(Aws::IAM::Client).to receive(:create_access_key).and_return(
         access_key: {
           access_key_id: 'AKIAIOSFODNN7EXAMPLE',
@@ -165,8 +162,6 @@ describe AwskeyringCommand do
           user_name: 'Bob'
         }
       )
-
-      # Delete the access key, using Aws::IAM::Client#delete_access_key.
       allow_any_instance_of(Aws::IAM::Client).to receive(:delete_access_key).and_return({})
     end
 
@@ -196,10 +191,9 @@ describe AwskeyringCommand do
       allow(Awskeyring).to receive(:get_pair).with('test').and_return(nil, nil)
       allow(Awskeyring).to receive(:get_item).with('test').and_return(old_item)
       allow(Awskeyring).to receive(:update_item).and_return(true)
+
       allow_any_instance_of(Keychain::Item).to receive(:save).and_return(true)
 
-      # https://docs.aws.amazon.com/sdk-for-ruby/v3/api/Aws/STS/Client.html
-      # Aws::IAM::Client#list_access_keys user_name =
       allow_any_instance_of(Aws::IAM::Client).to receive(:list_access_keys).and_return(
         access_key_metadata: [
           {
@@ -221,10 +215,8 @@ describe AwskeyringCommand do
     it 'calls the rotate method and fails' do
       expect(Awskeyring).to receive(:get_item).with('test').and_return(old_item)
       expect(Awskeyring).to_not receive(:update_item)
-      # Create an access key, using Aws::IAM::Client#create_access_key.
-      expect_any_instance_of(Aws::IAM::Client).to_not receive(:create_access_key)
 
-      # Delete the access key, using Aws::IAM::Client#delete_access_key.
+      expect_any_instance_of(Aws::IAM::Client).to_not receive(:create_access_key)
       expect_any_instance_of(Aws::IAM::Client).to_not receive(:delete_access_key)
 
       expect do
