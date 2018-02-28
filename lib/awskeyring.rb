@@ -67,9 +67,9 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   def self.update_item(account:, key:, secret:)
-    item = git_item(account)
-    item.account(key)
-    item.password(secret)
+    item = get_item(account)
+    item.attributes[:account] = key
+    item.password = secret
     item.save!
   end
 

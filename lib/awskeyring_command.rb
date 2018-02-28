@@ -165,9 +165,11 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       access_key_id: new_key[:access_key][:access_key_id],
       secret_access_key: new_key[:access_key][:secret_access_key]
     )
-    iam.delete_access_key(
-      access_key_id: item.attributes[:account]
-    )
+    retry_backoff do
+      iam.delete_access_key(
+        access_key_id: item.attributes[:account]
+      )
+    end
     Awskeyring.update_item(
       account: account,
       key: new_key[:access_key][:access_key_id],
@@ -383,6 +385,21 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       exit 1
     end
     value
+  end
+
+  def retry_backoff(&block)
+    retries ||= 1
+    begin
+      yield block
+    rescue Aws::IAM::Errors::InvalidClientTokenId => e
+      if retries < 4
+        sleep 2**retries
+        retries += 1
+        retry
+      end
+      warn e.message
+      exit 1
+    end
   end
 
   def ask_missing(existing:, message:, secure: false, optional: false)

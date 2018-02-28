@@ -16,7 +16,7 @@ module Awskeyring
   end
 
   def self.mfa_arn(mfa_arn)
-    raise 'Invalid MFA ARN' unless mfa_arn =~ %r(\Aarn:aws:iam::[0-9]{12}:mfa\/\S*\z)
+    raise 'Invalid MFA ARN' unless mfa_arn =~ %r(\A\z|\Aarn:aws:iam::[0-9]{12}:mfa\/\S*\z)
     mfa_arn
   end
 
