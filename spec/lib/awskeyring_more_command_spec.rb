@@ -78,10 +78,16 @@ describe AwskeyringCommand do
 
     before do
       allow(Awskeyring).to receive(:add_item).and_return(nil)
-      allow_any_instance_of(HighLine).to receive(:ask) { 'joe' }
+      allow_any_instance_of(HighLine).to receive(:ask) { '' }
     end
 
     it 'tries to add a valid account' do
+      expect do
+        AwskeyringCommand.start(['add', 'test', '-k', access_key, '-s', secret_access_key])
+      end.to output("# Added account test\n").to_stdout
+    end
+
+    it 'tries to add a valid account with ARN' do
       expect do
         AwskeyringCommand.start(['add', 'test', '-k', access_key, '-s', secret_access_key, '-m', mfa_arn])
       end.to output("# Added account test\n").to_stdout
@@ -112,7 +118,7 @@ describe AwskeyringCommand do
 
     before do
       allow(Awskeyring).to receive(:add_role).and_return(nil)
-      allow_any_instance_of(HighLine).to receive(:ask) { 'joe' }
+      allow_any_instance_of(HighLine).to receive(:ask) { '' }
     end
 
     it 'tries to add a valid role' do

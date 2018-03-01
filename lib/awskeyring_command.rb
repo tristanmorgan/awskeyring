@@ -378,7 +378,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   def ask_check(existing:, message:, secure: false, optional: false, validator: nil)
     retries ||= 3
     begin
-      value = validator.call(ask_missing(existing: existing, message: message, secure: secure, optional: optional))
+      value = ask_missing(existing: existing, message: message, secure: secure, optional: optional)
+      value = validator.call(value) unless value.empty? && optional
     rescue RuntimeError => e
       warn e.message
       retry unless (retries -= 1).zero?
