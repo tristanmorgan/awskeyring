@@ -1,5 +1,18 @@
 # Change Log
 
+## [v0.0.6](https://github.com/vibrato/awskeyring/tree/v0.0.6) (2018-03-01)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.0.5...v0.0.6)
+
+**Implemented enhancements:**
+
+- Credential Rotation Feature [\#4](https://github.com/vibrato/awskeyring/issues/4)
+- Rotate credentials feature. [\#11](https://github.com/vibrato/awskeyring/pull/11) ([tristanmorgan](https://github.com/tristanmorgan))
+
+**Merged pull requests:**
+
+- Input validation [\#10](https://github.com/vibrato/awskeyring/pull/10) ([tristanmorgan](https://github.com/tristanmorgan))
+- Adding a check for incorrect file modes. [\#9](https://github.com/vibrato/awskeyring/pull/9) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v0.0.5](https://github.com/vibrato/awskeyring/tree/v0.0.5) (2018-02-15)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.0.4...v0.0.5)
 
