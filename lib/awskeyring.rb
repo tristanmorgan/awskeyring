@@ -4,7 +4,7 @@ require 'awskeyring/validate'
 
 # Aws Key-ring logical object,
 # gives you an interface to access keychains and items.
-module Awskeyring
+module Awskeyring # rubocop:disable Metrics/ModuleLength
   PREFS_FILE = (File.expand_path '~/.awskeyring').freeze
   ROLE_PREFIX = 'role '.freeze
   ACCOUNT_PREFIX = 'account '.freeze
@@ -64,6 +64,13 @@ module Awskeyring
       password: secret,
       comment: comment
     )
+  end
+
+  def self.update_item(account:, key:, secret:)
+    item = get_item(account)
+    item.attributes[:account] = key
+    item.password = secret
+    item.save!
   end
 
   def self.add_role(role:, arn:, account:)

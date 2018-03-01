@@ -149,6 +149,36 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     Awskeyring.delete_pair(item_role, nil, "# Removing role #{role}")
   end
 
+  desc 'rotate ACCOUNT', 'Rotate access keys for an ACCOUNT'
+  def rotate(account = nil) # rubocop:disable  Metrics/AbcSize, Metrics/MethodLength
+    account = ask_check(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
+    item = Awskeyring.get_item(account)
+    iam = Aws::IAM::Client.new(access_key_id: item.attributes[:account], secret_access_key: item.password)
+
+    if iam.list_access_keys[:access_key_metadata].length > 1
+      warn "You have two access keys for account #{account}"
+      exit 1
+    end
+
+    new_key = iam.create_access_key
+    iam = Aws::IAM::Client.new(
+      access_key_id: new_key[:access_key][:access_key_id],
+      secret_access_key: new_key[:access_key][:secret_access_key]
+    )
+    retry_backoff do
+      iam.delete_access_key(
+        access_key_id: item.attributes[:account]
+      )
+    end
+    Awskeyring.update_item(
+      account: account,
+      key: new_key[:access_key][:access_key_id],
+      secret: new_key[:access_key][:secret_access_key]
+    )
+
+    puts "# Updated account #{account}"
+  end
+
   desc 'token ACCOUNT [ROLE] [MFA]', 'Create an STS Token from a ROLE or an MFA code'
   method_option :role, type: :string, aliases: '-r', desc: 'The ROLE to assume.'
   method_option :code, type: :string, aliases: '-c', desc: 'Virtual mfa CODE.'
@@ -348,13 +378,29 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   def ask_check(existing:, message:, secure: false, optional: false, validator: nil)
     retries ||= 3
     begin
-      value = validator.call(ask_missing(existing: existing, message: message, secure: secure, optional: optional))
+      value = ask_missing(existing: existing, message: message, secure: secure, optional: optional)
+      value = validator.call(value) unless value.empty? && optional
     rescue RuntimeError => e
       warn e.message
       retry unless (retries -= 1).zero?
       exit 1
     end
     value
+  end
+
+  def retry_backoff(&block)
+    retries ||= 1
+    begin
+      yield block
+    rescue Aws::IAM::Errors::InvalidClientTokenId => e
+      if retries < 4
+        sleep 2**retries
+        retries += 1
+        retry
+      end
+      warn e.message
+      exit 1
+    end
   end
 
   def ask_missing(existing:, message:, secure: false, optional: false)
