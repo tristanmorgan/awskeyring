@@ -2,7 +2,7 @@ require 'keychain'
 require 'aws-sdk-iam'
 require 'awskeyring/validate'
 
-# Aws Key-ring logical object,
+# Awskeyring Module,
 # gives you an interface to access keychains and items.
 module Awskeyring # rubocop:disable Metrics/ModuleLength
   PREFS_FILE = (File.expand_path '~/.awskeyring').freeze

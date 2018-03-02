@@ -1,7 +1,7 @@
 require 'spec_helper'
 require_relative '../../../lib/awskeyring/validate'
 
-describe Awskeyring do
+describe Awskeyring::Validate do
   context 'When validating inputs' do
     let(:test_key) { 'AKIA1234567890ABCDEF' }
     let(:test_broken_key) { 'AKIA1234567890' }
