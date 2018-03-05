@@ -9,6 +9,9 @@ Metrics/BlockLength:
   Exclude:
     - spec/**/*
 
+Metrics/AbcSize:
+  Max: 20
+
 Naming/FileName:
   Exclude:
     - Gemfile

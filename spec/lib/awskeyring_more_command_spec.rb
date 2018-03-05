@@ -20,7 +20,8 @@ describe AwskeyringCommand do
     before do
       allow(Awskeyring).to receive(:delete_expired).with(session_key, session_token)
                                                    .and_return([session_key, session_token])
-      allow(Process).to receive(:spawn).exactly(1).with(/open "https:/).and_return(9999)
+      allow(Awskeyring::Awsapi).to receive(:get_login_url).and_return('login-url')
+      allow(Process).to receive(:spawn).exactly(1).with('open "login-url"').and_return(9999)
       allow(Process).to receive(:wait).exactly(1).with(9999)
     end
 
@@ -28,7 +29,13 @@ describe AwskeyringCommand do
       expect(Awskeyring).to receive(:get_pair).with('test').and_return(
         [session_key, session_token]
       )
-
+      expect(Awskeyring::Awsapi).to receive(:get_login_url).with(
+        key: 'ASIATESTTEST',
+        secret: 'bigerlongbase64',
+        token: 'evenlongerbase64token',
+        path: 'console',
+        user: ENV['USER']
+      )
       expect(Awskeyring).to_not receive(:get_item)
       expect { AwskeyringCommand.start(%w[console test]) }
         .to output("# Using temporary session credentials\n").to_stdout
@@ -46,25 +53,76 @@ describe AwskeyringCommand do
     before do
       allow(Awskeyring).to receive(:get_pair).with('test').and_return(nil, nil)
       allow(Awskeyring).to receive(:get_item).with('test').and_return(item)
-      allow_any_instance_of(Aws::STS::Client).to receive(:get_federation_token)
-        .and_return(
-          double(
-            credentials: {
-              access_key_id: 'ASIATESTETSTTETS',
-              secret_access_key: 'verybiglonghexkey',
-              session_token: 'evenlongerbiglonghexkey',
-              expiration: 5
-            }
-          )
-        )
-      allow(Process).to receive(:spawn).exactly(1).with(/open "https:/).and_return(9999)
+      allow(Awskeyring::Awsapi).to receive(:get_login_url).and_return('login-url')
+      allow(Process).to receive(:spawn).exactly(1).with('open "login-url"').and_return(9999)
       allow(Process).to receive(:wait).exactly(1).with(9999)
     end
 
     it 'opens the AWS Console' do
       expect(Awskeyring).to receive(:get_item).with('test').and_return(item)
-      expect(Process).to receive(:spawn).with(/open "https:.*console.aws.amazon.com%2Ftest%2Fhome"/)
+      expect(Awskeyring::Awsapi).to receive(:get_login_url).with(
+        key: 'AKIATESTTEST',
+        secret: 'biglongbase64',
+        token: nil,
+        path: 'test',
+        user: ENV['USER']
+      )
+      expect(Process).to receive(:spawn).with('open "login-url"')
       AwskeyringCommand.start(%w[console test -p test])
+    end
+  end
+
+  context 'When we try to retrieve a token' do
+    let(:item) do
+      double(
+        attributes: { label: 'account test', account: 'AKIATESTTEST' },
+        password: 'biglongbase64'
+      )
+    end
+    let(:role) do
+      double(
+        attributes: { label: 'account test', account: 'arn:aws:iam::012345678901:role/test' },
+        password: ''
+      )
+    end
+
+    before do
+      allow(Awskeyring).to receive(:get_pair).with('test').and_return(nil, nil)
+      allow(Awskeyring).to receive(:get_item).with('test').and_return(item)
+      allow(Awskeyring).to receive(:get_role).with('role').and_return(role)
+      allow(Awskeyring).to receive(:add_pair)
+      allow(Awskeyring::Awsapi).to receive(:get_token)
+        .and_return(
+          key: 'ASIAEXAMPLE',
+          secret: 'bigishLongSecret',
+          token: 'VeryveryVeryLongSecret',
+          expiry: '321654987'
+        )
+    end
+
+    it 'tries to receive a new token' do
+      expect(Awskeyring).to receive(:get_item).with('test').and_return(item)
+      expect(Awskeyring).to receive(:add_pair).with(
+        account: 'test',
+        key: 'ASIAEXAMPLE',
+        secret: 'bigishLongSecret',
+        token: 'VeryveryVeryLongSecret',
+        expiry: '321654987',
+        role: 'role'
+      )
+      expect(Awskeyring::Awsapi).to receive(:get_token).with(
+        code: nil,
+        role_arn: 'arn:aws:iam::012345678901:role/test',
+        duration: '3600',
+        mfa: nil,
+        key: 'AKIATESTTEST',
+        secret: 'biglongbase64',
+        user: ENV['USER']
+      )
+
+      expect do
+        AwskeyringCommand.start(%w[token test -r role])
+      end.to output("Authentication valid until 321654987\n").to_stdout
     end
   end
 
@@ -143,32 +201,14 @@ describe AwskeyringCommand do
     end
 
     before do
-      allow(Awskeyring).to receive(:get_pair).with('test').and_return(nil, nil)
       allow(Awskeyring).to receive(:get_item).with('test').and_return(old_item)
       allow(Awskeyring).to receive(:update_item).and_return(true)
 
-      allow_any_instance_of(Keychain::Item).to receive(:save).and_return(true)
-
-      allow_any_instance_of(Aws::IAM::Client).to receive(:list_access_keys).and_return(
-        access_key_metadata: [
-          {
-            access_key_id: 'AKIATESTTEST',
-            create_date: Time.parse('2016-12-01T22:19:58Z'),
-            status: 'Active',
-            user_name: 'Alice'
-          }
-        ]
+      allow(Awskeyring::Awsapi).to receive(:rotate).and_return(
+        account: 'test',
+        key: 'AKIAIOSFODNN7EXAMPLE',
+        secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY'
       )
-      allow_any_instance_of(Aws::IAM::Client).to receive(:create_access_key).and_return(
-        access_key: {
-          access_key_id: 'AKIAIOSFODNN7EXAMPLE',
-          create_date: Time.parse('2015-03-09T18:39:23.411Z'),
-          secret_access_key: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
-          status: 'Active',
-          user_name: 'Bob'
-        }
-      )
-      allow_any_instance_of(Aws::IAM::Client).to receive(:delete_access_key).and_return({})
     end
 
     it 'calls the rotate method' do
@@ -194,12 +234,7 @@ describe AwskeyringCommand do
     end
 
     before do
-      allow(Awskeyring).to receive(:get_pair).with('test').and_return(nil, nil)
       allow(Awskeyring).to receive(:get_item).with('test').and_return(old_item)
-      allow(Awskeyring).to receive(:update_item).and_return(true)
-
-      allow_any_instance_of(Keychain::Item).to receive(:save).and_return(true)
-
       allow_any_instance_of(Aws::IAM::Client).to receive(:list_access_keys).and_return(
         access_key_metadata: [
           {
