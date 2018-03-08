@@ -71,7 +71,7 @@ describe AwskeyringCommand do
 
     before do
       allow(Awskeyring).to receive(:get_pair).with('test').and_return(nil, nil)
-      allow(Awskeyring).to receive(:get_item).with('test').and_return(
+      allow(Awskeyring).to receive(:get_item).with(account: 'test').and_return(
         cred
       )
       allow(Awskeyring).to receive(:get_role).with('test').and_return(
@@ -80,13 +80,12 @@ describe AwskeyringCommand do
     end
 
     it 'removes an account' do
-      expect(Awskeyring).not_to receive(:delete_expired)
-      expect(Awskeyring).to receive(:delete_pair).with(cred, nil, '# Removing account test')
+      expect(Awskeyring).to receive(:delete_account).with(account: 'test', message: '# Removing account test')
       AwskeyringCommand.start(%w[remove test])
     end
 
     it 'removes a role' do
-      expect(Awskeyring).to receive(:delete_pair).with(role, nil, '# Removing role test')
+      expect(Awskeyring).to receive(:delete_role).with(role_name: 'test', message: '# Removing role test')
       AwskeyringCommand.start(%w[remove-role test])
     end
   end
@@ -112,26 +111,20 @@ describe AwskeyringCommand do
     end
 
     before do
-      allow(Awskeyring).to receive(:delete_expired).with(session_key, session_token)
+      allow(Awskeyring).to receive(:delete_expired).with(key: session_key, token: session_token)
                                                    .and_return([session_key, session_token])
-      allow(Awskeyring).to receive(:get_pair).with('test').and_return(
+      allow(Awskeyring).to receive(:get_pair).with(account: 'test').and_return(
         [session_key, session_token]
       )
     end
 
     it 'removes a token' do
-      expect(Awskeyring).to receive(:get_pair).with('test').and_return(
-        [session_key, session_token]
-      )
-
-      expect(Awskeyring).to_not receive(:get_item)
-
-      expect(Awskeyring).to receive(:delete_pair).with(session_key, session_token, '# Removing token for account test')
+      expect(Awskeyring).to receive(:delete_token).with(account: 'test', message: '# Removing token for account test')
       AwskeyringCommand.start(%w[remove-token test])
     end
 
     it 'export an AWS Session Token' do
-      expect(Awskeyring).to receive(:get_pair).with('test').and_return(
+      expect(Awskeyring).to receive(:get_pair).with(account: 'test').and_return(
         [session_key, session_token]
       )
 
@@ -141,7 +134,7 @@ describe AwskeyringCommand do
       expect { AwskeyringCommand.start(%w[env test]) }
         .to output(%(# Using temporary session credentials
 export AWS_DEFAULT_REGION="us-east-1"
-export AWS_ACCOUNT_NAME="session-key test"
+export AWS_ACCOUNT_NAME="test"
 export AWS_ACCESS_KEY_ID="ASIATESTTEST"
 export AWS_ACCESS_KEY="ASIATESTTEST"
 export AWS_SECRET_ACCESS_KEY="bigerlongbase64"
@@ -161,15 +154,22 @@ export AWS_SESSION_TOKEN="evenlongerbase64token"
     end
 
     before do
-      allow(Awskeyring).to receive(:get_pair).with('test').and_return(nil, nil)
-      allow(Awskeyring).to receive(:get_item).with('test').and_return(item)
+      # Awskeyring.get_valid_creds -> get_valid_item_pair -> get_pair
+      allow(Awskeyring).to receive(:get_pair).with(account: 'test').and_return(nil, nil)
+      allow(Awskeyring).to receive(:get_item).with(account: 'test').and_return(item)
     end
+
     it 'export an AWS Access key' do
-      expect(Awskeyring).not_to receive(:delete_expired)
+      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test').and_return(
+        account: 'test',
+        key: 'AKIATESTTEST',
+        secret: 'biglongbase64',
+        token: nil
+      )
 
       ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
       expect { AwskeyringCommand.start(%w[env test]) }
-        .to output(%(export AWS_ACCOUNT_NAME="account test"
+        .to output(%(export AWS_ACCOUNT_NAME="test"
 export AWS_ACCESS_KEY_ID="AKIATESTTEST"
 export AWS_ACCESS_KEY="AKIATESTTEST"
 export AWS_SECRET_ACCESS_KEY="biglongbase64"

@@ -65,20 +65,19 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     account = ask_check(
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
-    cred, temp_cred = get_valid_item_pair(account: account)
-    token = temp_cred.password unless temp_cred.nil?
+    cred = Awskeyring.get_valid_creds(account: account)
     put_env_string(
-      account: cred.attributes[:label],
-      key: cred.attributes[:account],
-      secret: cred.password,
-      token: token
+      account: cred[:account],
+      key: cred[:key],
+      secret: cred[:secret],
+      token: cred[:token]
     )
   end
 
   desc 'exec ACCOUNT command...', 'Execute a COMMAND with the environment set for an ACCOUNT'
   # execute an external command with env set
   def exec(account, *command)
-    cred, temp_cred = get_valid_item_pair(account: account)
+    cred, temp_cred = Awskeyring.get_valid_item_pair(account: account)
     token = temp_cred.password unless temp_cred.nil?
     env_vars = env_vars(
       account: cred.attributes[:label],
@@ -144,8 +143,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     account = ask_check(
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
-    cred, temp_cred = get_valid_item_pair(account: account)
-    Awskeyring.delete_pair(cred, temp_cred, "# Removing account #{account}")
+    Awskeyring.delete_account(account: account, message: "# Removing account #{account}")
   end
 
   desc 'remove-token ACCOUNT', 'Removes a token for ACCOUNT from the keyring'
@@ -154,9 +152,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     account = ask_check(
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
-    session_key, session_token = Awskeyring.get_pair(account)
-    session_key, session_token = Awskeyring.delete_expired(session_key, session_token) if session_key
-    Awskeyring.delete_pair(session_key, session_token, "# Removing token for account #{account}") if session_key
+    Awskeyring.delete_token(account: account, message: "# Removing token for account #{account}")
   end
 
   map 'remove-role' => :remove_role
@@ -164,8 +160,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # remove a role
   def remove_role(role = nil)
     role = ask_check(existing: role, message: 'role name', validator: Awskeyring::Validate.method(:role_name))
-    item_role = Awskeyring.get_role(role)
-    Awskeyring.delete_pair(item_role, nil, "# Removing role #{role}")
+    Awskeyring.delete_role(role_name: role, message: "# Removing role #{role}")
   end
 
   desc 'rotate ACCOUNT', 'Rotate access keys for an ACCOUNT'
@@ -174,8 +169,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     account = ask_check(
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
-    item = Awskeyring.get_item(account)
-    new_key = Awskeyring::Awsapi.rotate(account: account, key: item.attributes[:account], secret: item.password)
+    item_hash = Awskeyring.get_item_hash(account: account)
+    new_key = Awskeyring::Awsapi.rotate(account: item_hash[:account], key: item_hash[:key], secret: item_hash[:secret])
     Awskeyring.update_item(
       account: account,
       key: new_key[:key],
@@ -205,19 +200,19 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       exit 2
     end
 
-    session_key, session_token = Awskeyring.get_pair(account)
+    session_key, session_token = Awskeyring.get_pair(account: account)
     Awskeyring.delete_pair(session_key, session_token, '# Removing STS credentials') if session_key
 
-    item = Awskeyring.get_item(account)
-    item_role = Awskeyring.get_role(role) if role
+    item_hash = Awskeyring.get_item_hash(account: account)
+    role_arn = Awskeyring.get_role_arn(role_name: role) if role
 
     new_creds = Awskeyring::Awsapi.get_token(
       code: code,
-      role_arn: item_role.attributes[:account],
+      role_arn: role_arn,
       duration: duration,
-      mfa: item.attributes[:comment],
-      key: item.attributes[:account],
-      secret: item.password,
+      mfa: item_hash[:mfa],
+      key: item_hash[:key],
+      secret: item_hash[:secret],
       user: ENV['USER']
     )
 
@@ -240,7 +235,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     account = ask_check(
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
-    cred, temp_cred = get_valid_item_pair(account: account)
+    cred, temp_cred = Awskeyring.get_valid_item_pair(account: account)
     token = temp_cred.password unless temp_cred.nil?
 
     path = options[:path] || 'console'
@@ -290,23 +285,6 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   def list_commands
     self.class.all_commands.keys.map { |elem| elem.tr('_', '-') }
-  end
-
-  def get_valid_item_pair(account:)
-    session_key, session_token = Awskeyring.get_pair(account)
-    session_key, session_token = Awskeyring.delete_expired(session_key, session_token) if session_key
-
-    if session_key && session_token
-      puts '# Using temporary session credentials'
-      return session_key, session_token
-    end
-
-    item = Awskeyring.get_item(account)
-    if item.nil?
-      warn "# Credential not found with name: #{account}"
-      exit 2
-    end
-    [item, nil]
   end
 
   def env_vars(account:, key:, secret:, token:)
