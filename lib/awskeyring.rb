@@ -1,14 +1,23 @@
+require 'json'
 require 'keychain'
-require 'aws-sdk-iam'
-require 'awskeyring/validate'
 
-# Aws Key-ring logical object,
+# Awskeyring Module,
 # gives you an interface to access keychains and items.
 module Awskeyring # rubocop:disable Metrics/ModuleLength
+  # Default rpeferences fole path
   PREFS_FILE = (File.expand_path '~/.awskeyring').freeze
+  # Prefix for Roles
   ROLE_PREFIX = 'role '.freeze
+  # Prefix for Accounts
   ACCOUNT_PREFIX = 'account '.freeze
+  # Prefix for Session Keys
+  SESSION_KEY_PREFIX = 'session-key '.freeze
+  # Prefix for Session Tokens
+  SESSION_TOKEN_PREFIX = 'session-token '.freeze
 
+  # Retrieve the preferences
+  #
+  # @return [Hash] prefs of the gem
   def self.prefs
     if File.exist? PREFS_FILE
       JSON.parse(File.read(PREFS_FILE))
@@ -17,6 +26,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     end
   end
 
+  # Create a new Keychain
   def self.init_keychain(awskeyring:)
     keychain = Keychain.create(awskeyring)
     keychain.lock_interval = 300
@@ -26,6 +36,9 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     File.new(Awskeyring::PREFS_FILE, 'w').write JSON.dump(prefs)
   end
 
+  # Load the keychain for access
+  #
+  # @return [Keychain] keychain ready for use.
   def self.load_keychain
     unless File.exist?(Awskeyring::PREFS_FILE) && !prefs.empty?
       warn "Config missing, run `#{File.basename($PROGRAM_NAME)} initialise` to recreate."
@@ -39,6 +52,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     keychain
   end
 
+  # Return a list of all acount items
   def self.list_items
     items = all_items.all.sort do |a, b|
       a.attributes[:label] <=> b.attributes[:label]
@@ -46,6 +60,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     items.select { |elem| elem.attributes[:label].start_with?(ACCOUNT_PREFIX) }
   end
 
+  # Return a list of all role items
   def self.list_roles
     items = all_items.all.sort do |a, b|
       a.attributes[:label] <=> b.attributes[:label]
@@ -53,19 +68,22 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     items.select { |elem| elem.attributes[:label].start_with?(ROLE_PREFIX) }
   end
 
+  # Return all keychain items
   def self.all_items
     load_keychain.generic_passwords
   end
 
+  # Add an account item
   def self.add_item(account:, key:, secret:, comment:)
     all_items.create(
-      label: "#{ACCOUNT_PREFIX}#{account}",
+      label: ACCOUNT_PREFIX + account,
       account: key,
       password: secret,
       comment: comment
     )
   end
 
+  # update and account item
   def self.update_item(account:, key:, secret:)
     item = get_item(account)
     item.attributes[:account] = key
@@ -73,48 +91,56 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     item.save!
   end
 
+  # Add a Role item
   def self.add_role(role:, arn:, account:)
     all_items.create(
-      label: "#{ROLE_PREFIX}#{role}",
+      label: ROLE_PREFIX + role,
       account: arn,
       password: '',
       comment: account
     )
   end
 
+  # add a session token pair of items
   def self.add_pair(params = {})
-    all_items.create(label: "session-key #{params[:account]}",
+    all_items.create(label: SESSION_KEY_PREFIX + params[:account],
                      account: params[:key],
                      password: params[:secret],
-                     comment: "#{ROLE_PREFIX}#{params[:role]}")
-    all_items.create(label: "session-token #{params[:account]}",
+                     comment: ROLE_PREFIX + params[:role])
+    all_items.create(label: SESSION_TOKEN_PREFIX + params[:account],
                      account: params[:expiry],
                      password: params[:token],
-                     comment: "#{ROLE_PREFIX}#{params[:role]}")
+                     comment: ROLE_PREFIX + params[:role])
   end
 
+  # Return an account item by name
   def self.get_item(account)
-    all_items.where(label: "#{ACCOUNT_PREFIX}#{account}").first
+    all_items.where(label: ACCOUNT_PREFIX + account).first
   end
 
+  # Return a role item by name
   def self.get_role(name)
-    all_items.where(label: "#{ROLE_PREFIX}#{name}").first
+    all_items.where(label: ROLE_PREFIX + name).first
   end
 
+  # Return a session token pair of items by name
   def self.get_pair(account)
-    session_key = all_items.where(label: "session-key #{account}").first
-    session_token = all_items.where(label: "session-token #{account}").first if session_key
+    session_key = all_items.where(label: SESSION_KEY_PREFIX + account).first
+    session_token = all_items.where(label: SESSION_TOKEN_PREFIX + account).first if session_key
     [session_key, session_token]
   end
 
+  # Return a list account item names
   def self.list_item_names
     list_items.map { |elem| elem.attributes[:label][(ACCOUNT_PREFIX.length)..-1] }
   end
 
+  # Return a list role item names
   def self.list_role_names
     list_roles.map { |elem| elem.attributes[:label][(ROLE_PREFIX.length)..-1] }
   end
 
+  # Delete session token items if expired
   def self.delete_expired(key, token)
     expires_at = Time.at(token.attributes[:account].to_i)
     if expires_at < Time.now
@@ -125,6 +151,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     [key, token]
   end
 
+  # Delete session token items
   def self.delete_pair(key, token, message)
     puts message if message
     token.delete if token

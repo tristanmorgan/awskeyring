@@ -1,14 +1,12 @@
-require 'aws-sdk-iam'
-require 'cgi'
 require 'highline'
-require 'json'
-require 'open-uri'
 require 'thor'
 
-require_relative 'awskeyring'
+require 'awskeyring'
+require 'awskeyring/awsapi'
+require 'awskeyring/validate'
 require 'awskeyring/version'
 
-# AWS Key-ring command line interface.
+# AWSkeyring command line interface.
 class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   map %w[--version -v] => :__version
   map ['init'] => :initialise
@@ -19,13 +17,15 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   map ['rmt'] => :remove_token
 
   desc '--version, -v', 'Prints the version'
+  # print the version number
   def __version
     puts Awskeyring::VERSION
   end
 
   desc 'initialise', 'Initialises a new KEYCHAIN'
   method_option :keychain, type: :string, aliases: '-n', desc: 'Name of KEYCHAIN to initialise.'
-  def initialise # rubocop:disable  Metrics/AbcSize
+  # initialise the keychain
+  def initialise
     unless Awskeyring.prefs.empty?
       puts "#{Awskeyring::PREFS_FILE} exists. no need to initialise."
       exit 1
@@ -47,19 +47,24 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   desc 'list', 'Prints a list of accounts in the keyring'
+  # list the accounts
   def list
     puts Awskeyring.list_item_names.join("\n")
   end
 
   map 'list-role' => :list_role
   desc 'list-role', 'Prints a list of roles in the keyring'
+  # List roles
   def list_role
     puts Awskeyring.list_role_names.join("\n")
   end
 
   desc 'env ACCOUNT', 'Outputs bourne shell environment exports for an ACCOUNT'
+  # Print Env vars
   def env(account = nil)
-    account = ask_check(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
+    account = ask_check(
+      existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
+    )
     cred, temp_cred = get_valid_item_pair(account: account)
     token = temp_cred.password unless temp_cred.nil?
     put_env_string(
@@ -71,6 +76,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   desc 'exec ACCOUNT command...', 'Execute a COMMAND with the environment set for an ACCOUNT'
+  # execute an external command with env set
   def exec(account, *command)
     cred, temp_cred = get_valid_item_pair(account: account)
     token = temp_cred.password unless temp_cred.nil?
@@ -88,15 +94,20 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option :key, type: :string, aliases: '-k', desc: 'AWS account key id.'
   method_option :secret, type: :string, aliases: '-s', desc: 'AWS account secret.'
   method_option :mfa, type: :string, aliases: '-m', desc: 'AWS virtual mfa arn.'
-  def add(account = nil) # rubocop:disable Metrics/AbcSize
-    account = ask_check(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
-    key = ask_check(existing: options[:key], message: 'access key id', validator: Awskeyring.method(:access_key))
+  # Add an Account
+  def add(account = nil) # rubocop:disable Metrics/MethodLength
+    account = ask_check(
+      existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
+    )
+    key = ask_check(
+      existing: options[:key], message: 'access key id', validator: Awskeyring::Validate.method(:access_key)
+    )
     secret = ask_check(
       existing: options[:secret], message: 'secret access key',
-      secure: true, validator: Awskeyring.method(:secret_access_key)
+      secure: true, validator: Awskeyring::Validate.method(:secret_access_key)
     )
     mfa = ask_check(
-      existing: options[:mfa], message: 'mfa arn', optional: true, validator: Awskeyring.method(:mfa_arn)
+      existing: options[:mfa], message: 'mfa arn', optional: true, validator: Awskeyring::Validate.method(:mfa_arn)
     )
 
     Awskeyring.add_item(
@@ -111,11 +122,12 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   map 'add-role' => :add_role
   desc 'add-role ROLE', 'Adds a ROLE to the keyring'
   method_option :arn, type: :string, aliases: '-a', desc: 'AWS role arn.'
+  # Add a role
   def add_role(role = nil)
-    role = ask_check(existing: role, message: 'role name', validator: Awskeyring.method(:role_name))
-    arn = ask_check(existing: options[:arn], message: 'role arn', validator: Awskeyring.method(:role_arn))
+    role = ask_check(existing: role, message: 'role name', validator: Awskeyring::Validate.method(:role_name))
+    arn = ask_check(existing: options[:arn], message: 'role arn', validator: Awskeyring::Validate.method(:role_arn))
     account = ask_check(
-      existing: account, message: 'account', optional: true, validator: Awskeyring.method(:account_name)
+      existing: account, message: 'account', optional: true, validator: Awskeyring::Validate.method(:account_name)
     )
 
     Awskeyring.add_role(
@@ -127,15 +139,21 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   desc 'remove ACCOUNT', 'Removes an ACCOUNT from the keyring'
+  # Remove an account
   def remove(account = nil)
-    account = ask_check(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
+    account = ask_check(
+      existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
+    )
     cred, temp_cred = get_valid_item_pair(account: account)
     Awskeyring.delete_pair(cred, temp_cred, "# Removing account #{account}")
   end
 
   desc 'remove-token ACCOUNT', 'Removes a token for ACCOUNT from the keyring'
+  # remove a session token
   def remove_token(account = nil)
-    account = ask_check(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
+    account = ask_check(
+      existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
+    )
     session_key, session_token = Awskeyring.get_pair(account)
     session_key, session_token = Awskeyring.delete_expired(session_key, session_token) if session_key
     Awskeyring.delete_pair(session_key, session_token, "# Removing token for account #{account}") if session_key
@@ -143,37 +161,25 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   map 'remove-role' => :remove_role
   desc 'remove-role ROLE', 'Removes a ROLE from the keyring'
+  # remove a role
   def remove_role(role = nil)
-    role = ask_check(existing: role, message: 'role name', validator: Awskeyring.method(:role_name))
+    role = ask_check(existing: role, message: 'role name', validator: Awskeyring::Validate.method(:role_name))
     item_role = Awskeyring.get_role(role)
     Awskeyring.delete_pair(item_role, nil, "# Removing role #{role}")
   end
 
   desc 'rotate ACCOUNT', 'Rotate access keys for an ACCOUNT'
-  def rotate(account = nil) # rubocop:disable  Metrics/AbcSize, Metrics/MethodLength
-    account = ask_check(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
-    item = Awskeyring.get_item(account)
-    iam = Aws::IAM::Client.new(access_key_id: item.attributes[:account], secret_access_key: item.password)
-
-    if iam.list_access_keys[:access_key_metadata].length > 1
-      warn "You have two access keys for account #{account}"
-      exit 1
-    end
-
-    new_key = iam.create_access_key
-    iam = Aws::IAM::Client.new(
-      access_key_id: new_key[:access_key][:access_key_id],
-      secret_access_key: new_key[:access_key][:secret_access_key]
+  # rotate Account keys
+  def rotate(account = nil)
+    account = ask_check(
+      existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
-    retry_backoff do
-      iam.delete_access_key(
-        access_key_id: item.attributes[:account]
-      )
-    end
+    item = Awskeyring.get_item(account)
+    new_key = Awskeyring::Awsapi.rotate(account: account, key: item.attributes[:account], secret: item.password)
     Awskeyring.update_item(
       account: account,
-      key: new_key[:access_key][:access_key_id],
-      secret: new_key[:access_key][:secret_access_key]
+      key: new_key[:key],
+      secret: new_key[:secret]
     )
 
     puts "# Updated account #{account}"
@@ -183,8 +189,11 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option :role, type: :string, aliases: '-r', desc: 'The ROLE to assume.'
   method_option :code, type: :string, aliases: '-c', desc: 'Virtual mfa CODE.'
   method_option :duration, type: :string, aliases: '-d', desc: 'Session DURATION in seconds.'
+  # generate a sessiopn token
   def token(account = nil, role = nil, code = nil) # rubocop:disable all
-    account = ask_check(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
+    account = ask_check(
+      existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
+    )
     role ||= options[:role]
     code ||= options[:code]
     duration = options[:duration]
@@ -202,105 +211,53 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     item = Awskeyring.get_item(account)
     item_role = Awskeyring.get_role(role) if role
 
-    sts = Aws::STS::Client.new(access_key_id: item.attributes[:account], secret_access_key: item.password)
-
-    begin
-      response =
-        if code && role
-          sts.assume_role(
-            duration_seconds: duration.to_i,
-            role_arn: item_role.attributes[:account],
-            role_session_name: ENV['USER'],
-            serial_number: item.attributes[:comment],
-            token_code: code
-          )
-        elsif role
-          sts.assume_role(
-            duration_seconds: duration.to_i,
-            role_arn: item_role.attributes[:account],
-            role_session_name: ENV['USER']
-          )
-        elsif code
-          sts.get_session_token(
-            duration_seconds: duration.to_i,
-            serial_number: item.attributes[:comment],
-            token_code: code
-          )
-        end
-    rescue Aws::STS::Errors::AccessDenied => e
-      puts e.to_s
-      exit 1
-    end
+    new_creds = Awskeyring::Awsapi.get_token(
+      code: code,
+      role_arn: item_role.attributes[:account],
+      duration: duration,
+      mfa: item.attributes[:comment],
+      key: item.attributes[:account],
+      secret: item.password,
+      user: ENV['USER']
+    )
 
     Awskeyring.add_pair(
       account: account,
-      key: response.credentials[:access_key_id],
-      secret: response.credentials[:secret_access_key],
-      token: response.credentials[:session_token],
-      expiry: response.credentials[:expiration].to_i.to_s,
+      key: new_creds[:key],
+      secret: new_creds[:secret],
+      token: new_creds[:token],
+      expiry: new_creds[:expiry].to_i.to_s,
       role: role
     )
 
-    puts "Authentication valid until #{response.credentials[:expiration]}"
+    puts "Authentication valid until #{new_creds[:expiry]}"
   end
 
   desc 'console ACCOUNT', 'Open the AWS Console for the ACCOUNT'
   method_option :path, type: :string, aliases: '-p', desc: 'The service PATH to open.'
-  def console(account = nil) # rubocop:disable all
-    account = ask_check(existing: account, message: 'account name', validator: Awskeyring.method(:account_name))
+  # Open the AWS Console
+  def console(account = nil)
+    account = ask_check(
+      existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
+    )
     cred, temp_cred = get_valid_item_pair(account: account)
     token = temp_cred.password unless temp_cred.nil?
 
     path = options[:path] || 'console'
 
-    console_url = "https://console.aws.amazon.com/#{path}/home"
-    signin_url = 'https://signin.aws.amazon.com/federation'
-    policy_json = {
-      Version: '2012-10-17',
-      Statement: [{
-        Action: '*',
-        Resource: '*',
-        Effect: 'Allow'
-      }]
-    }.to_json
-
-    if temp_cred
-      session_json = {
-        sessionId: cred.attributes[:account],
-        sessionKey: cred.password,
-        sessionToken: token
-      }.to_json
-    else
-      sts = Aws::STS::Client.new(access_key_id: cred.attributes[:account],
-                                 secret_access_key: cred.password)
-
-      session = sts.get_federation_token(name: ENV['USER'],
-                                         policy: policy_json,
-                                         duration_seconds: (60 * 60 * 12))
-      session_json = {
-        sessionId: session.credentials[:access_key_id],
-        sessionKey: session.credentials[:secret_access_key],
-        sessionToken: session.credentials[:session_token]
-      }.to_json
-
-    end
-    get_signin_token_url = signin_url + '?Action=getSigninToken' \
-                           '&Session=' + CGI.escape(session_json)
-
-    returned_content = open(get_signin_token_url).read
-
-    signin_token = JSON.parse(returned_content)['SigninToken']
-    signin_token_param = '&SigninToken=' + CGI.escape(signin_token)
-    destination_param = '&Destination=' + CGI.escape(console_url)
-
-    login_url = signin_url + '?Action=login' + signin_token_param + destination_param
+    login_url = Awskeyring::Awsapi.get_login_url(
+      key: cred.attributes[:account],
+      secret: cred.password,
+      token: token,
+      path: path, user: ENV['USER']
+    )
 
     pid = Process.spawn("open \"#{login_url}\"")
     Process.wait pid
   end
 
-  # autocomplete
   desc 'awskeyring CURR PREV', 'Autocompletion for bourne shells', hide: true
+  # autocomplete
   def awskeyring(curr, prev)
     comp_line = ENV['COMP_LINE']
     unless comp_line
@@ -318,7 +275,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   private
 
-  def print_auto_resp(curr, len) # rubocop:disable  Metrics/AbcSize
+  def print_auto_resp(curr, len)
     case len
     when 2
       puts list_commands.select { |elem| elem.start_with?(curr) }.join("\n")
@@ -386,21 +343,6 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       exit 1
     end
     value
-  end
-
-  def retry_backoff(&block)
-    retries ||= 1
-    begin
-      yield block
-    rescue Aws::IAM::Errors::InvalidClientTokenId => e
-      if retries < 4
-        sleep 2**retries
-        retries += 1
-        retry
-      end
-      warn e.message
-      exit 1
-    end
   end
 
   def ask_missing(existing:, message:, secure: false, optional: false)
