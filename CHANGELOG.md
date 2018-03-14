@@ -1,5 +1,13 @@
 # Change Log
 
+## [v0.1.0](https://github.com/vibrato/awskeyring/tree/v0.1.0) (2018-03-14)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.0.6...v0.1.0)
+
+**Implemented enhancements:**
+
+- Item refactor [\#13](https://github.com/vibrato/awskeyring/pull/13) ([tristanmorgan](https://github.com/tristanmorgan))
+- Aws refactor [\#12](https://github.com/vibrato/awskeyring/pull/12) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v0.0.6](https://github.com/vibrato/awskeyring/tree/v0.0.6) (2018-03-01)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.0.5...v0.0.6)
 
