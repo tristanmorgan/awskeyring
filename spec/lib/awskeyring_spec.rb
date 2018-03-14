@@ -70,7 +70,7 @@ describe Awskeyring do
         secret: 'biglongbase64',
         token: nil
       )
-      expect(subject.get_item_hash(account: 'test')).to eq(
+      expect(subject.get_account_hash(account: 'test')).to eq(
         account: 'test',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
@@ -144,14 +144,18 @@ describe Awskeyring do
       allow(session_token).to receive(:delete)
     end
 
-    it 'returns a hash with the creds' do
-      expect(subject.get_valid_creds(account: 'test')).to eq(
+    it 'returns a hash with the creds and token' do
+      test_hash = nil
+      expect do
+        test_hash = subject.get_valid_creds(account: 'test')
+      end.to output(/# Using temporary session credentials/).to_stdout
+      expect(test_hash).to eq(
         account: 'test',
         key: 'ASIATESTTEST',
         secret: 'bigerlongbase64',
         token: 'evenlongerbase64token'
       )
-      expect(subject.get_item_hash(account: 'test')).to eq(
+      expect(subject.get_account_hash(account: 'test')).to eq(
         account: 'test',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',

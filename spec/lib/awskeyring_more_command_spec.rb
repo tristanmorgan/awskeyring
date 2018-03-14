@@ -4,31 +4,20 @@ require_relative '../../lib/awskeyring_command'
 
 describe AwskeyringCommand do
   context 'When we try to access AWS with a token' do
-    let(:session_key) do
-      double(
-        attributes: { label: 'session-key test', account: 'ASIATESTTEST' },
-        password: 'bigerlongbase64'
-      )
-    end
-    let(:session_token) do
-      double(
-        attributes: { label: 'session-token test', account: 0 },
-        password: 'evenlongerbase64token'
-      )
-    end
-
     before do
-      allow(Awskeyring).to receive(:delete_expired).with(key: session_key, token: session_token)
-                                                   .and_return([session_key, session_token])
+      allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test').and_return(
+        account: 'test',
+        key: 'ASIATESTTEST',
+        secret: 'bigerlongbase64',
+        token: 'evenlongerbase64token'
+      )
       allow(Awskeyring::Awsapi).to receive(:get_login_url).and_return('login-url')
       allow(Process).to receive(:spawn).exactly(1).with('open "login-url"').and_return(9999)
       allow(Process).to receive(:wait).exactly(1).with(9999)
     end
 
     it 'opens the AWS Console' do
-      expect(Awskeyring).to receive(:get_pair).with(account: 'test').and_return(
-        [session_key, session_token]
-      )
+      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test')
       expect(Awskeyring::Awsapi).to receive(:get_login_url).with(
         key: 'ASIATESTTEST',
         secret: 'bigerlongbase64',
@@ -36,30 +25,26 @@ describe AwskeyringCommand do
         path: 'console',
         user: ENV['USER']
       )
-      expect(Awskeyring).to_not receive(:get_item)
-      expect { AwskeyringCommand.start(%w[console test]) }
-        .to output("# Using temporary session credentials\n").to_stdout
+      expect(Process).to receive(:spawn).exactly(1).with('open "login-url"')
+      AwskeyringCommand.start(%w[console test])
     end
   end
 
   context 'When we try to access AWS without a token' do
-    let(:item) do
-      double(
-        attributes: { label: 'account test', account: 'AKIATESTTEST' },
-        password: 'biglongbase64'
-      )
-    end
-
     before do
-      allow(Awskeyring).to receive(:get_pair).with(account: 'test').and_return(nil, nil)
-      allow(Awskeyring).to receive(:get_item).with(account: 'test').and_return(item)
+      allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test').and_return(
+        account: 'test',
+        key: 'AKIATESTTEST',
+        secret: 'biglongbase64',
+        token: nil
+      )
       allow(Awskeyring::Awsapi).to receive(:get_login_url).and_return('login-url')
       allow(Process).to receive(:spawn).exactly(1).with('open "login-url"').and_return(9999)
       allow(Process).to receive(:wait).exactly(1).with(9999)
     end
 
     it 'opens the AWS Console' do
-      expect(Awskeyring).to receive(:get_item).with(account: 'test').and_return(item)
+      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test')
       expect(Awskeyring::Awsapi).to receive(:get_login_url).with(
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
@@ -73,24 +58,18 @@ describe AwskeyringCommand do
   end
 
   context 'When we try to retrieve a token' do
-    let(:item) do
-      double(
-        attributes: { label: 'account test', account: 'AKIATESTTEST' },
-        password: 'biglongbase64'
-      )
-    end
-    let(:role) do
-      double(
-        attributes: { label: 'role test', account: 'arn:aws:iam::012345678901:role/test' },
-        password: ''
-      )
-    end
-
     before do
-      allow(Awskeyring).to receive(:get_pair).with(account: 'test').and_return(nil, nil)
-      allow(Awskeyring).to receive(:get_item).with(account: 'test').and_return(item)
-      allow(Awskeyring).to receive(:get_role).with(role_name: 'role').and_return(role)
-      allow(Awskeyring).to receive(:add_pair)
+      allow(Awskeyring).to receive(:delete_token).with(account: 'test', message: '# Removing STS credentials')
+      allow(Awskeyring).to receive(:get_account_hash).with(account: 'test').and_return(
+        account: 'test',
+        key: 'AKIATESTTEST',
+        secret: 'biglongbase64'
+      )
+      allow(Awskeyring).to receive(:get_role_arn).with(role_name: 'role').and_return(
+        'arn:aws:iam::012345678901:role/test'
+      )
+
+      allow(Awskeyring).to receive(:add_token)
       allow(Awskeyring::Awsapi).to receive(:get_token)
         .and_return(
           key: 'ASIAEXAMPLE',
@@ -101,8 +80,9 @@ describe AwskeyringCommand do
     end
 
     it 'tries to receive a new token' do
-      expect(Awskeyring).to receive(:get_item).with(account: 'test').and_return(item)
-      expect(Awskeyring).to receive(:add_pair).with(
+      expect(Awskeyring).to receive(:get_account_hash).with(account: 'test')
+      expect(Awskeyring).to receive(:get_role_arn).with(role_name: 'role')
+      expect(Awskeyring).to receive(:add_token).with(
         account: 'test',
         key: 'ASIAEXAMPLE',
         secret: 'bigishLongSecret',
@@ -135,7 +115,7 @@ describe AwskeyringCommand do
     let(:bad_mfa_arn) { 'arn:azure:iamnot::ABCD45678901:Administrators' }
 
     before do
-      allow(Awskeyring).to receive(:add_item).and_return(nil)
+      allow(Awskeyring).to receive(:add_account).and_return(nil)
       allow_any_instance_of(HighLine).to receive(:ask) { '' }
     end
 
@@ -193,17 +173,16 @@ describe AwskeyringCommand do
   end
 
   context 'when we try to rotate keys' do
-    let(:old_item) do
-      double(
-        attributes: { label: 'account test', account: 'AKIATESTTEST' },
-        password: 'biglongbase64'
-      )
-    end
-
     before do
       ENV['AWS_DEFAULT_REGION'] = nil
-      allow(Awskeyring).to receive(:get_item).with(account: 'test').and_return(old_item)
-      allow(Awskeyring).to receive(:update_item).and_return(true)
+      allow(Awskeyring).to receive(:get_account_hash).with(account: 'test').and_return(
+        account: 'test',
+        key: 'AKIAIOSFODNN7EXAMPLE',
+        secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+        mfa: nil
+      )
+
+      allow(Awskeyring).to receive(:update_account).and_return(true)
 
       allow(Awskeyring::Awsapi).to receive(:rotate).and_return(
         account: 'test',
@@ -213,8 +192,7 @@ describe AwskeyringCommand do
     end
 
     it 'calls the rotate method' do
-      expect(Awskeyring).to receive(:get_item).with(account: 'test').and_return(old_item)
-      expect(Awskeyring).to receive(:update_item).with(
+      expect(Awskeyring).to receive(:update_account).with(
         account: 'test',
         key: 'AKIAIOSFODNN7EXAMPLE',
         secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY'
@@ -257,7 +235,7 @@ describe AwskeyringCommand do
 
     it 'calls the rotate method and fails' do
       expect(Awskeyring).to receive(:get_item).with(account: 'test').and_return(old_item)
-      expect(Awskeyring).to_not receive(:update_item)
+      expect(Awskeyring).to_not receive(:update_account)
 
       expect_any_instance_of(Aws::IAM::Client).to_not receive(:create_access_key)
       expect_any_instance_of(Aws::IAM::Client).to_not receive(:delete_access_key)

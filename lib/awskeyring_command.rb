@@ -49,7 +49,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   desc 'list', 'Prints a list of accounts in the keyring'
   # list the accounts
   def list
-    puts Awskeyring.list_item_names.join("\n")
+    puts Awskeyring.list_account_names.join("\n")
   end
 
   map 'list-role' => :list_role
@@ -77,13 +77,12 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   desc 'exec ACCOUNT command...', 'Execute a COMMAND with the environment set for an ACCOUNT'
   # execute an external command with env set
   def exec(account, *command)
-    cred, temp_cred = Awskeyring.get_valid_item_pair(account: account)
-    token = temp_cred.password unless temp_cred.nil?
+    cred = Awskeyring.get_valid_creds(account: account)
     env_vars = env_vars(
-      account: cred.attributes[:label],
-      key: cred.attributes[:account],
-      secret: cred.password,
-      token: token
+      account: cred[:account],
+      key: cred[:key],
+      secret: cred[:secret],
+      token: cred[:token]
     )
     pid = Process.spawn(env_vars, command.join(' '))
     Process.wait pid
@@ -109,11 +108,11 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       existing: options[:mfa], message: 'mfa arn', optional: true, validator: Awskeyring::Validate.method(:mfa_arn)
     )
 
-    Awskeyring.add_item(
+    Awskeyring.add_account(
       account: account,
       key: key,
       secret: secret,
-      comment: mfa
+      mfa: mfa
     )
     puts "# Added account #{account}"
   end
@@ -169,9 +168,9 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     account = ask_check(
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
-    item_hash = Awskeyring.get_item_hash(account: account)
+    item_hash = Awskeyring.get_account_hash(account: account)
     new_key = Awskeyring::Awsapi.rotate(account: item_hash[:account], key: item_hash[:key], secret: item_hash[:secret])
-    Awskeyring.update_item(
+    Awskeyring.update_account(
       account: account,
       key: new_key[:key],
       secret: new_key[:secret]
@@ -200,10 +199,9 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       exit 2
     end
 
-    session_key, session_token = Awskeyring.get_pair(account: account)
-    Awskeyring.delete_pair(session_key, session_token, '# Removing STS credentials') if session_key
+    Awskeyring.delete_token(account: account, message: '# Removing STS credentials')
 
-    item_hash = Awskeyring.get_item_hash(account: account)
+    item_hash = Awskeyring.get_account_hash(account: account)
     role_arn = Awskeyring.get_role_arn(role_name: role) if role
 
     new_creds = Awskeyring::Awsapi.get_token(
@@ -216,7 +214,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       user: ENV['USER']
     )
 
-    Awskeyring.add_pair(
+    Awskeyring.add_token(
       account: account,
       key: new_creds[:key],
       secret: new_creds[:secret],
@@ -235,16 +233,16 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     account = ask_check(
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
-    cred, temp_cred = Awskeyring.get_valid_item_pair(account: account)
-    token = temp_cred.password unless temp_cred.nil?
+    cred = Awskeyring.get_valid_creds(account: account)
 
     path = options[:path] || 'console'
 
     login_url = Awskeyring::Awsapi.get_login_url(
-      key: cred.attributes[:account],
-      secret: cred.password,
-      token: token,
-      path: path, user: ENV['USER']
+      key: cred[:key],
+      secret: cred[:secret],
+      token: cred[:token],
+      path: path,
+      user: ENV['USER']
     )
 
     pid = Process.spawn("open \"#{login_url}\"")
@@ -275,7 +273,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     when 2
       puts list_commands.select { |elem| elem.start_with?(curr) }.join("\n")
     when 3
-      puts Awskeyring.list_item_names.select { |elem| elem.start_with?(curr) }.join("\n")
+      puts Awskeyring.list_account_names.select { |elem| elem.start_with?(curr) }.join("\n")
     when 4
       puts Awskeyring.list_role_names.select { |elem| elem.start_with?(curr) }.join("\n")
     else

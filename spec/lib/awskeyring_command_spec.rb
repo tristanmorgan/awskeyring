@@ -40,7 +40,7 @@ describe AwskeyringCommand do
 
   context 'When accounts and roles are set' do
     before do
-      allow(Awskeyring).to receive(:list_item_names).and_return(%w[company personal vibrato])
+      allow(Awskeyring).to receive(:list_account_names).and_return(%w[company personal vibrato])
       allow(Awskeyring).to receive(:list_role_names).and_return(%w[admin minion readonly])
     end
 
@@ -56,27 +56,9 @@ describe AwskeyringCommand do
   end
 
   context 'When there is an account and a role' do
-    let(:cred) do
-      double(
-        attributes: { label: 'role test', account: 'AKIATESTTEST' },
-        password: 'biglongbase64'
-      )
-    end
-    let(:role) do
-      double(
-        attributes: { label: 'account test', account: 'arn:aws:iam::012345678901:role/test' },
-        password: ''
-      )
-    end
-
     before do
-      allow(Awskeyring).to receive(:get_pair).with('test').and_return(nil, nil)
-      allow(Awskeyring).to receive(:get_item).with(account: 'test').and_return(
-        cred
-      )
-      allow(Awskeyring).to receive(:get_role).with('test').and_return(
-        role
-      )
+      allow(Awskeyring).to receive(:delete_account)
+      allow(Awskeyring).to receive(:delete_role)
     end
 
     it 'removes an account' do
@@ -91,30 +73,13 @@ describe AwskeyringCommand do
   end
 
   context 'When there is an account, a role and a session token' do
-    let(:cred) do
-      double(
-        attributes: { label: 'role test', account: 'AKIATESTTEST' },
-        password: 'biglongbase64'
-      )
-    end
-    let(:session_key) do
-      double(
-        attributes: { label: 'session-key test', account: 'ASIATESTTEST' },
-        password: 'bigerlongbase64'
-      )
-    end
-    let(:session_token) do
-      double(
-        attributes: { label: 'session-token test', account: 0 },
-        password: 'evenlongerbase64token'
-      )
-    end
-
     before do
-      allow(Awskeyring).to receive(:delete_expired).with(key: session_key, token: session_token)
-                                                   .and_return([session_key, session_token])
-      allow(Awskeyring).to receive(:get_pair).with(account: 'test').and_return(
-        [session_key, session_token]
+      allow(Awskeyring).to receive(:delete_token)
+      allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test').and_return(
+        account: 'test',
+        key: 'ASIATESTTEST',
+        secret: 'bigerlongbase64',
+        token: 'evenlongerbase64token'
       )
     end
 
@@ -124,16 +89,10 @@ describe AwskeyringCommand do
     end
 
     it 'export an AWS Session Token' do
-      expect(Awskeyring).to receive(:get_pair).with(account: 'test').and_return(
-        [session_key, session_token]
-      )
-
-      expect(Awskeyring).to_not receive(:get_item)
-
+      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test')
       ENV['AWS_DEFAULT_REGION'] = nil
       expect { AwskeyringCommand.start(%w[env test]) }
-        .to output(%(# Using temporary session credentials
-export AWS_DEFAULT_REGION="us-east-1"
+        .to output(%(export AWS_DEFAULT_REGION="us-east-1"
 export AWS_ACCOUNT_NAME="test"
 export AWS_ACCESS_KEY_ID="ASIATESTTEST"
 export AWS_ACCESS_KEY="ASIATESTTEST"
@@ -146,26 +105,17 @@ export AWS_SESSION_TOKEN="evenlongerbase64token"
   end
 
   context 'When there is just an account' do
-    let(:item) do
-      double(
-        attributes: { label: 'account test', account: 'AKIATESTTEST' },
-        password: 'biglongbase64'
-      )
-    end
-
     before do
-      # Awskeyring.get_valid_creds -> get_valid_item_pair -> get_pair
-      allow(Awskeyring).to receive(:get_pair).with(account: 'test').and_return(nil, nil)
-      allow(Awskeyring).to receive(:get_item).with(account: 'test').and_return(item)
-    end
-
-    it 'export an AWS Access key' do
-      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test').and_return(
+      allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test').and_return(
         account: 'test',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
         token: nil
       )
+    end
+
+    it 'export an AWS Access key' do
+      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test')
 
       ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
       expect { AwskeyringCommand.start(%w[env test]) }

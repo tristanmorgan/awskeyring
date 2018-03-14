@@ -39,7 +39,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   # Load the keychain for access
   #
   # @return [Keychain] keychain ready for use.
-  def self.load_keychain
+  private_class_method def self.load_keychain
     unless File.exist?(Awskeyring::PREFS_FILE) && !prefs.empty?
       warn "Config missing, run `#{File.basename($PROGRAM_NAME)} initialise` to recreate."
       exit 1
@@ -53,7 +53,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Return a list of all acount items
-  def self.list_items
+  private_class_method def self.list_items
     items = all_items.all.sort do |a, b|
       a.attributes[:label] <=> b.attributes[:label]
     end
@@ -61,7 +61,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Return a list of all role items
-  def self.list_roles
+  private_class_method def self.list_roles
     items = all_items.all.sort do |a, b|
       a.attributes[:label] <=> b.attributes[:label]
     end
@@ -69,22 +69,22 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Return all keychain items
-  def self.all_items
+  private_class_method def self.all_items
     load_keychain.generic_passwords
   end
 
   # Add an account item
-  def self.add_item(account:, key:, secret:, comment:)
+  def self.add_account(account:, key:, secret:, mfa:)
     all_items.create(
       label: ACCOUNT_PREFIX + account,
       account: key,
       password: secret,
-      comment: comment
+      comment: mfa
     )
   end
 
   # update and account item
-  def self.update_item(account:, key:, secret:)
+  def self.update_account(account:, key:, secret:)
     item = get_item(account: account)
     item.attributes[:account] = key
     item.password = secret
@@ -102,7 +102,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # add a session token pair of items
-  def self.add_pair(params = {})
+  def self.add_token(params = {})
     all_items.create(label: SESSION_KEY_PREFIX + params[:account],
                      account: params[:key],
                      password: params[:secret],
@@ -114,24 +114,24 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Return an account item by name
-  def self.get_item(account:)
+  private_class_method def self.get_item(account:)
     all_items.where(label: ACCOUNT_PREFIX + account).first
   end
 
   # Return a role item by name
-  def self.get_role(role_name:)
+  private_class_method def self.get_role(role_name:)
     all_items.where(label: ROLE_PREFIX + role_name).first
   end
 
   # Return a session token pair of items by name
-  def self.get_pair(account:)
+  private_class_method def self.get_pair(account:)
     session_key = all_items.where(label: SESSION_KEY_PREFIX + account).first
     session_token = all_items.where(label: SESSION_TOKEN_PREFIX + account).first if session_key
     [session_key, session_token]
   end
 
   # Return a list account item names
-  def self.list_item_names
+  def self.list_account_names
     list_items.map { |elem| elem.attributes[:label][(ACCOUNT_PREFIX.length)..-1] }
   end
 
@@ -141,7 +141,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Return a session token if available or a static key
-  def self.get_valid_item_pair(account:)
+  private_class_method def self.get_valid_item_pair(account:)
     session_key, session_token = get_pair(account: account)
     session_key, session_token = delete_expired(key: session_key, token: session_token) if session_key
 
@@ -171,7 +171,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Return a hash for account (skip tokens)
-  def self.get_item_hash(account:)
+  def self.get_account_hash(account:)
     cred = get_item(account: account)
     return unless cred
     {
@@ -189,7 +189,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Delete session token items if expired
-  def self.delete_expired(key:, token:)
+  private_class_method def self.delete_expired(key:, token:)
     expires_at = Time.at(token.attributes[:account].to_i)
     if expires_at < Time.now
       delete_pair(key: key, token: token, message: '# Removing expired session credentials')
@@ -200,7 +200,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Delete session token items
-  def self.delete_pair(key:, token:, message:)
+  private_class_method def self.delete_pair(key:, token:, message:)
     return unless key
     puts message if message
     token.delete if token
