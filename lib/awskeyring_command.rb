@@ -189,7 +189,17 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
     role ||= options[:role]
+    if role
+      role = ask_check(
+        existing: role, message: 'role name', validator: Awskeyring::Validate.method(:role_name)
+      )
+    end
     code ||= options[:code]
+    if code
+      code = ask_check(
+        existing: code, message: 'current mfa code', validator: Awskeyring::Validate.method(:mfa_code)
+      )
+    end
     duration = options[:duration]
     duration ||= (60 * 60 * 1).to_s if role
     duration ||= (60 * 60 * 12).to_s if code
@@ -315,6 +325,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       value = validator.call(value) unless value.empty? && optional
     rescue RuntimeError => e
       warn e.message
+      existing = nil
       retry unless (retries -= 1).zero?
       exit 1
     end

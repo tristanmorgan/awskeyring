@@ -24,6 +24,17 @@ describe Awskeyring::Validate do
     it 'invalidates an secret access key' do
       expect { subject.secret_access_key(test_broken_secret) }.to raise_error('Secret Access Key is not 40 chars')
     end
+
+    let(:test_mfa_code) { '321654' }
+    let(:test_broken_mfa_code) { 'mfa_code' }
+
+    it 'validates an mfa code' do
+      expect { subject.mfa_code(test_mfa_code) }.to_not raise_error
+    end
+
+    it 'invalidates an mfa code' do
+      expect { subject.mfa_code(test_broken_mfa_code) }.to raise_error('Invalid MFA CODE')
+    end
   end
 
   context 'When validating inputs ARNs' do
