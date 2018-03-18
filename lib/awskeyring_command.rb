@@ -268,11 +268,15 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       warn "enable autocomplete with 'complete -C /path-to-command/#{exec_name} #{exec_name}'"
       exit 1
     end
-    comp_len = comp_line.split.length
-    comp_len += 1 if curr == ''
+    comp_len = comp_line.split.index(prev)
 
-    comp_len = 2 if prev == 'help'
-    comp_len = 4 if prev == 'remove-role'
+    case prev
+    when 'help'
+      comp_len = 0
+    when 'remove-role', '-r', 'rmr'
+      comp_len = 2
+    end
+
     print_auto_resp(curr, comp_len)
   end
 
@@ -280,11 +284,11 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   def print_auto_resp(curr, len)
     case len
-    when 2
+    when 0
       puts list_commands.select { |elem| elem.start_with?(curr) }.join("\n")
-    when 3
+    when 1
       puts Awskeyring.list_account_names.select { |elem| elem.start_with?(curr) }.join("\n")
-    when 4
+    when 2
       puts Awskeyring.list_role_names.select { |elem| elem.start_with?(curr) }.join("\n")
     else
       exit 1

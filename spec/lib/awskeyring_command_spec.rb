@@ -53,6 +53,20 @@ describe AwskeyringCommand do
       expect { AwskeyringCommand.start(%w[list-role]) }
         .to output("admin\nminion\nreadonly\n").to_stdout
     end
+
+    it 'lists accounts with autocomplete' do
+      ENV['COMP_LINE'] = 'awskeyring token vib'
+      expect { AwskeyringCommand.start(%w[awskeyring vib token]) }
+        .to output("vibrato\n").to_stdout
+      ENV['COMP_LINE'] = nil
+    end
+
+    it 'lists roles with autocomplete' do
+      ENV['COMP_LINE'] = 'awskeyring token vibrato min'
+      expect { AwskeyringCommand.start(%w[awskeyring min vibrato]) }
+        .to output("minion\n").to_stdout
+      ENV['COMP_LINE'] = nil
+    end
   end
 
   context 'When there is an account and a role' do
