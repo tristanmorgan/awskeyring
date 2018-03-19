@@ -5,6 +5,7 @@
 * [![license MIT](http://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 * [![All Downloads](http://ruby-gem-downloads-badge.herokuapp.com/awskeyring?type=total)](https://rubygems.org/gems/awskeyring)
 * [![Version Downloads](http://ruby-gem-downloads-badge.herokuapp.com/awskeyring?label=downloads-current-version)](https://rubygems.org/gems/awskeyring)
+* [![Documentation](http://img.shields.io/badge/yard-docs-brightgreen.svg)](http://www.rubydoc.info/gems/awskeyring)
 
 Awskeyring is a small tool to manage AWS account keys in the macOS Keychain.
 
@@ -12,7 +13,8 @@ Awskeyring is a small tool to manage AWS account keys in the macOS Keychain.
 
 The motivation of this application is to provide a local secure store of AWS
 credentials using specifically in the macOS Keychain, to have them easily accessed
-from the Terminal, and to provide useful functions like assuming roles.
+from the Terminal, and to provide useful functions like assuming roles and opening
+the AWS Console from the cli.
 For Enterprise environments there are better suited tools to use
 like [HashiCorp Vault](https://vaultproject.io/).
 

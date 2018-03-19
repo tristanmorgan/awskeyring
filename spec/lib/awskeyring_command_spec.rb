@@ -53,12 +53,32 @@ describe AwskeyringCommand do
       expect { AwskeyringCommand.start(%w[list-role]) }
         .to output("admin\nminion\nreadonly\n").to_stdout
     end
+
+    it 'lists accounts with autocomplete' do
+      ENV['COMP_LINE'] = 'awskeyring token vib'
+      expect { AwskeyringCommand.start(%w[awskeyring vib token]) }
+        .to output("vibrato\n").to_stdout
+      ENV['COMP_LINE'] = nil
+    end
+
+    it 'lists roles with autocomplete' do
+      ENV['COMP_LINE'] = 'awskeyring token vibrato min'
+      expect { AwskeyringCommand.start(%w[awskeyring min vibrato]) }
+        .to output("minion\n").to_stdout
+      ENV['COMP_LINE'] = nil
+    end
   end
 
   context 'When there is an account and a role' do
     before do
       allow(Awskeyring).to receive(:delete_account)
       allow(Awskeyring).to receive(:delete_role)
+      allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test').and_return(
+        account: 'test',
+        key: 'AKIATESTTEST',
+        secret: 'biglongbase64',
+        token: nil
+      )
     end
 
     it 'removes an account' do
@@ -69,6 +89,21 @@ describe AwskeyringCommand do
     it 'removes a role' do
       expect(Awskeyring).to receive(:delete_role).with(role_name: 'test', message: '# Removing role test')
       AwskeyringCommand.start(%w[remove-role test])
+    end
+
+    it 'export an AWS Access key' do
+      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test')
+
+      ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
+      expect { AwskeyringCommand.start(%w[env test]) }
+        .to output(%(export AWS_ACCOUNT_NAME="test"
+export AWS_ACCESS_KEY_ID="AKIATESTTEST"
+export AWS_ACCESS_KEY="AKIATESTTEST"
+export AWS_SECRET_ACCESS_KEY="biglongbase64"
+export AWS_SECRET_KEY="biglongbase64"
+unset AWS_SECURITY_TOKEN
+unset AWS_SESSION_TOKEN
+)).to_stdout
     end
   end
 
@@ -100,32 +135,6 @@ export AWS_SECRET_ACCESS_KEY="bigerlongbase64"
 export AWS_SECRET_KEY="bigerlongbase64"
 export AWS_SECURITY_TOKEN="evenlongerbase64token"
 export AWS_SESSION_TOKEN="evenlongerbase64token"
-)).to_stdout
-    end
-  end
-
-  context 'When there is just an account' do
-    before do
-      allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test').and_return(
-        account: 'test',
-        key: 'AKIATESTTEST',
-        secret: 'biglongbase64',
-        token: nil
-      )
-    end
-
-    it 'export an AWS Access key' do
-      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test')
-
-      ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
-      expect { AwskeyringCommand.start(%w[env test]) }
-        .to output(%(export AWS_ACCOUNT_NAME="test"
-export AWS_ACCESS_KEY_ID="AKIATESTTEST"
-export AWS_ACCESS_KEY="AKIATESTTEST"
-export AWS_SECRET_ACCESS_KEY="biglongbase64"
-export AWS_SECRET_KEY="biglongbase64"
-unset AWS_SECURITY_TOKEN
-unset AWS_SESSION_TOKEN
 )).to_stdout
     end
   end

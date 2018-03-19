@@ -50,5 +50,13 @@ module Awskeyring
       raise 'Invalid Role ARN' unless role_arn =~ %r(\Aarn:aws:iam::[0-9]{12}:role\/\S*\z)
       role_arn
     end
+
+    # Validate an MFA CODE
+    #
+    # @param [String] mfa_code The mfa code
+    def self.mfa_code(mfa_code)
+      raise 'Invalid MFA CODE' unless mfa_code =~ /\A\d{6}\z/
+      mfa_code
+    end
   end
 end

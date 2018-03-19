@@ -63,7 +63,8 @@ describe AwskeyringCommand do
       allow(Awskeyring).to receive(:get_account_hash).with(account: 'test').and_return(
         account: 'test',
         key: 'AKIATESTTEST',
-        secret: 'biglongbase64'
+        secret: 'biglongbase64',
+        mfa: 'arn:aws:iam::012345678901:mfa/ec2-user'
       )
       allow(Awskeyring).to receive(:get_role_arn).with(role_name: 'role').and_return(
         'arn:aws:iam::012345678901:role/test'
@@ -77,6 +78,7 @@ describe AwskeyringCommand do
           token: 'VeryveryVeryLongSecret',
           expiry: '321654987'
         )
+      allow_any_instance_of(HighLine).to receive(:ask) { 'invalid' }
     end
 
     it 'tries to receive a new token' do
@@ -94,7 +96,7 @@ describe AwskeyringCommand do
         code: nil,
         role_arn: 'arn:aws:iam::012345678901:role/test',
         duration: '3600',
-        mfa: nil,
+        mfa: 'arn:aws:iam::012345678901:mfa/ec2-user',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
         user: ENV['USER']
@@ -103,6 +105,37 @@ describe AwskeyringCommand do
       expect do
         AwskeyringCommand.start(%w[token test -r role])
       end.to output("Authentication valid until 321654987\n").to_stdout
+    end
+
+    it 'tries to receive a new token with an MFA' do
+      expect(Awskeyring).to receive(:get_account_hash).with(account: 'test')
+      expect(Awskeyring).to receive(:add_token).with(
+        account: 'test',
+        key: 'ASIAEXAMPLE',
+        secret: 'bigishLongSecret',
+        token: 'VeryveryVeryLongSecret',
+        expiry: '321654987',
+        role: nil
+      )
+      expect(Awskeyring::Awsapi).to receive(:get_token).with(
+        code: '987654',
+        role_arn: nil,
+        duration: '43200',
+        mfa: 'arn:aws:iam::012345678901:mfa/ec2-user',
+        key: 'AKIATESTTEST',
+        secret: 'biglongbase64',
+        user: ENV['USER']
+      )
+
+      expect do
+        AwskeyringCommand.start(%w[token test -c 987654])
+      end.to output("Authentication valid until 321654987\n").to_stdout
+    end
+
+    it 'tries to receive a new token with an invalid MFA' do
+      expect do
+        AwskeyringCommand.start(%w[token test -c invalid])
+      end.to raise_error(SystemExit).and output(/Invalid MFA CODE/).to_stderr
     end
   end
 
@@ -141,6 +174,17 @@ describe AwskeyringCommand do
       expect do
         AwskeyringCommand.start(['add', 'test', '-k', access_key, '-s', bad_secret_access_key, '-m', mfa_arn])
       end.to raise_error(SystemExit).and output(/Secret Access Key is not 40 chars/).to_stderr
+    end
+  end
+
+  context 'When we try to add an AWS account' do
+    let(:access_key) { 'AKIA0123456789ABCDEF' }
+    let(:secret_access_key) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
+    let(:bad_mfa_arn) { 'arn:azure:iamnot::ABCD45678901:Administrators' }
+
+    before do
+      allow(Awskeyring).to receive(:add_account).and_return(nil)
+      allow_any_instance_of(HighLine).to receive(:ask) { bad_mfa_arn }
     end
 
     it 'tries to add an invalid mfa' do
