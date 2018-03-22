@@ -10,11 +10,13 @@ require 'awskeyring/version'
 class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   map %w[--version -v] => :__version
   map ['init'] => :initialise
+  map ['con'] => :console
   map ['ls'] => :list
   map ['lsr'] => :list_role
   map ['rm'] => :remove
   map ['rmr'] => :remove_role
   map ['rmt'] => :remove_token
+  map ['rot'] => :rotate
 
   desc '--version, -v', 'Prints the version'
   # print the version number

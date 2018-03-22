@@ -108,6 +108,16 @@ unset AWS_SESSION_TOKEN
   end
 
   context 'When there is an account, a role and a session token' do
+    let(:env_vars) do
+      { 'AWS_DEFAULT_REGION' => 'us-east-1',
+        'AWS_ACCOUNT_NAME' => 'test',
+        'AWS_ACCESS_KEY_ID' => 'ASIATESTTEST',
+        'AWS_ACCESS_KEY' => 'ASIATESTTEST',
+        'AWS_SECRET_ACCESS_KEY' => 'bigerlongbase64',
+        'AWS_SECRET_KEY' => 'bigerlongbase64',
+        'AWS_SECURITY_TOKEN' => 'evenlongerbase64token',
+        'AWS_SESSION_TOKEN' => 'evenlongerbase64token' }
+    end
     before do
       allow(Awskeyring).to receive(:delete_token)
       allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test').and_return(
@@ -116,6 +126,11 @@ unset AWS_SESSION_TOKEN
         secret: 'bigerlongbase64',
         token: 'evenlongerbase64token'
       )
+      allow(Process).to receive(:spawn).exactly(1).with(
+        env_vars,
+        'test-exec with params'
+      ).and_return(8888)
+      allow(Process).to receive(:wait).exactly(1).with(8888)
     end
 
     it 'removes a token' do
@@ -136,6 +151,16 @@ export AWS_SECRET_KEY="bigerlongbase64"
 export AWS_SECURITY_TOKEN="evenlongerbase64token"
 export AWS_SESSION_TOKEN="evenlongerbase64token"
 )).to_stdout
+    end
+
+    it 'runs an external command' do
+      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test')
+      ENV['AWS_DEFAULT_REGION'] = nil
+      expect(Process).to receive(:spawn).exactly(1).with(
+        env_vars,
+        'test-exec with params'
+      )
+      AwskeyringCommand.start(%w[exec test test-exec with params])
     end
   end
 end

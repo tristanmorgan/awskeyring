@@ -19,12 +19,14 @@ task :filemode do
   failure = false
   files.each do |file|
     mode = File.stat(file).mode
+    print '.'
     if (mode & 0x7) != (mode >> 3 & 0x7)
       puts file
       failure = true
     end
   end
   abort 'Error: Incorrect file mode found' if failure
+  print "\n"
 end
 
 task default: %i[filemode rubocop spec]

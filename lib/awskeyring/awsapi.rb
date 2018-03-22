@@ -48,8 +48,8 @@ module Awskeyring
               token_code: params[:code]
             )
           end
-      rescue Aws::STS::Errors::AccessDenied => e
-        puts e.to_s
+      rescue Aws::STS::Errors::AccessDenied => err
+        puts err.to_s
         exit 1
       end
 
@@ -153,13 +153,13 @@ module Awskeyring
       retries ||= 1
       begin
         yield block
-      rescue Aws::IAM::Errors::InvalidClientTokenId => e
+      rescue Aws::IAM::Errors::InvalidClientTokenId => err
         if retries < 4
           sleep 2**retries
           retries += 1
           retry
         end
-        warn e.message
+        warn err.message
         exit 1
       end
     end
