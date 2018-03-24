@@ -47,23 +47,23 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
 
     keychain = Keychain.open(prefs['awskeyring'])
     if keychain && keychain.lock_interval > 300
-      warn 'It is STRONGLY reccomended to set your keychain to lock in 5 minutes or less.'
+      warn 'It is STRONGLY recommended to set your keychain to lock in 5 minutes or less.'
     end
     keychain
   end
 
   # Return a list of all acount items
   private_class_method def self.list_items
-    items = all_items.all.sort do |a, b|
-      a.attributes[:label] <=> b.attributes[:label]
+    items = all_items.all.sort do |elem_a, elem_b|
+      elem_a.attributes[:label] <=> elem_b.attributes[:label]
     end
     items.select { |elem| elem.attributes[:label].start_with?(ACCOUNT_PREFIX) }
   end
 
   # Return a list of all role items
   private_class_method def self.list_roles
-    items = all_items.all.sort do |a, b|
-      a.attributes[:label] <=> b.attributes[:label]
+    items = all_items.all.sort do |elem_a, elem_b|
+      elem_a.attributes[:label] <=> elem_b.attributes[:label]
     end
     items.select { |elem| elem.attributes[:label].start_with?(ROLE_PREFIX) }
   end
