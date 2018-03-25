@@ -1,5 +1,13 @@
 # Change Log
 
+## [v0.1.1](https://github.com/vibrato/awskeyring/tree/v0.1.1) (2018-03-26)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.1.0...v0.1.1)
+
+**Merged pull requests:**
+
+- More coverage with tests. [\#15](https://github.com/vibrato/awskeyring/pull/15) ([tristanmorgan](https://github.com/tristanmorgan))
+- Validate MFA code and tweak Autocomplete [\#14](https://github.com/vibrato/awskeyring/pull/14) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v0.1.0](https://github.com/vibrato/awskeyring/tree/v0.1.0) (2018-03-14)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.0.6...v0.1.0)
 

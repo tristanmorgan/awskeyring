@@ -15,7 +15,7 @@ RSpec::Core::RakeTask.new(:spec)
 
 desc 'Check filemode bits'
 task :filemode do
-  files = Dir.glob('**/*')
+  files = `git ls-files -z`.split("\x0")
   failure = false
   files.each do |file|
     mode = File.stat(file).mode
