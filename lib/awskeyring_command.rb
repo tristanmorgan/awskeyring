@@ -76,6 +76,22 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     )
   end
 
+  desc 'json ACCOUNT', 'Outputs AWS CLI compatible JSON for an ACCOUNT'
+  # Print JSON for use with credential_process
+  def json(account = nil)
+    account = ask_check(
+      existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
+    )
+    cred = Awskeyring.get_valid_creds(account: account)
+    expiry = Time.at(cred[:expiry]) unless cred[:expiry].nil?
+    puts Awskeyring::Awsapi.get_cred_json(
+      key: cred[:key],
+      secret: cred[:secret],
+      token: cred[:token],
+      expiry: expiry || Time.new + 3600
+    )
+  end
+
   desc 'exec ACCOUNT command...', 'Execute a COMMAND with the environment set for an ACCOUNT'
   # execute an external command with env set
   def exec(account, *command)

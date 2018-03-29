@@ -61,6 +61,24 @@ module Awskeyring
       }
     end
 
+    # Genarates AWS CLI compatible JSON
+    # see credential_process in AWS Docs
+    #
+    # @param [String] key The aws_access_key_id
+    # @param [String] secret The aws_secret_access_key
+    # @param [String] token The aws_session_token
+    # @param [String] expiry expiry time
+    # @return [String] credential_process json
+    def self.get_cred_json(key:, secret:, token:, expiry:)
+      JSON.pretty_generate(
+        Version: 1,
+        AccessKeyId: key,
+        SecretAccessKey: secret,
+        SessionToken: token,
+        Expiration: expiry
+      )
+    end
+
     # Retrieves an AWS Console login url
     #
     # @param [String] key The aws_access_key_id

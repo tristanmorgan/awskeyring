@@ -105,6 +105,21 @@ describe Awskeyring::Awsapi do
         expiry: Time.parse('2011-07-11T19:55:29.611Z')
       )
     end
+
+    it 'returns a JSON formatted Credential' do
+      expect(subject.get_cred_json(
+               key: 'ASIAIOSFODNN7EXAMPLE',
+               secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+               token: role_token,
+               expiry: Time.parse('2011-07-11T19:55:29.611Z')
+      )).to eq(%({
+  "Version": 1,
+  "AccessKeyId": "ASIAIOSFODNN7EXAMPLE",
+  "SecretAccessKey": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY",
+  "SessionToken": "AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi",
+  "Expiration": "2011-07-11 19:55:29 UTC"
+}))
+    end
   end
 
   context 'When we try to access AWS Console' do

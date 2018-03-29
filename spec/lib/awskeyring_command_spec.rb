@@ -124,13 +124,15 @@ unset AWS_SESSION_TOKEN
         account: 'test',
         key: 'ASIATESTTEST',
         secret: 'bigerlongbase64',
-        token: 'evenlongerbase64token'
+        token: 'evenlongerbase64token',
+        expiry: Time.parse('2011-07-11T19:55:29.611Z').to_i
       )
       allow(Process).to receive(:spawn).exactly(1).with(
         env_vars,
         'test-exec with params'
       ).and_return(8888)
       allow(Process).to receive(:wait).exactly(1).with(8888)
+      allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
     end
 
     it 'removes a token' do
@@ -151,6 +153,19 @@ export AWS_SECRET_KEY="bigerlongbase64"
 export AWS_SECURITY_TOKEN="evenlongerbase64token"
 export AWS_SESSION_TOKEN="evenlongerbase64token"
 )).to_stdout
+    end
+
+    it 'provides JSON for use with credential_process' do
+      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test')
+      ENV['AWS_DEFAULT_REGION'] = nil
+      expect { AwskeyringCommand.start(%w[json test]) }
+        .to output(JSON.pretty_generate(
+          Version: 1,
+          AccessKeyId: 'ASIATESTTEST',
+          SecretAccessKey: 'bigerlongbase64',
+          SessionToken: 'evenlongerbase64token',
+          Expiration: Time.at(Time.parse('2011-07-11T19:55:29.611Z').to_i)
+        ) + "\n").to_stdout
     end
 
     it 'runs an external command' do
