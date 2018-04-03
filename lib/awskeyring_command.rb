@@ -182,12 +182,23 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   desc 'rotate ACCOUNT', 'Rotate access keys for an ACCOUNT'
   # rotate Account keys
-  def rotate(account = nil)
+  def rotate(account = nil) # rubocop:disable Metrics/MethodLength
     account = ask_check(
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
     item_hash = Awskeyring.get_account_hash(account: account)
-    new_key = Awskeyring::Awsapi.rotate(account: item_hash[:account], key: item_hash[:key], secret: item_hash[:secret])
+
+    begin
+      new_key = Awskeyring::Awsapi.rotate(
+        account: item_hash[:account],
+        key: item_hash[:key],
+        secret: item_hash[:secret]
+      )
+    rescue Aws::Errors::ServiceError => err
+      warn err.to_s
+      exit 1
+    end
+
     Awskeyring.update_account(
       account: account,
       key: new_key[:key],
@@ -232,15 +243,20 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     item_hash = Awskeyring.get_account_hash(account: account)
     role_arn = Awskeyring.get_role_arn(role_name: role) if role
 
-    new_creds = Awskeyring::Awsapi.get_token(
-      code: code,
-      role_arn: role_arn,
-      duration: duration,
-      mfa: item_hash[:mfa],
-      key: item_hash[:key],
-      secret: item_hash[:secret],
-      user: ENV['USER']
-    )
+    begin
+      new_creds = Awskeyring::Awsapi.get_token(
+        code: code,
+        role_arn: role_arn,
+        duration: duration,
+        mfa: item_hash[:mfa],
+        key: item_hash[:key],
+        secret: item_hash[:secret],
+        user: ENV['USER']
+      )
+    rescue Aws::Errors::ServiceError => err
+      warn err.to_s
+      exit 1
+    end
 
     Awskeyring.add_token(
       account: account,
@@ -257,7 +273,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   desc 'console ACCOUNT', 'Open the AWS Console for the ACCOUNT'
   method_option :path, type: :string, aliases: '-p', desc: 'The service PATH to open.'
   # Open the AWS Console
-  def console(account = nil)
+  def console(account = nil) # rubocop:disable Metrics/MethodLength
     account = ask_check(
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
@@ -265,13 +281,18 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
     path = options[:path] || 'console'
 
-    login_url = Awskeyring::Awsapi.get_login_url(
-      key: cred[:key],
-      secret: cred[:secret],
-      token: cred[:token],
-      path: path,
-      user: ENV['USER']
-    )
+    begin
+      login_url = Awskeyring::Awsapi.get_login_url(
+        key: cred[:key],
+        secret: cred[:secret],
+        token: cred[:token],
+        path: path,
+        user: ENV['USER']
+      )
+    rescue Aws::Errors::ServiceError => err
+      warn err.to_s
+      exit 1
+    end
 
     pid = Process.spawn("open \"#{login_url}\"")
     Process.wait pid
@@ -345,8 +366,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     begin
       value = ask_missing(existing: existing, message: message, secure: secure, optional: optional)
       value = validator.call(value) unless value.empty? && optional
-    rescue RuntimeError => e
-      warn e.message
+    rescue RuntimeError => err
+      warn err.message
       existing = nil
       retry unless (retries -= 1).zero?
       exit 1

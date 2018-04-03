@@ -38,7 +38,7 @@ See below and in the wiki for more details on usage.
 
 Install it with:
 
-    $ gem install awskeyring
+    $ gem install awskeyring --user-install
 
 ## Usage
 

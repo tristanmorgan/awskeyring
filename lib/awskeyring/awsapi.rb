@@ -49,7 +49,7 @@ module Awskeyring
             )
           end
       rescue Aws::STS::Errors::AccessDenied => err
-        puts err.to_s
+        warn err.to_s
         exit 1
       end
 
