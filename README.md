@@ -32,7 +32,13 @@ Now your keys are stored safely in the macOS keychain. To print environment vari
 
     awskeyring env personal-aws
 
-See below and in the wiki for more details on usage.
+Alternatively you can create a profile using the credential_process config variable. See the [AWS CLI Config docs](http://docs.aws.amazon.com/cli/latest/topic/config-vars.html#cli-aws-help-config-vars) for more details on this config option.
+
+    [profile personal]
+    region = us-west-1
+    credential_process = awskeyring json personal-aws 
+
+See below and in the [wiki](https://github.com/vibrato/awskeyring/wiki) for more details on usage.
 
 ## Installation
 
@@ -53,6 +59,7 @@ The CLI is using [Thor](http://whatisthor.com) with help provided interactively.
       awskeyring exec ACCOUNT command...     # Execute a COMMAND with the environment set for an ACCOUNT
       awskeyring help [COMMAND]              # Describe available commands or one specific command
       awskeyring initialise                  # Initialises a new KEYCHAIN
+      awskeyring json ACCOUNT                # Outputs AWS CLI compatible JSON for an ACCOUNT
       awskeyring list                        # Prints a list of accounts in the keyring
       awskeyring list-role                   # Prints a list of roles in the keyring
       awskeyring remove ACCOUNT              # Removes an ACCOUNT from the keyring
@@ -73,7 +80,7 @@ To set your environment easily the following bash function helps:
 
 After checking out the repo, run `bundle update` to install dependencies. Then, run `rake` to run the tests. Run `bundle exec awskeyring` to use the gem in this directory, ignoring other installed copies of this gem.
 
-To install this gem onto your local machine, run `bundle exec rake install`. To release a new version, update the version number in `version.rb`, and then run `bundle exec rake release`, which will create a git tag for the version, push git commits and tags, and push the `.gem` file to [rubygems.org](https://rubygems.org).
+To install this gem onto your local machine, run `bundle exec rake install`.
 
 ## Contributing
 
