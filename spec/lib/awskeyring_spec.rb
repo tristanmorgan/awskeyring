@@ -68,7 +68,8 @@ describe Awskeyring do
         account: 'test',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
-        token: nil
+        token: nil,
+        expiry: nil
       )
       expect(subject.get_account_hash(account: 'test')).to eq(
         account: 'test',
@@ -124,7 +125,7 @@ describe Awskeyring do
     end
     let(:session_token) do
       double(
-        attributes: { label: 'session-token test', account: 0 },
+        attributes: { label: 'session-token test', account: Time.parse('2016-12-01T22:20:01Z').to_i.to_s },
         password: 'evenlongerbase64token'
       )
     end
@@ -153,7 +154,8 @@ describe Awskeyring do
         account: 'test',
         key: 'ASIATESTTEST',
         secret: 'bigerlongbase64',
-        token: 'evenlongerbase64token'
+        token: 'evenlongerbase64token',
+        expiry: Time.parse('2016-12-01T22:20:01Z').to_i
       )
       expect(subject.get_account_hash(account: 'test')).to eq(
         account: 'test',

@@ -162,11 +162,13 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   def self.get_valid_creds(account:)
     cred, temp_cred = get_valid_item_pair(account: account)
     token = temp_cred.password unless temp_cred.nil?
+    expiry = temp_cred.attributes[:account].to_i unless temp_cred.nil?
     {
       account: account,
       key: cred.attributes[:account],
       secret: cred.password,
-      token: token
+      token: token,
+      expiry: expiry
     }
   end
 
