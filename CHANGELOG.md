@@ -1,6 +1,13 @@
 # Change Log
 
-## [v0.1.1](https://github.com/vibrato/awskeyring/tree/v0.1.1) (2018-03-26)
+## [v0.2.0](https://github.com/vibrato/awskeyring/tree/v0.2.0) (2018-04-05)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.1.1...v0.2.0)
+
+**Implemented enhancements:**
+
+- Add AWS CLI credential\_process compatible JSON output [\#16](https://github.com/vibrato/awskeyring/pull/16) ([tristanmorgan](https://github.com/tristanmorgan))
+
+## [v0.1.1](https://github.com/vibrato/awskeyring/tree/v0.1.1) (2018-03-25)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.1.0...v0.1.1)
 
 **Merged pull requests:**
