@@ -7,6 +7,19 @@ require 'json'
 module Awskeyring
   # AWS API methods for Awskeyring
   module Awsapi # rubocop:disable Metrics/ModuleLength
+    # Admin policy as json
+    ADMIN_POLICY = {
+      Version: '2012-10-17',
+      Statement: [{
+        Action: '*',
+        Resource: '*',
+        Effect: 'Allow'
+      }]
+    }.to_json.freeze
+
+    TWELVE_HOUR = (60 * 60 * 12)
+    ONE_HOUR = (60 * 60 * 1)
+
     # Retrieves a temporary session token from AWS
     #
     # @param [Hash] params including
@@ -46,6 +59,12 @@ module Awskeyring
               duration_seconds: params[:duration].to_i,
               serial_number: params[:mfa],
               token_code: params[:code]
+            )
+          else
+            sts.get_federation_token(
+              name: params[:user],
+              policy: ADMIN_POLICY,
+              duration_seconds: params[:duration]
             )
           end
       rescue Aws::STS::Errors::AccessDenied => err
@@ -90,14 +109,6 @@ module Awskeyring
     def self.get_login_url(key:, secret:, token:, path:, user:) # rubocop:disable  Metrics/AbcSize, Metrics/MethodLength
       console_url = "https://console.aws.amazon.com/#{path}/home"
       signin_url = 'https://signin.aws.amazon.com/federation'
-      policy_json = {
-        Version: '2012-10-17',
-        Statement: [{
-          Action: '*',
-          Resource: '*',
-          Effect: 'Allow'
-        }]
-      }.to_json
 
       if token
         session_json = {
@@ -110,8 +121,8 @@ module Awskeyring
                                    secret_access_key: secret)
 
         session = sts.get_federation_token(name: user,
-                                           policy: policy_json,
-                                           duration_seconds: (60 * 60 * 12))
+                                           policy: ADMIN_POLICY,
+                                           duration_seconds: TWELVE_HOUR)
         session_json = {
           sessionId: session.credentials[:access_key_id],
           sessionKey: session.credentials[:secret_access_key],

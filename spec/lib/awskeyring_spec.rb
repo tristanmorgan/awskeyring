@@ -119,22 +119,30 @@ describe Awskeyring do
     end
     let(:session_key) do
       double(
-        attributes: { label: 'session-key test', account: 'ASIATESTTEST' },
+        attributes: {
+          label: 'session-key test',
+          account: 'ASIATESTTEST',
+          comment: 'role role'
+        },
         password: 'bigerlongbase64'
       )
     end
     let(:session_token) do
       double(
-        attributes: { label: 'session-token test', account: Time.parse('2016-12-01T22:20:01Z').to_i.to_s },
+        attributes: {
+          label: 'session-token test',
+          account: Time.parse('2016-12-01T22:20:01Z').to_i.to_s,
+          comment: 'role'
+        },
         password: 'evenlongerbase64token'
       )
     end
 
     before do
-      all_list = double([item, role])
+      all_list = double([item, role, session_key, session_token])
       allow(all_list).to receive(:where).and_return([nil])
       allow(all_list).to receive(:where).with(label: 'account test').and_return([item])
-      allow(all_list).to receive(:where).with(label: 'role test').and_return([role])
+      allow(all_list).to receive(:where).with(label: 'role role').and_return([role])
       allow(all_list).to receive(:where).with(label: 'session-key test').and_return([session_key])
       allow(all_list).to receive(:where).with(label: 'session-token test').and_return([session_token])
       allow(subject).to receive(:all_items).and_return(all_list)
@@ -166,7 +174,7 @@ describe Awskeyring do
     end
 
     it 'returns a hash with the role' do
-      expect(subject.get_role_arn(role_name: 'test')).to eq(
+      expect(subject.get_role_arn(role_name: 'role')).to eq(
         'arn:aws:iam::012345678901:role/test'
       )
     end

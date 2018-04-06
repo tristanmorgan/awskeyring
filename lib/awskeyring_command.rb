@@ -230,15 +230,9 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       )
     end
     duration = options[:duration]
-    duration ||= (60 * 60 * 1).to_s if role
-    duration ||= (60 * 60 * 12).to_s if code
-
-    if !role && !code
-      warn 'Please use either a role or a code'
-      exit 2
-    end
-
-    Awskeyring.delete_token(account: account, message: '# Removing STS credentials')
+    duration ||= Awskeyring::Awsapi::ONE_HOUR.to_s if role
+    duration ||= Awskeyring::Awsapi::TWELVE_HOUR.to_s if code
+    duration ||= Awskeyring::Awsapi::ONE_HOUR.to_s
 
     item_hash = Awskeyring.get_account_hash(account: account)
     role_arn = Awskeyring.get_role_arn(role_name: role) if role
@@ -253,6 +247,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
         secret: item_hash[:secret],
         user: ENV['USER']
       )
+      Awskeyring.delete_token(account: account, message: '# Removing STS credentials')
     rescue Aws::Errors::ServiceError => err
       warn err.to_s
       exit 1
@@ -267,7 +262,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       role: role
     )
 
-    puts "Authentication valid until #{new_creds[:expiry]}"
+    puts "# Token saved for account #{account}"
+    puts "# Authentication valid until #{Time.at(new_creds[:expiry].to_i)}"
   end
 
   desc 'console ACCOUNT', 'Open the AWS Console for the ACCOUNT'
