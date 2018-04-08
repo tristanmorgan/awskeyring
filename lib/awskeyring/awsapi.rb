@@ -98,6 +98,22 @@ module Awskeyring
       )
     end
 
+    # Verify Credentials are active and valid
+    #
+    # @param [String] key The aws_access_key_id
+    # @param [String] secret The aws_secret_access_key
+    # @param [String] token The aws_session_token
+    def self.verify_cred(key:, secret:)
+      begin
+        sts = Aws::STS::Client.new(access_key_id: key, secret_access_key: secret)
+        sts.get_caller_identity
+      rescue Aws::Errors::ServiceError => err
+        warn err.to_s
+        exit 1
+      end
+      true
+    end
+
     # Retrieves an AWS Console login url
     #
     # @param [String] key The aws_access_key_id

@@ -25,7 +25,7 @@ describe AwskeyringCommand do
 
     it 'prints autocomplete help text' do
       expect { AwskeyringCommand.start(%w[awskeyring one two]) }.to raise_error(SystemExit)
-        .and output(%r{enable autocomplete with 'complete -C \/path-to-command\/\w+ \w+'}).to_stderr
+        .and output(%r{enable autocomplete with 'complete -C \/.+\/\w+ \w+'}).to_stderr
     end
 
     it 'tells you that you must init the keychain' do

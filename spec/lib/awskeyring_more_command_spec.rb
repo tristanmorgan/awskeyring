@@ -198,12 +198,34 @@ describe AwskeyringCommand do
 
     before do
       allow(Awskeyring).to receive(:add_account).and_return(nil)
+      allow(Awskeyring).to receive(:update_account).and_return(nil)
       allow_any_instance_of(HighLine).to receive(:ask) { '' }
+      allow(Awskeyring::Awsapi).to receive(:verify_cred)
+        .and_return(true)
     end
 
     it 'tries to add a valid account' do
+      expect(Awskeyring::Awsapi).to receive(:verify_cred)
+      expect(Awskeyring).to_not receive(:update_account)
+      expect(Awskeyring).to receive(:add_account)
       expect do
         AwskeyringCommand.start(['add', 'test', '-k', access_key, '-s', secret_access_key])
+      end.to output("# Added account test\n").to_stdout
+    end
+
+    it 'tries to update a valid account' do
+      expect(Awskeyring::Awsapi).to receive(:verify_cred)
+      expect(Awskeyring).to receive(:update_account)
+      expect(Awskeyring).to_not receive(:add_account)
+      expect do
+        AwskeyringCommand.start(['add', 'test', '-k', access_key, '-s', secret_access_key, '-u'])
+      end.to output("# Updated account test\n").to_stdout
+    end
+
+    it 'tries to add a valid account without remote tests' do
+      expect(Awskeyring::Awsapi).to_not receive(:verify_cred)
+      expect do
+        AwskeyringCommand.start(['add', 'test', '-k', access_key, '-s', secret_access_key, '-l'])
       end.to output("# Added account test\n").to_stdout
     end
 
