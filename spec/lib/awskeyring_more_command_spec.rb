@@ -76,7 +76,7 @@ describe AwskeyringCommand do
           key: 'ASIAEXAMPLE',
           secret: 'bigishLongSecret',
           token: 'VeryveryVeryLongSecret',
-          expiry: '321654987'
+          expiry: '1422992424'
         )
       allow_any_instance_of(HighLine).to receive(:ask) { 'invalid' }
     end
@@ -89,7 +89,7 @@ describe AwskeyringCommand do
         key: 'ASIAEXAMPLE',
         secret: 'bigishLongSecret',
         token: 'VeryveryVeryLongSecret',
-        expiry: '321654987',
+        expiry: '1422992424',
         role: 'role'
       )
       expect(Awskeyring::Awsapi).to receive(:get_token).with(
@@ -104,7 +104,9 @@ describe AwskeyringCommand do
 
       expect do
         AwskeyringCommand.start(%w[token test -r role])
-      end.to output("Authentication valid until 321654987\n").to_stdout
+      end.to output(
+        "# Token saved for account test\n# Authentication valid until #{Time.at(1_422_992_424)}\n"
+      ).to_stdout
     end
 
     it 'tries to receive a new token with an MFA' do
@@ -114,7 +116,7 @@ describe AwskeyringCommand do
         key: 'ASIAEXAMPLE',
         secret: 'bigishLongSecret',
         token: 'VeryveryVeryLongSecret',
-        expiry: '321654987',
+        expiry: '1422992424',
         role: nil
       )
       expect(Awskeyring::Awsapi).to receive(:get_token).with(
@@ -129,7 +131,54 @@ describe AwskeyringCommand do
 
       expect do
         AwskeyringCommand.start(%w[token test -c 987654])
-      end.to output("Authentication valid until 321654987\n").to_stdout
+      end.to output(
+        "# Token saved for account test\n# Authentication valid until #{Time.at(1_422_992_424)}\n"
+      ).to_stdout
+    end
+
+    it 'tries to receive a new token with an MFA and role' do
+      expect(Awskeyring).to receive(:get_account_hash).with(account: 'test')
+      expect(Awskeyring).to receive(:add_token).with(
+        account: 'test',
+        key: 'ASIAEXAMPLE',
+        secret: 'bigishLongSecret',
+        token: 'VeryveryVeryLongSecret',
+        expiry: '1422992424',
+        role: 'role'
+      )
+      expect(Awskeyring::Awsapi).to receive(:get_token).with(
+        code: '987654',
+        role_arn: 'arn:aws:iam::012345678901:role/test',
+        duration: '3600',
+        mfa: 'arn:aws:iam::012345678901:mfa/ec2-user',
+        key: 'AKIATESTTEST',
+        secret: 'biglongbase64',
+        user: ENV['USER']
+      )
+
+      expect do
+        AwskeyringCommand.start(%w[token test -r role -c 987654])
+      end.to output(
+        "# Token saved for account test\n# Authentication valid until #{Time.at(1_422_992_424)}\n"
+      ).to_stdout
+    end
+
+    it 'tries to receive a new token without an mfa or role' do
+      expect(Awskeyring::Awsapi).to receive(:get_token).with(
+        code: nil,
+        role_arn: nil,
+        duration: '3600',
+        mfa: 'arn:aws:iam::012345678901:mfa/ec2-user',
+        key: 'AKIATESTTEST',
+        secret: 'biglongbase64',
+        user: ENV['USER']
+      )
+
+      expect do
+        AwskeyringCommand.start(%w[token test])
+      end.to output(
+        "# Token saved for account test\n# Authentication valid until #{Time.at(1_422_992_424)}\n"
+      ).to_stdout
     end
 
     it 'tries to receive a new token with an invalid MFA' do

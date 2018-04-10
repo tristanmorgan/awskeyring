@@ -106,11 +106,11 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     all_items.create(label: SESSION_KEY_PREFIX + params[:account],
                      account: params[:key],
                      password: params[:secret],
-                     comment: ROLE_PREFIX + params[:role])
+                     comment: params[:role].nil? ? '' : ROLE_PREFIX + params[:role])
     all_items.create(label: SESSION_TOKEN_PREFIX + params[:account],
                      account: params[:expiry],
                      password: params[:token],
-                     comment: ROLE_PREFIX + params[:role])
+                     comment: params[:role] || '')
   end
 
   # Return an account item by name

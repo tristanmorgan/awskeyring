@@ -6,9 +6,11 @@ describe Awskeyring::Awsapi do
     let(:mfa_token) { 'AQoEXAMPLEH4aoAH0gNCAPget_session_token5TthT+FvwqnKwRcOIfrRh3c/LTo6UDdyJwOOvEVP' }
     let(:role_token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
     let(:rofa_token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
+    let(:fed_token) { 'AQoEXAMPLEH4aoAH0gNCAPget_federated_token5TthT+FvwqnKwRcOIfrRh3c/LTo6UDdyJwOOvEVP' }
     before do
       ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
       allow_any_instance_of(Aws::STS::Client).to receive(:assume_role).and_return({})
+      allow_any_instance_of(Aws::STS::Client).to receive(:get_federation_token).and_return({})
       allow_any_instance_of(Aws::STS::Client).to receive(:assume_role).with(
         duration_seconds: 3600,
         role_arn: 'blah',
@@ -59,6 +61,20 @@ describe Awskeyring::Awsapi do
           }
         )
       )
+      allow_any_instance_of(Aws::STS::Client).to receive(:get_federation_token).with(
+        name: 'rspec-user',
+        policy: Awskeyring::Awsapi::ADMIN_POLICY,
+        duration_seconds: 3600
+      ).and_return(
+        double(
+          credentials: {
+            access_key_id: 'ASIAIUGFODNN7EXAMPLE',
+            expiration: Time.parse('2012-07-11T19:55:29.611Z'),
+            secret_access_key: 'wJalrXUXvFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+            session_token: fed_token
+          }
+        )
+      )
     end
 
     it 'assume a role no mfa' do
@@ -103,6 +119,21 @@ describe Awskeyring::Awsapi do
         secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
         token: mfa_token,
         expiry: Time.parse('2011-07-11T19:55:29.611Z')
+      )
+    end
+
+    it 'retrieves a federated token' do
+      expect(subject.get_token(
+               key: 'blah', secret: 'blah',
+               role_arn: nil,
+               code: nil, mfa: nil,
+               duration: 3600,
+               user: 'rspec-user'
+      )).to eq(
+        key: 'ASIAIUGFODNN7EXAMPLE',
+        secret: 'wJalrXUXvFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+        token: fed_token,
+        expiry: Time.parse('2012-07-11T19:55:29.611Z')
       )
     end
 

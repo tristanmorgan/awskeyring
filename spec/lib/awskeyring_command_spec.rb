@@ -125,6 +125,7 @@ unset AWS_SESSION_TOKEN
         key: 'ASIATESTTEST',
         secret: 'bigerlongbase64',
         token: 'evenlongerbase64token',
+        role: 'role',
         expiry: Time.parse('2011-07-11T19:55:29.611Z').to_i
       )
       allow(Process).to receive(:spawn).exactly(1).with(
