@@ -1,5 +1,15 @@
 # Change Log
 
+## [v0.3.0](https://github.com/vibrato/awskeyring/tree/v0.3.0) (2018-04-12)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.2.0...v0.3.0)
+
+**Implemented enhancements:**
+
+- Validate tokens upon adding them to the keychain [\#18](https://github.com/vibrato/awskeyring/issues/18)
+- Generate a token from IAM User credentials using the GetFederationToken API [\#17](https://github.com/vibrato/awskeyring/issues/17)
+- Test creds against AWS API \(optionally\). [\#20](https://github.com/vibrato/awskeyring/pull/20) ([tristanmorgan](https://github.com/tristanmorgan))
+- Allow STS get\_session\_token without role [\#19](https://github.com/vibrato/awskeyring/pull/19) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v0.2.0](https://github.com/vibrato/awskeyring/tree/v0.2.0) (2018-04-05)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.1.1...v0.2.0)
 
