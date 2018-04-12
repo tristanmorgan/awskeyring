@@ -110,8 +110,10 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option :key, type: :string, aliases: '-k', desc: 'AWS account key id.'
   method_option :secret, type: :string, aliases: '-s', desc: 'AWS account secret.'
   method_option :mfa, type: :string, aliases: '-m', desc: 'AWS virtual mfa arn.'
+  method_option :local, type: :boolean, aliases: '-l', desc: 'Only validate locally.', default: false
+  method_option :update, type: :boolean, aliases: '-u', desc: 'Update existing.', default: false
   # Add an Account
-  def add(account = nil) # rubocop:disable Metrics/MethodLength
+  def add(account = nil) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
     account = ask_check(
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
@@ -122,17 +124,27 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       existing: options[:secret], message: 'secret access key',
       secure: true, validator: Awskeyring::Validate.method(:secret_access_key)
     )
-    mfa = ask_check(
-      existing: options[:mfa], message: 'mfa arn', optional: true, validator: Awskeyring::Validate.method(:mfa_arn)
-    )
-
-    Awskeyring.add_account(
-      account: account,
-      key: key,
-      secret: secret,
-      mfa: mfa
-    )
-    puts "# Added account #{account}"
+    if options[:update]
+      Awskeyring::Awsapi.verify_cred(key: key, secret: secret) unless options[:local]
+      Awskeyring.update_account(
+        account: account,
+        key: key,
+        secret: secret
+      )
+      puts "# Updated account #{account}"
+    else
+      mfa = ask_check(
+        existing: options[:mfa], message: 'mfa arn', optional: true, validator: Awskeyring::Validate.method(:mfa_arn)
+      )
+      Awskeyring::Awsapi.verify_cred(key: key, secret: secret) unless options[:local]
+      Awskeyring.add_account(
+        account: account,
+        key: key,
+        secret: secret,
+        mfa: mfa
+      )
+      puts "# Added account #{account}"
+    end
   end
 
   map 'add-role' => :add_role
@@ -300,7 +312,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     comp_line = ENV['COMP_LINE']
     unless comp_line
       exec_name = File.basename($PROGRAM_NAME)
-      warn "enable autocomplete with 'complete -C /path-to-command/#{exec_name} #{exec_name}'"
+      warn "enable autocomplete with 'complete -C #{$PROGRAM_NAME} #{exec_name}'"
       exit 1
     end
     comp_len = comp_line.split.index(prev)
