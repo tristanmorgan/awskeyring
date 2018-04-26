@@ -9,6 +9,8 @@ describe AwskeyringCommand do
       allow(File).to receive(:exist?)
         .with(/\.awskeyring/)
         .and_return(false)
+      allow_any_instance_of(HighLine).to receive(:ask) { 'test' }
+      allow(Awskeyring).to receive(:init_keychain)
     end
 
     it 'outputs help text' do
@@ -35,6 +37,11 @@ describe AwskeyringCommand do
 
     it 'tells you it could not find the command test' do
       expect { AwskeyringCommand.start(%w[test]) }.to output(/Could not find command "test"./).to_stderr
+    end
+
+    it 'initialises the keychain' do
+      expect { AwskeyringCommand.start(%w[initialise]) }
+        .to output(/Add accounts to your test keychain with:/).to_stdout
     end
   end
 
