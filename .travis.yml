@@ -3,6 +3,7 @@ language: ruby
 os: osx
 rvm:
   - 2.3.3
+  - 2.3.7
 before_install: gem install bundler
 notifications:
   slack:
