@@ -105,6 +105,7 @@ module Awskeyring
     # @param [String] token The aws_session_token
     def self.verify_cred(key:, secret:)
       begin
+        ENV['AWS_DEFAULT_REGION'] = 'us-east-1' unless ENV['AWS_DEFAULT_REGION']
         sts = Aws::STS::Client.new(access_key_id: key, secret_access_key: secret)
         sts.get_caller_identity
       rescue Aws::Errors::ServiceError => err

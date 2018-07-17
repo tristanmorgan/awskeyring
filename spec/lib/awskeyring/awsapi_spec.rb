@@ -84,12 +84,12 @@ describe Awskeyring::Awsapi do
                code: nil, mfa: nil,
                duration: 3600,
                user: 'rspec-user'
-      )).to eq(
-        key: 'ASIAIOSFODNN7EXAMPLE',
-        secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
-        token: role_token,
-        expiry: Time.parse('2011-07-15T23:28:33.359Z')
-      )
+             )).to eq(
+               key: 'ASIAIOSFODNN7EXAMPLE',
+               secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+               token: role_token,
+               expiry: Time.parse('2011-07-15T23:28:33.359Z')
+             )
     end
 
     it 'assume a role with mfa' do
@@ -99,12 +99,12 @@ describe Awskeyring::Awsapi do
                code: '654321', mfa: 'arn:mfa',
                duration: 3600,
                user: 'rspec-user'
-      )).to eq(
-        key: 'ASIAIOSFODNN7EXAMPLE',
-        secret: 'wJalrXUtnFEMI/MFADENG/bPxRfiCYzEXAMPLEKEY',
-        token: rofa_token,
-        expiry: Time.parse('2011-07-15T23:28:33.359Z')
-      )
+             )).to eq(
+               key: 'ASIAIOSFODNN7EXAMPLE',
+               secret: 'wJalrXUtnFEMI/MFADENG/bPxRfiCYzEXAMPLEKEY',
+               token: rofa_token,
+               expiry: Time.parse('2011-07-15T23:28:33.359Z')
+             )
     end
 
     it 'retrieves a session with mfa' do
@@ -114,12 +114,12 @@ describe Awskeyring::Awsapi do
                code: '654321', mfa: 'arn:mfa',
                duration: 3600,
                user: 'rspec-user'
-      )).to eq(
-        key: 'ASIAIOSFODNN7EXAMPLE',
-        secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
-        token: mfa_token,
-        expiry: Time.parse('2011-07-11T19:55:29.611Z')
-      )
+             )).to eq(
+               key: 'ASIAIOSFODNN7EXAMPLE',
+               secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+               token: mfa_token,
+               expiry: Time.parse('2011-07-11T19:55:29.611Z')
+             )
     end
 
     it 'retrieves a federated token' do
@@ -129,12 +129,12 @@ describe Awskeyring::Awsapi do
                code: nil, mfa: nil,
                duration: 3600,
                user: 'rspec-user'
-      )).to eq(
-        key: 'ASIAIUGFODNN7EXAMPLE',
-        secret: 'wJalrXUXvFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
-        token: fed_token,
-        expiry: Time.parse('2012-07-11T19:55:29.611Z')
-      )
+             )).to eq(
+               key: 'ASIAIUGFODNN7EXAMPLE',
+               secret: 'wJalrXUXvFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+               token: fed_token,
+               expiry: Time.parse('2012-07-11T19:55:29.611Z')
+             )
     end
 
     it 'returns a JSON formatted Credential' do
@@ -143,7 +143,7 @@ describe Awskeyring::Awsapi do
                secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
                token: role_token,
                expiry: Time.parse('2011-07-11T19:55:29.611Z')
-      )).to eq(%({
+             )).to eq(%({
   "Version": 1,
   "AccessKeyId": "ASIAIOSFODNN7EXAMPLE",
   "SecretAccessKey": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY",
@@ -183,7 +183,7 @@ describe Awskeyring::Awsapi do
                key: 'blah', secret: 'secretblah',
                token: nil, path: 'test',
                user: 'rspec-user'
-      )).to eq('https://signin.aws.amazon.com/federation?Action=login&SigninToken=%2A%2A%2A+the+SigninToken+string+%2A%2A%2A&Destination=https%3A%2F%2Fconsole.aws.amazon.com%2Ftest%2Fhome')
+             )).to eq('https://signin.aws.amazon.com/federation?Action=login&SigninToken=%2A%2A%2A+the+SigninToken+string+%2A%2A%2A&Destination=https%3A%2F%2Fconsole.aws.amazon.com%2Ftest%2Fhome')
     end
 
     it 'return a login_url to the AWS Console using a token' do
@@ -192,7 +192,7 @@ describe Awskeyring::Awsapi do
                key: 'blah', secret: 'secretblah',
                token: 'doubleblah', path: nil,
                user: 'rspec-user'
-      )).to eq('https://signin.aws.amazon.com/federation?Action=login&SigninToken=%2A%2A%2A+the+SigninToken+string+%2A%2A%2A&Destination=https%3A%2F%2Fconsole.aws.amazon.com%2F%2Fhome')
+             )).to eq('https://signin.aws.amazon.com/federation?Action=login&SigninToken=%2A%2A%2A+the+SigninToken+string+%2A%2A%2A&Destination=https%3A%2F%2Fconsole.aws.amazon.com%2F%2Fhome')
     end
   end
 
@@ -200,7 +200,6 @@ describe Awskeyring::Awsapi do
     let(:key) { 'AKIA1234567890ABCDEF' }
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     before do
-      ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
       allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity).and_return(
         account: '123456789012',
         arn: 'arn:aws:iam::123456789012:user/Alice',
@@ -209,8 +208,17 @@ describe Awskeyring::Awsapi do
     end
 
     it 'calls get_caller_identity' do
+      ENV['AWS_DEFAULT_REGION'] = 'us-west-1'
       allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity)
       expect(subject.verify_cred(key: key, secret: secret)).to be(true)
+      expect(ENV['AWS_DEFAULT_REGION']).to eq 'us-west-1'
+    end
+
+    it 'calls get_caller_identity and sets default region' do
+      ENV['AWS_DEFAULT_REGION'] = nil
+      allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity)
+      expect(subject.verify_cred(key: key, secret: secret)).to be(true)
+      expect(ENV['AWS_DEFAULT_REGION']).to eq 'us-east-1'
     end
   end
 
