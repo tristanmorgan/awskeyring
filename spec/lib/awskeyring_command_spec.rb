@@ -77,8 +77,10 @@ describe AwskeyringCommand do
         account: 'test',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
-        token: nil
+        token: nil,
+        updated: Time.parse('2011-08-11T22:20:01Z')
       )
+      allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
     end
 
     it 'removes an account' do
@@ -126,7 +128,8 @@ unset AWS_SESSION_TOKEN
         secret: 'bigerlongbase64',
         token: 'evenlongerbase64token',
         role: 'role',
-        expiry: Time.parse('2011-07-11T19:55:29.611Z').to_i
+        expiry: Time.parse('2011-07-11T19:55:29.611Z').to_i,
+        updated: Time.parse('2011-06-01T22:20:01Z')
       )
       allow(Process).to receive(:spawn).exactly(1).with(
         env_vars,

@@ -68,6 +68,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
     cred = Awskeyring.get_valid_creds(account: account)
+    age_check(account, cred[:updated])
     put_env_string(
       account: cred[:account],
       key: cred[:key],
@@ -83,6 +84,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
     cred = Awskeyring.get_valid_creds(account: account)
+    age_check(account, cred[:updated])
     expiry = Time.at(cred[:expiry]) unless cred[:expiry].nil?
     puts Awskeyring::Awsapi.get_cred_json(
       key: cred[:key],
@@ -96,6 +98,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # execute an external command with env set
   def exec(account, *command)
     cred = Awskeyring.get_valid_creds(account: account)
+    age_check(account, cred[:updated])
     env_vars = env_vars(
       account: cred[:account],
       key: cred[:key],
@@ -247,6 +250,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     duration ||= Awskeyring::Awsapi::ONE_HOUR.to_s
 
     item_hash = Awskeyring.get_account_hash(account: account)
+    age_check(account, item_hash[:updated])
     role_arn = Awskeyring.get_role_arn(role_name: role) if role
 
     begin
@@ -286,6 +290,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
     cred = Awskeyring.get_valid_creds(account: account)
+    age_check(account, cred[:updated])
 
     path = options[:path] || 'console'
 
@@ -328,6 +333,11 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   private
+
+  def age_check(account, updated)
+    age = (Time.new - updated).div 86_400
+    warn "# Creds for account #{account} are #{age} days old." unless age < 90
+  end
 
   def print_auto_resp(curr, len)
     case len

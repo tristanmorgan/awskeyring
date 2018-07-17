@@ -42,7 +42,11 @@ describe Awskeyring do
   context 'When there is accounts and roles' do
     let(:item) do
       double(
-        attributes: { label: 'account test', account: 'AKIATESTTEST' },
+        attributes: {
+          label: 'account test',
+          account: 'AKIATESTTEST',
+          updated_at: Time.parse('2016-12-01T22:20:01Z')
+        },
         password: 'biglongbase64'
       )
     end
@@ -69,13 +73,15 @@ describe Awskeyring do
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
         token: nil,
-        expiry: nil
+        expiry: nil,
+        updated: Time.parse('2016-12-01T22:20:01Z')
       )
       expect(subject.get_account_hash(account: 'test')).to eq(
         account: 'test',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
-        mfa: nil
+        mfa: nil,
+        updated: Time.parse('2016-12-01T22:20:01Z')
       )
     end
 
@@ -106,7 +112,8 @@ describe Awskeyring do
         attributes: {
           label: 'account test',
           account: 'AKIATESTTEST',
-          comment: 'arn:aws:iam::012345678901:mfa/ec2-user'
+          comment: 'arn:aws:iam::012345678901:mfa/ec2-user',
+          updated_at: Time.parse('2016-12-01T22:20:01Z')
         },
         password: 'biglongbase64'
       )
@@ -122,7 +129,8 @@ describe Awskeyring do
         attributes: {
           label: 'session-key test',
           account: 'ASIATESTTEST',
-          comment: 'role role'
+          comment: 'role role',
+          updated_at: Time.parse('2016-12-01T22:20:01Z')
         },
         password: 'bigerlongbase64'
       )
@@ -163,13 +171,15 @@ describe Awskeyring do
         key: 'ASIATESTTEST',
         secret: 'bigerlongbase64',
         token: 'evenlongerbase64token',
-        expiry: Time.parse('2016-12-01T22:20:01Z').to_i
+        expiry: Time.parse('2016-12-01T22:20:01Z').to_i,
+        updated: Time.parse('2016-12-01T22:20:01Z')
       )
       expect(subject.get_account_hash(account: 'test')).to eq(
         account: 'test',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
-        mfa: 'arn:aws:iam::012345678901:mfa/ec2-user'
+        mfa: 'arn:aws:iam::012345678901:mfa/ec2-user',
+        updated: Time.parse('2016-12-01T22:20:01Z')
       )
     end
 

@@ -168,7 +168,8 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
       key: cred.attributes[:account],
       secret: cred.password,
       token: token,
-      expiry: expiry
+      expiry: expiry,
+      updated: cred.attributes[:updated_at]
     }
   end
 
@@ -180,7 +181,8 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
       account: account,
       key: cred.attributes[:account],
       secret: cred.password,
-      mfa: cred.attributes[:comment]
+      mfa: cred.attributes[:comment],
+      updated: cred.attributes[:updated_at]
     }
   end
 
