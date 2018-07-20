@@ -200,6 +200,8 @@ describe Awskeyring::Awsapi do
     let(:key) { 'AKIA1234567890ABCDEF' }
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     before do
+      ENV['AWS_DEFAULT_REGION'] = nil
+      ENV['AWS_REGION'] = nil
       allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity).and_return(
         account: '123456789012',
         arn: 'arn:aws:iam::123456789012:user/Alice',
@@ -219,6 +221,15 @@ describe Awskeyring::Awsapi do
       allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity)
       expect(subject.verify_cred(key: key, secret: secret)).to be(true)
       expect(ENV['AWS_DEFAULT_REGION']).to eq 'us-east-1'
+    end
+
+    it 'retrieves the current region' do
+      ENV['AWS_DEFAULT_REGION'] = 'us-west-1'
+      expect(subject.region).to eq 'us-west-1'
+    end
+
+    it 'can not retrieve the current region' do
+      expect(subject.region).to be nil
     end
   end
 

@@ -121,6 +121,8 @@ unset AWS_SESSION_TOKEN
         'AWS_SESSION_TOKEN' => 'evenlongerbase64token' }
     end
     before do
+      ENV['AWS_DEFAULT_REGION'] = nil
+      ENV['AWS_REGION'] = nil
       allow(Awskeyring).to receive(:delete_token)
       allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test').and_return(
         account: 'test',
@@ -146,7 +148,6 @@ unset AWS_SESSION_TOKEN
 
     it 'export an AWS Session Token' do
       expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test')
-      ENV['AWS_DEFAULT_REGION'] = nil
       expect { AwskeyringCommand.start(%w[env test]) }
         .to output(%(export AWS_DEFAULT_REGION="us-east-1"
 export AWS_ACCOUNT_NAME="test"
@@ -161,7 +162,6 @@ export AWS_SESSION_TOKEN="evenlongerbase64token"
 
     it 'provides JSON for use with credential_process' do
       expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test')
-      ENV['AWS_DEFAULT_REGION'] = nil
       expect { AwskeyringCommand.start(%w[json test]) }
         .to output(JSON.pretty_generate(
           Version: 1,
@@ -174,7 +174,6 @@ export AWS_SESSION_TOKEN="evenlongerbase64token"
 
     it 'runs an external command' do
       expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test')
-      ENV['AWS_DEFAULT_REGION'] = nil
       expect(Process).to receive(:spawn).exactly(1).with(
         env_vars,
         'test-exec with params'
