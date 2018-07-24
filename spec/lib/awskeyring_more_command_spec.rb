@@ -9,11 +9,13 @@ describe AwskeyringCommand do
         account: 'test',
         key: 'ASIATESTTEST',
         secret: 'bigerlongbase64',
-        token: 'evenlongerbase64token'
+        token: 'evenlongerbase64token',
+        updated: Time.parse('2011-08-01T22:20:01Z')
       )
       allow(Awskeyring::Awsapi).to receive(:get_login_url).and_return('login-url')
       allow(Process).to receive(:spawn).exactly(1).with('open "login-url"').and_return(9999)
       allow(Process).to receive(:wait).exactly(1).with(9999)
+      allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
     end
 
     it 'opens the AWS Console' do
@@ -36,11 +38,13 @@ describe AwskeyringCommand do
         account: 'test',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
-        token: nil
+        token: nil,
+        updated: Time.parse('2011-08-01T22:20:01Z')
       )
       allow(Awskeyring::Awsapi).to receive(:get_login_url).and_return('login-url')
       allow(Process).to receive(:spawn).exactly(1).with('open "login-url"').and_return(9999)
       allow(Process).to receive(:wait).exactly(1).with(9999)
+      allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
     end
 
     it 'opens the AWS Console' do
@@ -64,7 +68,8 @@ describe AwskeyringCommand do
         account: 'test',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
-        mfa: 'arn:aws:iam::012345678901:mfa/ec2-user'
+        mfa: 'arn:aws:iam::012345678901:mfa/ec2-user',
+        updated: Time.parse('2011-08-01T22:20:01Z')
       )
       allow(Awskeyring).to receive(:get_role_arn).with(role_name: 'role').and_return(
         'arn:aws:iam::012345678901:role/test'
@@ -76,9 +81,11 @@ describe AwskeyringCommand do
           key: 'ASIAEXAMPLE',
           secret: 'bigishLongSecret',
           token: 'VeryveryVeryLongSecret',
-          expiry: '1422992424'
+          expiry: '1422992424',
+          updated: Time.parse('2011-08-01T22:20:01Z')
         )
       allow_any_instance_of(HighLine).to receive(:ask) { 'invalid' }
+      allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
     end
 
     it 'tries to receive a new token' do
@@ -294,7 +301,15 @@ describe AwskeyringCommand do
         account: 'test',
         key: 'AKIAIOSFODNN7EXAMPLE',
         secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
-        mfa: nil
+        mfa: nil,
+        updated: Time.parse('2016-12-01T22:20:01Z')
+      )
+      allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test').and_return(
+        account: 'test',
+        key: 'AKIAIOSFODNN7EXAMPLE',
+        secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+        token: nil,
+        updated: Time.parse('2016-12-01T22:20:01Z')
       )
 
       allow(Awskeyring).to receive(:update_account).and_return(true)
@@ -304,6 +319,7 @@ describe AwskeyringCommand do
         key: 'AKIAIOSFODNN7EXAMPLE',
         secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY'
       )
+      allow(Time).to receive(:new).and_return(Time.parse('2017-03-11T19:55:29.611Z'))
     end
 
     it 'calls the rotate method' do
@@ -316,6 +332,12 @@ describe AwskeyringCommand do
       expect do
         AwskeyringCommand.start(%w[rotate test])
       end.to output(/# Updated account test/).to_stdout
+    end
+
+    it 'warns about the age of the creds' do
+      expect do
+        AwskeyringCommand.start(%w[env test])
+      end.to output(/# Creds for account test are 99 days old./).to_stderr
     end
   end
 

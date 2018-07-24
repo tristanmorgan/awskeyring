@@ -19,6 +19,8 @@ module Awskeyring
 
     TWELVE_HOUR = (60 * 60 * 12)
     ONE_HOUR = (60 * 60 * 1)
+    # Days in seconds
+    ONE_DAY = (24 * 60 * 60)
 
     # Retrieves a temporary session token from AWS
     #
