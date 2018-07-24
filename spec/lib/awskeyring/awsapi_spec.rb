@@ -8,13 +8,16 @@ describe Awskeyring::Awsapi do
     let(:rofa_token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
     let(:fed_token) { 'AQoEXAMPLEH4aoAH0gNCAPget_federated_token5TthT+FvwqnKwRcOIfrRh3c/LTo6UDdyJwOOvEVP' }
     before do
-      ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
+      ENV['AWS_DEFAULT_REGION'] = nil
+      ENV['AWS_REGION'] = nil
       allow_any_instance_of(Aws::STS::Client).to receive(:assume_role).and_return({})
       allow_any_instance_of(Aws::STS::Client).to receive(:get_federation_token).and_return({})
       allow_any_instance_of(Aws::STS::Client).to receive(:assume_role).with(
         duration_seconds: 3600,
         role_arn: 'blah',
-        role_session_name: 'rspec-user'
+        role_session_name: 'rspec-user',
+        serial_number: nil,
+        token_code: nil
       ).and_return(
         double(
           assumed_role_user: {
@@ -90,9 +93,11 @@ describe Awskeyring::Awsapi do
                token: role_token,
                expiry: Time.parse('2011-07-15T23:28:33.359Z')
              )
+      expect(ENV['AWS_DEFAULT_REGION']).to eq 'us-east-1'
     end
 
     it 'assume a role with mfa' do
+      ENV['AWS_DEFAULT_REGION'] = 'us-west-2'
       expect(subject.get_token(
                key: 'blah', secret: 'blah',
                role_arn: 'blah',
@@ -105,6 +110,7 @@ describe Awskeyring::Awsapi do
                token: rofa_token,
                expiry: Time.parse('2011-07-15T23:28:33.359Z')
              )
+      expect(ENV['AWS_DEFAULT_REGION']).to eq 'us-west-2'
     end
 
     it 'retrieves a session with mfa' do
@@ -162,7 +168,8 @@ describe Awskeyring::Awsapi do
     end
 
     before do
-      ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
+      ENV['AWS_DEFAULT_REGION'] = nil
+      ENV['AWS_REGION'] = nil
       allow_any_instance_of(Aws::STS::Client).to receive(:get_federation_token)
         .and_return(
           double(
@@ -184,15 +191,18 @@ describe Awskeyring::Awsapi do
                token: nil, path: 'test',
                user: 'rspec-user'
              )).to eq('https://signin.aws.amazon.com/federation?Action=login&SigninToken=%2A%2A%2A+the+SigninToken+string+%2A%2A%2A&Destination=https%3A%2F%2Fconsole.aws.amazon.com%2Ftest%2Fhome')
+      expect(ENV['AWS_DEFAULT_REGION']).to eq 'us-east-1'
     end
 
     it 'return a login_url to the AWS Console using a token' do
+      ENV['AWS_DEFAULT_REGION'] = 'us-west-2'
       expect_any_instance_of(Aws::STS::Client).to_not receive(:get_federation_token)
       expect(subject.get_login_url(
                key: 'blah', secret: 'secretblah',
                token: 'doubleblah', path: nil,
                user: 'rspec-user'
              )).to eq('https://signin.aws.amazon.com/federation?Action=login&SigninToken=%2A%2A%2A+the+SigninToken+string+%2A%2A%2A&Destination=https%3A%2F%2Fconsole.aws.amazon.com%2F%2Fhome')
+      expect(ENV['AWS_DEFAULT_REGION']).to eq 'us-west-2'
     end
   end
 

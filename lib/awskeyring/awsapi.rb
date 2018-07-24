@@ -38,23 +38,19 @@ module Awskeyring
     #    token The aws_session_token
     #    expiry expiry time
     def self.get_token(params = {}) # rubocop:disable  Metrics/AbcSize, Metrics/MethodLength
+      ENV['AWS_DEFAULT_REGION'] = 'us-east-1' unless region
       sts = Aws::STS::Client.new(access_key_id: params[:key], secret_access_key: params[:secret])
 
+      params[:mfa] = nil unless params[:code]
       begin
         response =
-          if params[:code] && params[:role_arn]
+          if params[:role_arn]
             sts.assume_role(
               duration_seconds: params[:duration].to_i,
               role_arn: params[:role_arn],
               role_session_name: params[:user],
               serial_number: params[:mfa],
               token_code: params[:code]
-            )
-          elsif params[:role_arn]
-            sts.assume_role(
-              duration_seconds: params[:duration].to_i,
-              role_arn: params[:role_arn],
-              role_session_name: params[:user]
             )
           elsif params[:code]
             sts.get_session_token(
@@ -136,6 +132,7 @@ module Awskeyring
           sessionToken: token
         }.to_json
       else
+        ENV['AWS_DEFAULT_REGION'] = 'us-east-1' unless region
         sts = Aws::STS::Client.new(access_key_id: key,
                                    secret_access_key: secret)
 
