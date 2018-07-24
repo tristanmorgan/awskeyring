@@ -14,6 +14,8 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   SESSION_KEY_PREFIX = 'session-key '.freeze
   # Prefix for Session Tokens
   SESSION_TOKEN_PREFIX = 'session-token '.freeze
+  # Default warning of key age in days.
+  DEFAULT_KEY_AGE = 90
 
   # Retrieve the preferences
   #
@@ -32,7 +34,10 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     keychain.lock_interval = 300
     keychain.lock_on_sleep = true
 
-    prefs = { awskeyring: awskeyring }
+    prefs = {
+      awskeyring: awskeyring,
+      keyage: DEFAULT_KEY_AGE
+    }
     File.new(Awskeyring::PREFS_FILE, 'w').write JSON.dump(prefs)
   end
 

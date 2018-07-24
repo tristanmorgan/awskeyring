@@ -31,11 +31,11 @@ describe Awskeyring do
       allow(File).to receive(:read).and_call_original
       allow(File).to receive(:read)
         .with(/\.awskeyring/)
-        .and_return('{ "awskeyring": "test" }')
+        .and_return('{ "awskeyring": "test", "keyage": 90 }')
     end
 
     it 'loads preferences from a file' do
-      expect(subject.prefs).to eq('awskeyring' => 'test')
+      expect(subject.prefs).to eq('awskeyring' => 'test', 'keyage' => 90)
     end
   end
 

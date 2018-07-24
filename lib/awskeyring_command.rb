@@ -90,7 +90,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       key: cred[:key],
       secret: cred[:secret],
       token: cred[:token],
-      expiry: expiry || Time.new + 3600
+      expiry: expiry || Time.new + Awskeyring::Awsapi::ONE_HOUR
     )
   end
 
@@ -335,8 +335,9 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   private
 
   def age_check(account, updated)
-    age = (Time.new - updated).div 86_400
-    warn "# Creds for account #{account} are #{age} days old." unless age < 90
+    maxage = Awskeyring.prefs[:keyage] || Awskeyring::DEFAULT_KEY_AGE
+    age = (Time.new - updated).div Awskeyring::Awsapi::ONE_DAY
+    warn "# Creds for account #{account} are #{age} days old." unless age < maxage
   end
 
   def print_auto_resp(curr, len)
