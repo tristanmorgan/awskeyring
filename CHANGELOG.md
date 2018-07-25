@@ -1,5 +1,21 @@
 # Change Log
 
+## [v0.3.1](https://github.com/vibrato/awskeyring/tree/v0.3.1) (2018-07-25)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.3.0...v0.3.1)
+
+**Implemented enhancements:**
+
+- Warn about key-age [\#24](https://github.com/vibrato/awskeyring/pull/24) ([tristanmorgan](https://github.com/tristanmorgan))
+
+**Fixed bugs:**
+
+- Error adding account when region is not specified [\#21](https://github.com/vibrato/awskeyring/issues/21)
+- Check more locations for current region. [\#23](https://github.com/vibrato/awskeyring/pull/23) ([tristanmorgan](https://github.com/tristanmorgan))
+
+**Merged pull requests:**
+
+- Set a default region on cred verify. [\#22](https://github.com/vibrato/awskeyring/pull/22) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v0.3.0](https://github.com/vibrato/awskeyring/tree/v0.3.0) (2018-04-12)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.2.0...v0.3.0)
 
