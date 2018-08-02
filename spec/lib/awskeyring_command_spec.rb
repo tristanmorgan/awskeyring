@@ -67,6 +67,13 @@ describe AwskeyringCommand do
         .to output("minion\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
+
+    it 'lists commands with autocomplete' do
+      ENV['COMP_LINE'] = 'awskeyring '
+      expect { AwskeyringCommand.start(['awskeyring', '', 'awskeyring']) }
+        .to output(/--version\nadd\nadd-role\nconsole\nenv\nexec\nhelp/).to_stdout
+      ENV['COMP_LINE'] = nil
+    end
   end
 
   context 'When there is an account and a role' do

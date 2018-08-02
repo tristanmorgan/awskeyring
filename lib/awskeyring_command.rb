@@ -343,7 +343,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   def print_auto_resp(curr, len)
     case len
     when 0
-      puts list_commands.select { |elem| elem.start_with?(curr) }.join("\n")
+      puts list_commands.select { |elem| elem.start_with?(curr) }.sort.join("\n")
     when 1
       puts Awskeyring.list_account_names.select { |elem| elem.start_with?(curr) }.join("\n")
     when 2
@@ -354,7 +354,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   def list_commands
-    self.class.all_commands.keys.map { |elem| elem.tr('_', '-') }
+    self.class.all_commands.keys.map { |elem| elem.tr('_', '-') }.reject { |elem| elem == 'awskeyring' }
   end
 
   def env_vars(account:, key:, secret:, token:)
