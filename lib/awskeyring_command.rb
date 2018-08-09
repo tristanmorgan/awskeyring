@@ -62,12 +62,13 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   desc 'env ACCOUNT', 'Outputs bourne shell environment exports for an ACCOUNT'
+  method_option 'no-token', type: :boolean, aliases: '-n', desc: 'Do not use saved token.', default: false
   # Print Env vars
   def env(account = nil)
     account = ask_check(
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
-    cred = Awskeyring.get_valid_creds(account: account)
+    cred = Awskeyring.get_valid_creds(account: account, no_token: options['no-token'])
     age_check(account, cred[:updated])
     put_env_string(
       account: cred[:account],
@@ -78,12 +79,13 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   desc 'json ACCOUNT', 'Outputs AWS CLI compatible JSON for an ACCOUNT'
+  method_option 'no-token', type: :boolean, aliases: '-n', desc: 'Do not use saved token.', default: false
   # Print JSON for use with credential_process
   def json(account = nil)
     account = ask_check(
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
-    cred = Awskeyring.get_valid_creds(account: account)
+    cred = Awskeyring.get_valid_creds(account: account, no_token: options['no-token'])
     age_check(account, cred[:updated])
     expiry = Time.at(cred[:expiry]) unless cred[:expiry].nil?
     puts Awskeyring::Awsapi.get_cred_json(
@@ -95,9 +97,10 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   desc 'exec ACCOUNT command...', 'Execute a COMMAND with the environment set for an ACCOUNT'
+  method_option 'no-token', type: :boolean, aliases: '-n', desc: 'Do not use saved token.', default: false
   # execute an external command with env set
   def exec(account, *command)
-    cred = Awskeyring.get_valid_creds(account: account)
+    cred = Awskeyring.get_valid_creds(account: account, no_token: options['no-token'])
     age_check(account, cred[:updated])
     env_vars = env_vars(
       account: cred[:account],
@@ -284,12 +287,13 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   desc 'console ACCOUNT', 'Open the AWS Console for the ACCOUNT'
   method_option :path, type: :string, aliases: '-p', desc: 'The service PATH to open.'
+  method_option 'no-token', type: :boolean, aliases: '-n', desc: 'Do not use saved token.', default: false
   # Open the AWS Console
-  def console(account = nil) # rubocop:disable Metrics/MethodLength
+  def console(account = nil) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     account = ask_check(
       existing: account, message: 'account name', validator: Awskeyring::Validate.method(:account_name)
     )
-    cred = Awskeyring.get_valid_creds(account: account)
+    cred = Awskeyring.get_valid_creds(account: account, no_token: options['no-token'])
     age_check(account, cred[:updated])
 
     path = options[:path] || 'console'
@@ -343,7 +347,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   def print_auto_resp(curr, len)
     case len
     when 0
-      puts list_commands.select { |elem| elem.start_with?(curr) }.join("\n")
+      puts list_commands.select { |elem| elem.start_with?(curr) }.sort.join("\n")
     when 1
       puts Awskeyring.list_account_names.select { |elem| elem.start_with?(curr) }.join("\n")
     when 2
@@ -354,7 +358,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   def list_commands
-    self.class.all_commands.keys.map { |elem| elem.tr('_', '-') }
+    self.class.all_commands.keys.map { |elem| elem.tr('_', '-') }.reject { |elem| elem == 'awskeyring' }
   end
 
   def env_vars(account:, key:, secret:, token:)

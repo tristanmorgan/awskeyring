@@ -5,7 +5,7 @@ require_relative '../../lib/awskeyring_command'
 describe AwskeyringCommand do
   context 'When we try to access AWS with a token' do
     before do
-      allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test').and_return(
+      allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false).and_return(
         account: 'test',
         key: 'ASIATESTTEST',
         secret: 'bigerlongbase64',
@@ -19,7 +19,7 @@ describe AwskeyringCommand do
     end
 
     it 'opens the AWS Console' do
-      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test')
+      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false)
       expect(Awskeyring::Awsapi).to receive(:get_login_url).with(
         key: 'ASIATESTTEST',
         secret: 'bigerlongbase64',
@@ -34,7 +34,7 @@ describe AwskeyringCommand do
 
   context 'When we try to access AWS without a token' do
     before do
-      allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test').and_return(
+      allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false).and_return(
         account: 'test',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
@@ -48,7 +48,7 @@ describe AwskeyringCommand do
     end
 
     it 'opens the AWS Console' do
-      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test')
+      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false)
       expect(Awskeyring::Awsapi).to receive(:get_login_url).with(
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
@@ -304,7 +304,7 @@ describe AwskeyringCommand do
         mfa: nil,
         updated: Time.parse('2016-12-01T22:20:01Z')
       )
-      allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test').and_return(
+      allow(Awskeyring).to receive(:get_valid_creds).and_return(
         account: 'test',
         key: 'AKIAIOSFODNN7EXAMPLE',
         secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
