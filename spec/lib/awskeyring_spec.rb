@@ -183,6 +183,17 @@ describe Awskeyring do
       )
     end
 
+    it 'returns a hash with the only the creds' do
+      expect(subject.get_valid_creds(account: 'test', no_token: true)).to eq(
+        account: 'test',
+        key: 'AKIATESTTEST',
+        secret: 'biglongbase64',
+        token: nil,
+        expiry: nil,
+        updated: Time.parse('2016-12-01T22:20:01Z')
+      )
+    end
+
     it 'returns a hash with the role' do
       expect(subject.get_role_arn(role_name: 'role')).to eq(
         'arn:aws:iam::012345678901:role/test'
