@@ -7,4 +7,9 @@ trap('SIGINT') do
   exit 1
 end
 
-AwskeyringCommand.start
+begin
+  AwskeyringCommand.start
+rescue Keychain::UserCancelledError => err
+  warn err.to_s
+  exit 1
+end

@@ -13,6 +13,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   I18n.backend.load_translations
 
   map %w[--version -v] => :__version
+  map %w[--help -h] => :help
   map ['init'] => :initialise
   map ['con'] => :console
   map ['ls'] => :list
@@ -114,7 +115,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option :key, type: :string, aliases: '-k', desc: I18n.t('method_option.key')
   method_option :secret, type: :string, aliases: '-s', desc: I18n.t('method_option.secret')
   method_option :mfa, type: :string, aliases: '-m', desc: I18n.t('method_option.mfa')
-  method_option :local, type: :boolean, aliases: '-l', desc: I18n.t('method_option.local'), default: false
+  method_option 'no-remote', type: :boolean, aliases: '-r', desc: I18n.t('method_option.noremote'), default: false
   # Add an Account
   def add(account = nil) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
     account = ask_check(
@@ -131,7 +132,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       existing: options[:mfa], message: I18n.t('message.mfa'),
       optional: true, validator: Awskeyring::Validate.method(:mfa_arn)
     )
-    Awskeyring::Awsapi.verify_cred(key: key, secret: secret) unless options[:local]
+    Awskeyring::Awsapi.verify_cred(key: key, secret: secret) unless options['no-remote']
     Awskeyring.add_account(
       account: account,
       key: key,
@@ -144,7 +145,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   desc 'update ACCOUNT', I18n.t('update.desc')
   method_option :key, type: :string, aliases: '-k', desc: I18n.t('method_option.key')
   method_option :secret, type: :string, aliases: '-s', desc: I18n.t('method_option.secret')
-  method_option :local, type: :boolean, aliases: '-l', desc: I18n.t('method_option.local'), default: false
+  method_option 'no-remote', type: :boolean, aliases: '-r', desc: I18n.t('method_option.noremote'), default: false
   # Update an Account
   def update(account = nil) # rubocop:disable Metrics/MethodLength
     account = ask_check(
@@ -157,7 +158,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       existing: options[:secret], message: I18n.t('message.secret'),
       secure: true, validator: Awskeyring::Validate.method(:secret_access_key)
     )
-    Awskeyring::Awsapi.verify_cred(key: key, secret: secret) unless options[:local]
+    Awskeyring::Awsapi.verify_cred(key: key, secret: secret) unless options['no-remote']
     Awskeyring.update_account(
       account: account,
       key: key,
@@ -349,7 +350,18 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       warn I18n.t('message.awskeyring', path: $PROGRAM_NAME, bin: exec_name)
       exit 1
     end
+
+    curr, comp_len, sub_cmd = comp_type(comp_line: comp_line, curr: curr, prev: prev)
+    print_auto_resp(curr, comp_len, sub_cmd)
+  end
+
+  private
+
+  def comp_type(comp_line:, curr:, prev:)
     comp_len = comp_line.split.index(prev)
+    sub_cmd = comp_line.split[1] if comp_len > 0
+
+    comp_len = 3 if curr.start_with?('-') && !sub_cmd.nil?
 
     case prev
     when 'help'
@@ -358,10 +370,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       comp_len = 2
     end
 
-    print_auto_resp(curr, comp_len)
+    [curr, comp_len, sub_cmd]
   end
-
-  private
 
   def age_check_and_get(account:, no_token:)
     cred = Awskeyring.get_valid_creds(account: account, no_token: no_token)
@@ -373,21 +383,31 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     cred
   end
 
-  def print_auto_resp(curr, len)
+  def print_auto_resp(curr, len, sub_cmd)
+    list = []
     case len
     when 0
-      puts list_commands.select { |elem| elem.start_with?(curr) }.sort.join("\n")
+      list = list_commands
     when 1
-      puts Awskeyring.list_account_names.select { |elem| elem.start_with?(curr) }.join("\n")
+      list = Awskeyring.list_account_names
     when 2
-      puts Awskeyring.list_role_names.select { |elem| elem.start_with?(curr) }.join("\n")
+      list = Awskeyring.list_role_names
+    when 3
+      list = list_arguments(command: sub_cmd)
     else
       exit 1
     end
+    puts list.select { |elem| elem.start_with?(curr) }.sort!.join("\n")
   end
 
   def list_commands
-    self.class.all_commands.keys.map { |elem| elem.tr('_', '-') }.reject { |elem| elem == 'awskeyring' }
+    self.class.all_commands.keys.map { |elem| elem.tr('_', '-') }.reject! { |elem| elem == 'awskeyring' }
+  end
+
+  def list_arguments(command:)
+    command = list_commands.find { |elem| elem.start_with?(command) }
+    self.class.all_commands[command].options.values.map(&:aliases).flatten! +
+      self.class.all_commands[command].options.values.map(&:switch_name)
   end
 
   def env_vars(account:, key:, secret:, token:)

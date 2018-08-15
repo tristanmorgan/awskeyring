@@ -17,6 +17,9 @@ module Awskeyring
       }]
     }.to_json.freeze
 
+    # AWS Signin url
+    AWS_SIGNIN_URL = 'https://signin.aws.amazon.com/federation'.freeze
+
     # Twelve hours in seconds
     TWELVE_HOUR = (60 * 60 * 12)
     # One hour in seconds
@@ -122,9 +125,8 @@ module Awskeyring
     # @param [String] user The local username
     # @param [String] path within the Console to access
     # @return [String] login_url to access
-    def self.get_login_url(key:, secret:, token:, path:, user:) # rubocop:disable  Metrics/AbcSize, Metrics/MethodLength
+    def self.get_login_url(key:, secret:, token:, path:, user:) # rubocop:disable Metrics/MethodLength
       console_url = "https://console.aws.amazon.com/#{path}/home"
-      signin_url = 'https://signin.aws.amazon.com/federation'
 
       if token
         session_json = {
@@ -147,16 +149,20 @@ module Awskeyring
         }.to_json
       end
 
-      get_signin_token_url = signin_url + '?Action=getSigninToken' \
+      destination_param = '&Destination=' + CGI.escape(console_url)
+
+      AWS_SIGNIN_URL + '?Action=login' + token_param(session_json: session_json) + destination_param
+    end
+
+    # Get the signin token param
+    private_class_method def self.token_param(session_json:)
+      get_signin_token_url = AWS_SIGNIN_URL + '?Action=getSigninToken' \
                              '&Session=' + CGI.escape(session_json)
 
       returned_content = Net::HTTP.get(URI.parse(get_signin_token_url))
 
       signin_token = JSON.parse(returned_content)['SigninToken']
-      signin_token_param = '&SigninToken=' + CGI.escape(signin_token)
-      destination_param = '&Destination=' + CGI.escape(console_url)
-
-      signin_url + '?Action=login' + signin_token_param + destination_param
+      '&SigninToken=' + CGI.escape(signin_token)
     end
 
     # Get the current region

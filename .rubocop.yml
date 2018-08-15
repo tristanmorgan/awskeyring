@@ -12,10 +12,10 @@ Metrics/BlockLength:
 Metrics/AbcSize:
   Max: 20
 
-Naming/FileName:
-  Exclude:
-    - Gemfile
-    - Rakefile
+Bundler/GemComment:
+   Enabled: false
+   Include:
+     - Gemfile
 
 AllCops:
   Exclude:

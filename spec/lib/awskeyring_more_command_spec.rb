@@ -247,7 +247,7 @@ describe AwskeyringCommand do
     it 'tries to add a valid account without remote tests' do
       expect(Awskeyring::Awsapi).to_not receive(:verify_cred)
       expect do
-        AwskeyringCommand.start(['add', 'test', '-k', access_key, '-s', secret_access_key, '-l'])
+        AwskeyringCommand.start(['add', 'test', '-k', access_key, '-s', secret_access_key, '-r'])
       end.to output("# Added account test\n").to_stdout
     end
 
