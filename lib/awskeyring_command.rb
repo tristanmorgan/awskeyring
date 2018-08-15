@@ -220,7 +220,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       new_key = Awskeyring::Awsapi.rotate(
         account: item_hash[:account],
         key: item_hash[:key],
-        secret: item_hash[:secret]
+        secret: item_hash[:secret],
+        key_message: I18n.t('message.rotate', account: account)
       )
     rescue Aws::Errors::ServiceError => err
       warn err.to_s

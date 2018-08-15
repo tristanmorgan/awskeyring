@@ -65,7 +65,13 @@ en:
     delaccount: '# Removing account %{account}'
     delrole: '# Removing role %{role}'
     deltoken: '# Removing token for account %{account}'
+    delexpired: '# Removing expired session credentials'
+    missing: '# Config missing, run `%{bin} initialise` to recreate.'
+    rotate: '# You have two access keys for account %{account}'
+    temporary: '# Using temporary session credentials.'
+    timeout: '# It is STRONGLY recommended to set your keychain to lock in 5 minutes or less.'
     initialise: '# %{file} exists. no need to initialise.'
+    notfound: '# Credential not found with name: %{account}'
     newkeychain:
       Creating a new Keychain, you will be prompted for a password for it.
     addkeychain: >

@@ -46,14 +46,13 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   # @return [Keychain] keychain ready for use.
   private_class_method def self.load_keychain
     unless File.exist?(Awskeyring::PREFS_FILE) && !prefs.empty?
-      warn "Config missing, run `#{File.basename($PROGRAM_NAME)} initialise` to recreate."
+      warn I18n.t('message.missing', bin: File.basename($PROGRAM_NAME))
       exit 1
     end
 
     keychain = Keychain.open(prefs['awskeyring'])
-    if keychain && keychain.lock_interval > 300
-      warn 'It is STRONGLY recommended to set your keychain to lock in 5 minutes or less.'
-    end
+    warn I18n.t('message.timeout') if keychain && keychain.lock_interval > 300
+
     keychain
   end
 
@@ -151,13 +150,13 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     session_key, session_token = delete_expired(key: session_key, token: session_token) if session_key
 
     if session_key && session_token
-      puts '# Using temporary session credentials'
+      puts I18n.t('message.temporary')
       return session_key, session_token
     end
 
     item = get_item(account: account)
     if item.nil?
-      warn "# Credential not found with name: #{account}"
+      warn I18n.t('message.notfound', account: account)
       exit 2
     end
     [item, nil]
@@ -206,7 +205,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   private_class_method def self.delete_expired(key:, token:)
     expires_at = Time.at(token.attributes[:account].to_i)
     if expires_at < Time.now
-      delete_pair(key: key, token: token, message: '# Removing expired session credentials')
+      delete_pair(key: key, token: token, message: I18n.t('message.delexpired'))
       key = nil
       token = nil
     end
@@ -229,7 +228,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
 
   # Delete an Account
   def self.delete_account(account:, message:)
-    delete_token(account: account, message: '# Removing expired session credentials')
+    delete_token(account: account, message: I18n.t('message.delexpired'))
     cred = get_item(account: account)
     return unless cred
     puts message if message
