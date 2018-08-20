@@ -1,0 +1,82 @@
+---
+en:
+  __version:
+    desc: Prints the version
+  add:
+    desc: Adds an ACCOUNT to the keyring
+  add_role:
+    desc: Adds a ROLE to the keyring
+  awskeyring:
+    desc: Autocompletion for bourne shells
+  console:
+    desc: Open the AWS Console for the ACCOUNT
+  env:
+    desc: Outputs bourne shell environment exports for an ACCOUNT
+  exec:
+    desc: Execute a COMMAND with the environment set for an ACCOUNT
+  initialise:
+    desc: Initialises a new KEYCHAIN
+  json:
+    desc: Outputs AWS CLI compatible JSON for an ACCOUNT
+  list:
+    desc: Prints a list of accounts in the keyring
+  list_role:
+    desc: Prints a list of roles in the keyring
+  remove:
+    desc: Removes an ACCOUNT from the keyring
+  remove_role:
+    desc: Removes a ROLE from the keyring
+  remove_token:
+    desc: Removes a token for ACCOUNT from the keyring
+  rotate:
+    desc: Rotate access keys for an ACCOUNT
+  token:
+    desc: Create an STS Token from a ROLE or an MFA code
+  method_option:
+    arn: 'AWS role arn.'
+    code: 'Virtual mfa CODE.'
+    duration: 'Session DURATION in seconds.'
+    key: 'AWS account key id.'
+    keychain: 'Name of KEYCHAIN to initialise.'
+    local: 'Only validate locally.'
+    mfa: 'AWS virtual mfa arn.'
+    notoken: 'Do not use saved token.'
+    path: 'The service PATH to open.'
+    role: 'The ROLE to assume.'
+    secret: 'AWS account secret.'
+    update: 'Update existing.'
+  message:
+    keychain: 'Name for new keychain (default: awskeyring)'
+    account: 'account name'
+    arn: 'role arn'
+    code: 'current mfa code'
+    key: 'access key id'
+    mfa: 'mfa arn'
+    secret: 'secret access key'
+    role: 'role name'
+    addaccount: "# Added account %{account}"
+    upaccount: "# Updated account %{account}"
+    addrole: "# Added role %{role}"
+    addtoken: |
+      # Token saved for account %{account}
+      # Authentication valid until %{time}
+    age_check: '# Creds for account %{account} are %{age} days old.'
+    awskeyring: "# enable autocomplete with 'complete -C %{path} %{bin}'"
+    delaccount: '# Removing account %{account}'
+    delrole: '# Removing role %{role}'
+    deltoken: '# Removing token for account %{account}'
+    delexpired: '# Removing expired session credentials'
+    missing: '# Config missing, run `%{bin} initialise` to recreate.'
+    rotate: '# You have two access keys for account %{account}'
+    temporary: '# Using temporary session credentials.'
+    timeout: '# It is STRONGLY recommended to set your keychain to lock in 5 minutes or less.'
+    initialise: '# %{file} exists. no need to initialise.'
+    notfound: '# Credential not found with name: %{account}'
+    newkeychain:
+      Creating a new Keychain, you will be prompted for a password for it.
+    addkeychain: >
+      Your keychain has been initialised. It will auto-lock after 5 minutes
+      and when sleeping. Use Keychain Access to adjust.
+
+      Add accounts to your %{keychain} keychain with:
+          %{exec_name} add

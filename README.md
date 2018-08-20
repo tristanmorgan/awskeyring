@@ -74,7 +74,7 @@ and autocomplete that can be installed with:
 
 To set your environment easily the following bash function helps:
 
-    awsenv() { eval "$(awskeyring env $1)"; }
+    awsenv() { eval "$(awskeyring env $@)"; }
 
 ## Development
 

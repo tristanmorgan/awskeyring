@@ -314,7 +314,12 @@ describe AwskeyringCommand do
 
       allow(Awskeyring).to receive(:update_account).and_return(true)
 
-      allow(Awskeyring::Awsapi).to receive(:rotate).and_return(
+      allow(Awskeyring::Awsapi).to receive(:rotate).with(
+        account: 'test',
+        key: 'AKIAIOSFODNN7EXAMPLE',
+        key_message: '# You have two access keys for account test',
+        secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY'
+      ).and_return(
         account: 'test',
         key: 'AKIAIOSFODNN7EXAMPLE',
         secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY'
@@ -379,7 +384,7 @@ describe AwskeyringCommand do
 
       expect do
         AwskeyringCommand.start(%w[rotate test])
-      end.to raise_error(SystemExit).and output(/You have two access keys for account test/).to_stderr
+      end.to raise_error(SystemExit).and output(/# You have two access keys for account test/).to_stderr
     end
   end
 end

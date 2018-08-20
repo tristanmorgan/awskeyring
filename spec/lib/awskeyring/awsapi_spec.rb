@@ -249,6 +249,7 @@ describe Awskeyring::Awsapi do
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     let(:new_key) { 'AKIAIOSFODNN7EXAMPLE' }
     let(:new_secret) { 'wJalrXUtnFEMI/K7MDENG/bPxRiCYzEXAMPLEKEY' }
+    let(:key_message) { '# You have two access keys for account test' }
 
     before do
       ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
@@ -275,7 +276,7 @@ describe Awskeyring::Awsapi do
     end
 
     it 'rotates a secret access key' do
-      expect(subject.rotate(account: account, key: key, secret: secret)).to eq(
+      expect(subject.rotate(account: account, key: key, secret: secret, key_message: key_message)).to eq(
         account: account,
         key: new_key,
         secret: new_secret
@@ -287,6 +288,7 @@ describe Awskeyring::Awsapi do
     let(:account) { 'test' }
     let(:key) { 'AKIA1234567890ABCDEF' }
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
+    let(:key_message) { '# You have two access keys for account test' }
 
     before do
       ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
@@ -313,8 +315,8 @@ describe Awskeyring::Awsapi do
       expect_any_instance_of(Aws::IAM::Client).to_not receive(:delete_access_key)
 
       expect do
-        subject.rotate(account: account, key: key, secret: secret)
-      end.to raise_error(SystemExit).and output(/You have two access keys for account test/).to_stderr
+        subject.rotate(account: account, key: key, secret: secret, key_message: key_message)
+      end.to raise_error(SystemExit).and output(/# You have two access keys for account test/).to_stderr
     end
   end
 end
