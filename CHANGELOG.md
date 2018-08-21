@@ -1,5 +1,13 @@
 # Change Log
 
+## [v0.4.0](https://github.com/vibrato/awskeyring/tree/v0.4.0) (2018-08-21)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.3.1...v0.4.0)
+
+**Implemented enhancements:**
+
+- I18n - Internationalisation [\#26](https://github.com/vibrato/awskeyring/pull/26) ([tristanmorgan](https://github.com/tristanmorgan))
+- Adds no token flag to skip saved token [\#25](https://github.com/vibrato/awskeyring/pull/25) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v0.3.1](https://github.com/vibrato/awskeyring/tree/v0.3.1) (2018-07-25)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.3.0...v0.3.1)
 

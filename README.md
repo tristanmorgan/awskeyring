@@ -72,6 +72,10 @@ and autocomplete that can be installed with:
 
     $ complete -C /usr/local/bin/awskeyring awskeyring
 
+There are also short forms of most commands if you prefer:
+
+    $ awskeyring ls
+
 To set your environment easily the following bash function helps:
 
     awsenv() { eval "$(awskeyring env $@)"; }
