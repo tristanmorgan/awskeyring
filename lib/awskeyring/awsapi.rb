@@ -17,7 +17,9 @@ module Awskeyring
       }]
     }.to_json.freeze
 
+    # Twelve hours in seconds
     TWELVE_HOUR = (60 * 60 * 12)
+    # One hour in seconds
     ONE_HOUR = (60 * 60 * 1)
     # Days in seconds
     ONE_DAY = (24 * 60 * 60)

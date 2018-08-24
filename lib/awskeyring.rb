@@ -128,7 +128,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Return a session token pair of items by name
-  private_class_method def self.get_pair(account:)
+  private_class_method def self.get_token_pair(account:)
     session_key = all_items.where(label: SESSION_KEY_PREFIX + account).first
     session_token = all_items.where(label: SESSION_TOKEN_PREFIX + account).first if session_key
     [session_key, session_token]
@@ -145,11 +145,11 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Return a session token if available or a static key
-  private_class_method def self.get_valid_item_pair(account:)
-    session_key, session_token = get_pair(account: account)
+  private_class_method def self.get_valid_item_pair(account:, no_token: false)
+    session_key, session_token = get_token_pair(account: account)
     session_key, session_token = delete_expired(key: session_key, token: session_token) if session_key
 
-    if session_key && session_token
+    if session_key && session_token && !no_token
       puts I18n.t('message.temporary')
       return session_key, session_token
     end
@@ -164,33 +164,16 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
 
   # Return valid creds for account
   def self.get_valid_creds(account:, no_token: false)
-    if no_token
-      cred = get_item(account: account)
-      temp_cred = nil
-    else
-      cred, temp_cred = get_valid_item_pair(account: account)
-    end
+    cred, temp_cred = get_valid_item_pair(account: account, no_token: no_token)
     token = temp_cred.password unless temp_cred.nil?
     expiry = temp_cred.attributes[:account].to_i unless temp_cred.nil?
     {
       account: account,
+      expiry: expiry,
       key: cred.attributes[:account],
+      mfa: no_token ? cred.attributes[:comment] : nil,
       secret: cred.password,
       token: token,
-      expiry: expiry,
-      updated: cred.attributes[:updated_at]
-    }
-  end
-
-  # Return a hash for account (skip tokens)
-  def self.get_account_hash(account:)
-    cred = get_item(account: account)
-    return unless cred
-    {
-      account: account,
-      key: cred.attributes[:account],
-      secret: cred.password,
-      mfa: cred.attributes[:comment],
       updated: cred.attributes[:updated_at]
     }
   end
@@ -222,7 +205,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
 
   # Delete a session token
   def self.delete_token(account:, message:)
-    session_key, session_token = get_pair(account: account)
+    session_key, session_token = get_token_pair(account: account)
     delete_pair(key: session_key, token: session_token, message: message)
   end
 

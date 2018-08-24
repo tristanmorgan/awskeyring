@@ -214,7 +214,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     account = ask_check(
       existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
     )
-    item_hash = Awskeyring.get_account_hash(account: account)
+    item_hash = Awskeyring.get_valid_creds(account: account, no_token: true)
 
     begin
       new_key = Awskeyring::Awsapi.rotate(
@@ -263,7 +263,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     duration ||= Awskeyring::Awsapi::TWELVE_HOUR.to_s if code
     duration ||= Awskeyring::Awsapi::ONE_HOUR.to_s
 
-    item_hash = Awskeyring.get_account_hash(account: account)
+    item_hash = Awskeyring.get_valid_creds(account: account, no_token: true)
     age_check(account, item_hash[:updated])
     role_arn = Awskeyring.get_role_arn(role_name: role) if role
 

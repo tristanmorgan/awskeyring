@@ -64,7 +64,7 @@ describe AwskeyringCommand do
   context 'When we try to retrieve a token' do
     before do
       allow(Awskeyring).to receive(:delete_token).with(account: 'test', message: '# Removing STS credentials')
-      allow(Awskeyring).to receive(:get_account_hash).with(account: 'test').and_return(
+      allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: true).and_return(
         account: 'test',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
@@ -89,7 +89,7 @@ describe AwskeyringCommand do
     end
 
     it 'tries to receive a new token' do
-      expect(Awskeyring).to receive(:get_account_hash).with(account: 'test')
+      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: true)
       expect(Awskeyring).to receive(:get_role_arn).with(role_name: 'role')
       expect(Awskeyring).to receive(:add_token).with(
         account: 'test',
@@ -117,7 +117,7 @@ describe AwskeyringCommand do
     end
 
     it 'tries to receive a new token with an MFA' do
-      expect(Awskeyring).to receive(:get_account_hash).with(account: 'test')
+      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: true)
       expect(Awskeyring).to receive(:add_token).with(
         account: 'test',
         key: 'ASIAEXAMPLE',
@@ -144,7 +144,7 @@ describe AwskeyringCommand do
     end
 
     it 'tries to receive a new token with an MFA and role' do
-      expect(Awskeyring).to receive(:get_account_hash).with(account: 'test')
+      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: true)
       expect(Awskeyring).to receive(:add_token).with(
         account: 'test',
         key: 'ASIAEXAMPLE',
@@ -297,13 +297,6 @@ describe AwskeyringCommand do
   context 'when we try to rotate keys' do
     before do
       ENV['AWS_DEFAULT_REGION'] = nil
-      allow(Awskeyring).to receive(:get_account_hash).with(account: 'test').and_return(
-        account: 'test',
-        key: 'AKIAIOSFODNN7EXAMPLE',
-        secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
-        mfa: nil,
-        updated: Time.parse('2016-12-01T22:20:01Z')
-      )
       allow(Awskeyring).to receive(:get_valid_creds).and_return(
         account: 'test',
         key: 'AKIAIOSFODNN7EXAMPLE',
@@ -356,7 +349,13 @@ describe AwskeyringCommand do
 
     before do
       ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
-      allow(Awskeyring).to receive(:get_item).with('test').and_return(old_item)
+      allow(Awskeyring).to receive(:get_valid_creds).and_return(
+        account: 'test',
+        key: 'AKIAIOSFODNN7EXAMPLE',
+        secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+        token: nil,
+        updated: Time.parse('2016-12-01T22:20:01Z')
+      )
       allow_any_instance_of(Aws::IAM::Client).to receive(:list_access_keys).and_return(
         access_key_metadata: [
           {
@@ -376,7 +375,7 @@ describe AwskeyringCommand do
     end
 
     it 'calls the rotate method and fails' do
-      expect(Awskeyring).to receive(:get_item).with(account: 'test').and_return(old_item)
+      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: true)
       expect(Awskeyring).to_not receive(:update_account)
 
       expect_any_instance_of(Aws::IAM::Client).to_not receive(:create_access_key)
