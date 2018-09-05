@@ -30,6 +30,21 @@ describe AwskeyringCommand do
       expect(Process).to receive(:spawn).exactly(1).with('open "login-url"')
       AwskeyringCommand.start(%w[console test])
     end
+
+    it 'prints the AWS Console URL' do
+      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false)
+      expect(Awskeyring::Awsapi).to receive(:get_login_url).with(
+        key: 'ASIATESTTEST',
+        secret: 'bigerlongbase64',
+        token: 'evenlongerbase64token',
+        path: 'console',
+        user: ENV['USER']
+      )
+      expect(Process).to_not receive(:spawn).with('open "login-url"')
+      expect do
+        AwskeyringCommand.start(%w[console test --no-open])
+      end.to output(/login-url/).to_stdout
+    end
   end
 
   context 'When we try to access AWS without a token' do
@@ -225,7 +240,7 @@ describe AwskeyringCommand do
       expect(Awskeyring).to receive(:update_account)
       expect(Awskeyring).to_not receive(:add_account)
       expect do
-        AwskeyringCommand.start(['add', 'test', '-k', access_key, '-s', secret_access_key, '-u'])
+        AwskeyringCommand.start(['update', 'test', '-k', access_key, '-s', secret_access_key])
       end.to output("# Updated account test\n").to_stdout
     end
 

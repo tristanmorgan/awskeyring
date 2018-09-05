@@ -32,6 +32,8 @@ en:
     desc: Rotate access keys for an ACCOUNT
   token:
     desc: Create an STS Token from a ROLE or an MFA code
+  update:
+    desc: Updates an ACCOUNT in the keyring
   method_option:
     arn: 'AWS role arn.'
     code: 'Virtual mfa CODE.'
@@ -40,11 +42,11 @@ en:
     keychain: 'Name of KEYCHAIN to initialise.'
     local: 'Only validate locally.'
     mfa: 'AWS virtual mfa arn.'
+    noopen: 'Do not open the url.'
     notoken: 'Do not use saved token.'
     path: 'The service PATH to open.'
     role: 'The ROLE to assume.'
     secret: 'AWS account secret.'
-    update: 'Update existing.'
   message:
     keychain: 'Name for new keychain (default: awskeyring)'
     account: 'account name'
