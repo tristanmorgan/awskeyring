@@ -45,7 +45,8 @@ describe Awskeyring do
         attributes: {
           label: 'account test',
           account: 'AKIATESTTEST',
-          updated_at: Time.parse('2016-12-01T22:20:01Z')
+          updated_at: Time.parse('2016-12-01T22:20:01Z'),
+          comment: 'arn:aws:iam::012345678901:mfa/ec2-user'
         },
         password: 'biglongbase64'
       )
@@ -68,19 +69,13 @@ describe Awskeyring do
     end
 
     it 'returns a hash with the creds' do
-      expect(subject.get_valid_creds(account: 'test')).to eq(
+      expect(subject.get_valid_creds(account: 'test', no_token: true)).to eq(
         account: 'test',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
         token: nil,
         expiry: nil,
-        updated: Time.parse('2016-12-01T22:20:01Z')
-      )
-      expect(subject.get_account_hash(account: 'test')).to eq(
-        account: 'test',
-        key: 'AKIATESTTEST',
-        secret: 'biglongbase64',
-        mfa: nil,
+        mfa: 'arn:aws:iam::012345678901:mfa/ec2-user',
         updated: Time.parse('2016-12-01T22:20:01Z')
       )
     end
@@ -164,7 +159,7 @@ describe Awskeyring do
     it 'returns a hash with the creds and token' do
       test_hash = nil
       expect do
-        test_hash = subject.get_valid_creds(account: 'test')
+        test_hash = subject.get_valid_creds(account: 'test', no_token: false)
       end.to output(/# Using temporary session credentials/).to_stdout
       expect(test_hash).to eq(
         account: 'test',
@@ -172,13 +167,7 @@ describe Awskeyring do
         secret: 'bigerlongbase64',
         token: 'evenlongerbase64token',
         expiry: Time.parse('2016-12-01T22:20:01Z').to_i,
-        updated: Time.parse('2016-12-01T22:20:01Z')
-      )
-      expect(subject.get_account_hash(account: 'test')).to eq(
-        account: 'test',
-        key: 'AKIATESTTEST',
-        secret: 'biglongbase64',
-        mfa: 'arn:aws:iam::012345678901:mfa/ec2-user',
+        mfa: nil,
         updated: Time.parse('2016-12-01T22:20:01Z')
       )
     end
@@ -190,6 +179,7 @@ describe Awskeyring do
         secret: 'biglongbase64',
         token: nil,
         expiry: nil,
+        mfa: 'arn:aws:iam::012345678901:mfa/ec2-user',
         updated: Time.parse('2016-12-01T22:20:01Z')
       )
     end

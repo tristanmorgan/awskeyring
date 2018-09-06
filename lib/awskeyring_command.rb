@@ -68,8 +68,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     account = ask_check(
       existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
     )
-    cred = Awskeyring.get_valid_creds(account: account, no_token: options['no-token'])
-    age_check(account, cred[:updated])
+    cred = age_check_and_get(account: account, no_token: options['no-token'])
     put_env_string(
       account: cred[:account],
       key: cred[:key],
@@ -85,8 +84,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     account = ask_check(
       existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
     )
-    cred = Awskeyring.get_valid_creds(account: account, no_token: options['no-token'])
-    age_check(account, cred[:updated])
+    cred = age_check_and_get(account: account, no_token: options['no-token'])
     expiry = Time.at(cred[:expiry]) unless cred[:expiry].nil?
     puts Awskeyring::Awsapi.get_cred_json(
       key: cred[:key],
@@ -100,8 +98,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   # execute an external command with env set
   def exec(account, *command)
-    cred = Awskeyring.get_valid_creds(account: account, no_token: options['no-token'])
-    age_check(account, cred[:updated])
+    cred = age_check_and_get(account: account, no_token: options['no-token'])
     env_vars = env_vars(
       account: cred[:account],
       key: cred[:key],
@@ -214,13 +211,13 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     account = ask_check(
       existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
     )
-    item_hash = Awskeyring.get_account_hash(account: account)
+    cred = Awskeyring.get_valid_creds(account: account, no_token: true)
 
     begin
       new_key = Awskeyring::Awsapi.rotate(
-        account: item_hash[:account],
-        key: item_hash[:key],
-        secret: item_hash[:secret],
+        account: cred[:account],
+        key: cred[:key],
+        secret: cred[:secret],
         key_message: I18n.t('message.rotate', account: account)
       )
     rescue Aws::Errors::ServiceError => err
@@ -263,8 +260,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     duration ||= Awskeyring::Awsapi::TWELVE_HOUR.to_s if code
     duration ||= Awskeyring::Awsapi::ONE_HOUR.to_s
 
-    item_hash = Awskeyring.get_account_hash(account: account)
-    age_check(account, item_hash[:updated])
+    item_hash = age_check_and_get(account: account, no_token: true)
     role_arn = Awskeyring.get_role_arn(role_name: role) if role
 
     begin
@@ -299,12 +295,11 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option :path, type: :string, aliases: '-p', desc: I18n.t('method_option.path')
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   # Open the AWS Console
-  def console(account = nil) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+  def console(account = nil) # rubocop:disable Metrics/MethodLength
     account = ask_check(
       existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
     )
-    cred = Awskeyring.get_valid_creds(account: account, no_token: options['no-token'])
-    age_check(account, cred[:updated])
+    cred = age_check_and_get(account: account, no_token: options['no-token'])
 
     path = options[:path] || 'console'
 
@@ -348,10 +343,14 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   private
 
-  def age_check(account, updated)
+  def age_check_and_get(account:, no_token:)
+    cred = Awskeyring.get_valid_creds(account: account, no_token: no_token)
+
     maxage = Awskeyring.prefs[:keyage] || Awskeyring::DEFAULT_KEY_AGE
-    age = (Time.new - updated).div Awskeyring::Awsapi::ONE_DAY
+    age = (Time.new - cred[:updated]).div Awskeyring::Awsapi::ONE_DAY
     warn I18n.t('message.age_check', account: account, age: age) unless age < maxage
+
+    cred
   end
 
   def print_auto_resp(curr, len)

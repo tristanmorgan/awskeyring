@@ -2,6 +2,7 @@ require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
 require 'rubocop/rake_task'
 require 'github_changelog_generator/task'
+require 'yard'
 
 GitHubChangelogGenerator::RakeTask.new :changelog do |config|
   config.future_release = "v#{Awskeyring::VERSION}"
@@ -29,4 +30,9 @@ task :filemode do
   print "\n"
 end
 
-task default: %i[filemode rubocop spec]
+YARD::Rake::YardocTask.new do |t|
+  t.options = ['--fail-on-warning', '--no-progress']
+  t.stats_options = ['--list-undoc']
+end
+
+task default: %i[filemode rubocop spec yard]

@@ -17,7 +17,9 @@ module Awskeyring
       }]
     }.to_json.freeze
 
+    # Twelve hours in seconds
     TWELVE_HOUR = (60 * 60 * 12)
+    # One hour in seconds
     ONE_HOUR = (60 * 60 * 1)
     # Days in seconds
     ONE_DAY = (24 * 60 * 60)
@@ -100,7 +102,6 @@ module Awskeyring
     #
     # @param [String] key The aws_access_key_id
     # @param [String] secret The aws_secret_access_key
-    # @param [String] token The aws_session_token
     def self.verify_cred(key:, secret:)
       begin
         ENV['AWS_DEFAULT_REGION'] = 'us-east-1' unless region
