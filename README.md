@@ -67,6 +67,7 @@ The CLI is using [Thor](http://whatisthor.com) with help provided interactively.
       awskeyring remove-token ACCOUNT        # Removes a token for ACCOUNT from the keyring
       awskeyring rotate ACCOUNT              # Rotate access keys for an ACCOUNT
       awskeyring token ACCOUNT [ROLE] [MFA]  # Create an STS Token from a ROLE or an MFA code
+      awskeyring update ACCOUNT              # Updates an ACCOUNT in the keyring
 
 and autocomplete that can be installed with:
 

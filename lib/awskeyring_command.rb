@@ -21,6 +21,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   map ['rmr'] => :remove_role
   map ['rmt'] => :remove_token
   map ['rot'] => :rotate
+  map ['up'] => :update
 
   desc '--version, -v', I18n.t('__version.desc')
   # print the version number
@@ -114,7 +115,6 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option :secret, type: :string, aliases: '-s', desc: I18n.t('method_option.secret')
   method_option :mfa, type: :string, aliases: '-m', desc: I18n.t('method_option.mfa')
   method_option :local, type: :boolean, aliases: '-l', desc: I18n.t('method_option.local'), default: false
-  method_option :update, type: :boolean, aliases: '-u', desc: I18n.t('method_option.update'), default: false
   # Add an Account
   def add(account = nil) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
     account = ask_check(
@@ -127,28 +127,43 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       existing: options[:secret], message: I18n.t('message.secret'),
       secure: true, validator: Awskeyring::Validate.method(:secret_access_key)
     )
-    if options[:update]
-      Awskeyring::Awsapi.verify_cred(key: key, secret: secret) unless options[:local]
-      Awskeyring.update_account(
-        account: account,
-        key: key,
-        secret: secret
-      )
-      puts I18n.t('message.upaccount', account: account)
-    else
-      mfa = ask_check(
-        existing: options[:mfa], message: I18n.t('message.mfa'),
-        optional: true, validator: Awskeyring::Validate.method(:mfa_arn)
-      )
-      Awskeyring::Awsapi.verify_cred(key: key, secret: secret) unless options[:local]
-      Awskeyring.add_account(
-        account: account,
-        key: key,
-        secret: secret,
-        mfa: mfa
-      )
-      puts I18n.t('message.addaccount', account: account)
-    end
+    mfa = ask_check(
+      existing: options[:mfa], message: I18n.t('message.mfa'),
+      optional: true, validator: Awskeyring::Validate.method(:mfa_arn)
+    )
+    Awskeyring::Awsapi.verify_cred(key: key, secret: secret) unless options[:local]
+    Awskeyring.add_account(
+      account: account,
+      key: key,
+      secret: secret,
+      mfa: mfa
+    )
+    puts I18n.t('message.addaccount', account: account)
+  end
+
+  desc 'update ACCOUNT', I18n.t('update.desc')
+  method_option :key, type: :string, aliases: '-k', desc: I18n.t('method_option.key')
+  method_option :secret, type: :string, aliases: '-s', desc: I18n.t('method_option.secret')
+  method_option :local, type: :boolean, aliases: '-l', desc: I18n.t('method_option.local'), default: false
+  # Update an Account
+  def update(account = nil) # rubocop:disable Metrics/MethodLength
+    account = ask_check(
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
+    )
+    key = ask_check(
+      existing: options[:key], message: I18n.t('message.key'), validator: Awskeyring::Validate.method(:access_key)
+    )
+    secret = ask_check(
+      existing: options[:secret], message: I18n.t('message.secret'),
+      secure: true, validator: Awskeyring::Validate.method(:secret_access_key)
+    )
+    Awskeyring::Awsapi.verify_cred(key: key, secret: secret) unless options[:local]
+    Awskeyring.update_account(
+      account: account,
+      key: key,
+      secret: secret
+    )
+    puts I18n.t('message.upaccount', account: account)
   end
 
   map 'add-role' => :add_role
@@ -294,8 +309,9 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   desc 'console ACCOUNT', I18n.t('console.desc')
   method_option :path, type: :string, aliases: '-p', desc: I18n.t('method_option.path')
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
+  method_option 'no-open', type: :boolean, aliases: '-o', desc: I18n.t('method_option.noopen'), default: false
   # Open the AWS Console
-  def console(account = nil) # rubocop:disable Metrics/MethodLength
+  def console(account = nil) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     account = ask_check(
       existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
     )
@@ -316,8 +332,12 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       exit 1
     end
 
-    pid = Process.spawn("open \"#{login_url}\"")
-    Process.wait pid
+    if options['no-open']
+      puts login_url
+    else
+      pid = Process.spawn("open \"#{login_url}\"")
+      Process.wait pid
+    end
   end
 
   desc 'awskeyring CURR PREV', I18n.t('awskeyring.desc'), hide: true
