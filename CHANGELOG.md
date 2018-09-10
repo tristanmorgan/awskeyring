@@ -1,5 +1,16 @@
 # Change Log
 
+## [v0.5.0](https://github.com/vibrato/awskeyring/tree/v0.5.0) (2018-09-10)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.4.0...v0.5.0)
+
+**Implemented enhancements:**
+
+- Separate update account from add account. [\#28](https://github.com/vibrato/awskeyring/pull/28) ([tristanmorgan](https://github.com/tristanmorgan))
+
+**Merged pull requests:**
+
+- Refactor [\#27](https://github.com/vibrato/awskeyring/pull/27) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v0.4.0](https://github.com/vibrato/awskeyring/tree/v0.4.0) (2018-08-21)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.3.1...v0.4.0)
 
@@ -73,7 +84,7 @@
 ## [v0.0.5](https://github.com/vibrato/awskeyring/tree/v0.0.5) (2018-02-15)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.0.4...v0.0.5)
 
-**Closed issues:**
+**Fixed bugs:**
 
 - Issue on add [\#7](https://github.com/vibrato/awskeyring/issues/7)
 
