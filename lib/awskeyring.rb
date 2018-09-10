@@ -198,6 +198,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   # Delete session token items
   private_class_method def self.delete_pair(key:, token:, message:)
     return unless key
+
     puts message if message
     token.delete if token
     key.delete
@@ -214,6 +215,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     delete_token(account: account, message: I18n.t('message.delexpired'))
     cred = get_item(account: account)
     return unless cred
+
     puts message if message
     cred.delete
   end
@@ -222,6 +224,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   def self.delete_role(role_name:, message:)
     role = get_role(role_name: role_name)
     return unless role
+
     puts message if message
     role.delete
   end
