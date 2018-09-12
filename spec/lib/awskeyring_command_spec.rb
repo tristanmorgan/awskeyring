@@ -81,6 +81,13 @@ describe AwskeyringCommand do
         .to output(/--version\nadd\nadd-role\nconsole\nenv\nexec\nhelp/).to_stdout
       ENV['COMP_LINE'] = nil
     end
+
+    it 'lists flags with autocomplete' do
+      ENV['COMP_LINE'] = 'awskeyring token vibrato minion --dura'
+      expect { AwskeyringCommand.start(%w[awskeyring --dura minion]) }
+        .to output("--duration\n").to_stdout
+      ENV['COMP_LINE'] = nil
+    end
   end
 
   context 'When there is an account and a role' do
