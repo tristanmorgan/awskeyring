@@ -1,5 +1,12 @@
 # Change Log
 
+## [v0.5.1](https://github.com/vibrato/awskeyring/tree/v0.5.1) (2018-09-13)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.5.0...v0.5.1)
+
+**Implemented enhancements:**
+
+- Autocomplete flags too. [\#29](https://github.com/vibrato/awskeyring/pull/29) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v0.5.0](https://github.com/vibrato/awskeyring/tree/v0.5.0) (2018-09-10)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.4.0...v0.5.0)
 

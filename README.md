@@ -87,6 +87,10 @@ After checking out the repo, run `bundle update` to install dependencies. Then, 
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 
+## Security
+
+If you believe you have found a security issue in Awskeyring, please responsibly disclose by contacting me at [tristan@vibrato.com.au](mailto:tristan@vibrato.com.au). Awskeyring is a Ruby script and as such Ruby is whitelisted to access your "awskeyring" keychain. Use a strong password and keep the unlock time short.
+
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/vibrato/awskeyring. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
