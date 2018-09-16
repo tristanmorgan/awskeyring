@@ -13,7 +13,6 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   I18n.backend.load_translations
 
   map %w[--version -v] => :__version
-  map %w[--help -h] => :help
   map ['init'] => :initialise
   map ['con'] => :console
   map ['ls'] => :list
@@ -22,6 +21,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   map ['rmr'] => :remove_role
   map ['rmt'] => :remove_token
   map ['rot'] => :rotate
+  map ['tok'] => :token
   map ['up'] => :update
 
   desc '--version, -v', I18n.t('__version.desc')
@@ -357,11 +357,21 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   private
 
+  def age_check_and_get(account:, no_token:)
+    cred = Awskeyring.get_valid_creds(account: account, no_token: no_token)
+
+    maxage = Awskeyring.prefs[:keyage] || Awskeyring::DEFAULT_KEY_AGE
+    age = (Time.new - cred[:updated]).div Awskeyring::Awsapi::ONE_DAY
+    warn I18n.t('message.age_check', account: account, age: age) unless age < maxage
+
+    cred
+  end
+
   def comp_type(comp_line:, curr:, prev:)
     comp_len = comp_line.split.index(prev)
-    sub_cmd = comp_line.split[1] if comp_len > 0
+    sub_cmd = sub_command(comp_line.split)
 
-    comp_len = 3 if curr.start_with?('-') && !sub_cmd.nil?
+    comp_len = 3 if curr.start_with?('-')
 
     case prev
     when 'help'
@@ -373,14 +383,14 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     [curr, comp_len, sub_cmd]
   end
 
-  def age_check_and_get(account:, no_token:)
-    cred = Awskeyring.get_valid_creds(account: account, no_token: no_token)
+  def sub_command(comp_lines)
+    return nil if comp_lines.nil? || comp_lines.length < 2
 
-    maxage = Awskeyring.prefs[:keyage] || Awskeyring::DEFAULT_KEY_AGE
-    age = (Time.new - cred[:updated]).div Awskeyring::Awsapi::ONE_DAY
-    warn I18n.t('message.age_check', account: account, age: age) unless age < maxage
+    sub_cmd = comp_lines[1]
 
-    cred
+    return sub_cmd if self.class.all_commands.keys.index(sub_cmd)
+
+    self.class.map[sub_cmd].to_s
   end
 
   def print_auto_resp(curr, len, sub_cmd)
@@ -405,7 +415,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   def list_arguments(command:)
-    command = list_commands.find { |elem| elem.start_with?(command) }
+    exit 1 if command.empty?
     self.class.all_commands[command].options.values.map(&:aliases).flatten! +
       self.class.all_commands[command].options.values.map(&:switch_name)
   end
