@@ -360,7 +360,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   def age_check_and_get(account:, no_token:)
     cred = Awskeyring.get_valid_creds(account: account, no_token: no_token)
 
-    maxage = Awskeyring.prefs[:keyage] || Awskeyring::DEFAULT_KEY_AGE
+    maxage = Awskeyring.key_age
     age = (Time.new - cred[:updated]).div Awskeyring::Awsapi::ONE_DAY
     warn I18n.t('message.age_check', account: account, age: age) unless age < maxage
 
@@ -378,6 +378,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       comp_len = 0
     when 'remove-role', '-r', 'rmr'
       comp_len = 2
+    when '--path', '-p'
+      comp_len = 4
     end
 
     [curr, comp_len, sub_cmd]
@@ -404,6 +406,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       list = Awskeyring.list_role_names
     when 3
       list = list_arguments(command: sub_cmd)
+    when 4
+      list = Awskeyring.list_console_path
     else
       exit 1
     end

@@ -49,6 +49,7 @@ describe AwskeyringCommand do
     before do
       allow(Awskeyring).to receive(:list_account_names).and_return(%w[company personal vibrato])
       allow(Awskeyring).to receive(:list_role_names).and_return(%w[admin minion readonly])
+      allow(Awskeyring).to receive(:list_console_path).and_return(%w[iam cloudformation vpc])
     end
 
     it 'list keychain items' do
@@ -86,6 +87,13 @@ describe AwskeyringCommand do
       ENV['COMP_LINE'] = 'awskeyring token vibrato minion --dura'
       expect { AwskeyringCommand.start(%w[awskeyring --dura minion]) }
         .to output("--duration\n").to_stdout
+      ENV['COMP_LINE'] = nil
+    end
+
+    it 'lists console paths with autocomplete' do
+      ENV['COMP_LINE'] = 'awskeyring console vibrato --path cloud'
+      expect { AwskeyringCommand.start(%w[awskeyring cloud --path]) }
+        .to output("cloudformation\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
   end

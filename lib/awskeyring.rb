@@ -16,6 +16,8 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   SESSION_TOKEN_PREFIX = 'session-token '.freeze
   # Default warning of key age in days.
   DEFAULT_KEY_AGE = 90
+  # Default Console Paths
+  DEFAULT_CONSOLE_LIST = %w[cloudformation ec2/v2 iam rds route53 s3 sns sqs vpc].freeze
 
   # Retrieve the preferences
   #
@@ -36,7 +38,8 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
 
     prefs = {
       awskeyring: awskeyring,
-      keyage: DEFAULT_KEY_AGE
+      keyage: DEFAULT_KEY_AGE,
+      console: DEFAULT_CONSOLE_LIST
     }
     File.new(Awskeyring::PREFS_FILE, 'w').write JSON.dump(prefs)
   end
@@ -142,6 +145,16 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   # Return a list role item names
   def self.list_role_names
     list_roles.map { |elem| elem.attributes[:label][(ROLE_PREFIX.length)..-1] }
+  end
+
+  # Return a list of console paths
+  def self.list_console_path
+    prefs.key?('console') ? prefs['console'] : DEFAULT_CONSOLE_LIST
+  end
+
+  # Return Key age warning number
+  def self.key_age
+    prefs.key?('keyage') ? prefs['keyage'] : DEFAULT_KEY_AGE
   end
 
   # Return a session token if available or a static key
