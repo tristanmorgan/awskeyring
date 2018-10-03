@@ -1,5 +1,12 @@
 # Change Log
 
+## [v0.5.3](https://github.com/vibrato/awskeyring/tree/v0.5.3) (2018-10-04)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.5.2...v0.5.3)
+
+**Implemented enhancements:**
+
+- Console favourites [\#31](https://github.com/vibrato/awskeyring/pull/31) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v0.5.2](https://github.com/vibrato/awskeyring/tree/v0.5.2) (2018-09-18)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.5.1...v0.5.2)
 
