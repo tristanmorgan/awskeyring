@@ -14,6 +14,8 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   SESSION_KEY_PREFIX = 'session-key '.freeze
   # Prefix for Session Tokens
   SESSION_TOKEN_PREFIX = 'session-token '.freeze
+  # Default keychain Lock period
+  FIVE_MINUTES = 300
   # Default warning of key age in days.
   DEFAULT_KEY_AGE = 90
   # Default Console Paths
@@ -31,9 +33,11 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Create a new Keychain
+  #
+  # @param [String] awskeyring The keychain name to create
   def self.init_keychain(awskeyring:)
     keychain = Keychain.create(awskeyring)
-    keychain.lock_interval = 300
+    keychain.lock_interval = FIVE_MINUTES
     keychain.lock_on_sleep = true
 
     prefs = {
@@ -54,7 +58,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     end
 
     keychain = Keychain.open(prefs['awskeyring'])
-    warn I18n.t('message.timeout') if keychain && keychain.lock_interval > 300
+    warn I18n.t('message.timeout') if keychain && keychain.lock_interval > FIVE_MINUTES
 
     keychain
   end
@@ -81,6 +85,11 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Add an account item
+  #
+  # @param [String] account The account name to create
+  # @param [String] key The aws_access_key_id
+  # @param [String] secret The aws_secret_key
+  # @param [String] mfa The arn of the MFA device
   def self.add_account(account:, key:, secret:, mfa:)
     all_items.create(
       label: ACCOUNT_PREFIX + account,
@@ -91,6 +100,10 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # update and account item
+  #
+  # @param [String] account The account to update
+  # @param [String] key The aws_access_key_id
+  # @param [String] secret The aws_secret_key
   def self.update_account(account:, key:, secret:)
     item = get_item(account: account)
     item.attributes[:account] = key
@@ -99,6 +112,10 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Add a Role item
+  #
+  # @param [String] role The role name to add
+  # @param [String] arn The arn of the role
+  # @param [String] account The account associate (optional)
   def self.add_role(role:, arn:, account:)
     all_items.create(
       label: ROLE_PREFIX + role,
@@ -109,6 +126,14 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # add a session token pair of items
+  #
+  # @param [Hash] params including
+  #    account The name of the accont
+  #    key The aws_access_key_id
+  #    secret The aws_secret_access_key
+  #    token The aws_sesson_token
+  #    expiry time of expiry
+  #    role The role used
   def self.add_token(params = {})
     all_items.create(label: SESSION_KEY_PREFIX + params[:account],
                      account: params[:key],
@@ -176,6 +201,9 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Return valid creds for account
+  #
+  # @param [String] account The account to retrieve
+  # @param [Boolean] no_token Flag to skip tokens
   def self.get_valid_creds(account:, no_token: false)
     cred, temp_cred = get_valid_item_pair(account: account, no_token: no_token)
     token = temp_cred.password unless temp_cred.nil?
@@ -192,6 +220,8 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # get the ARN for a role
+  #
+  # @param [String] role_name The role name to retrieve
   def self.get_role_arn(role_name:)
     role_item = get_role(role_name: role_name)
     role_item.attributes[:account] if role_item
@@ -218,12 +248,18 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Delete a session token
+  #
+  # @param [String] account The account to delete a token for
+  # @param [String] message The message to display
   def self.delete_token(account:, message:)
     session_key, session_token = get_token_pair(account: account)
     delete_pair(key: session_key, token: session_token, message: message)
   end
 
   # Delete an Account
+  #
+  # @param [String] account The account to delete
+  # @param [String] message The message to display
   def self.delete_account(account:, message:)
     delete_token(account: account, message: I18n.t('message.delexpired'))
     cred = get_item(account: account)
@@ -234,6 +270,9 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   end
 
   # Delete a role
+  #
+  # @param [String] role_name The role to delete
+  # @param [String] message The message to display
   def self.delete_role(role_name:, message:)
     role = get_role(role_name: role_name)
     return unless role
