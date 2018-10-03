@@ -33,9 +33,14 @@ describe Awskeyring do
         .with(/\.awskeyring/)
         .and_return('{ "awskeyring": "test", "keyage": 90 }')
     end
+    let(:default_console) { %w[cloudformation ec2/v2 iam rds route53 s3 sns sqs vpc] }
 
     it 'loads preferences from a file' do
       expect(subject.prefs).to eq('awskeyring' => 'test', 'keyage' => 90)
+    end
+
+    it 'provides a default list of console paths' do
+      expect(subject.list_console_path).to eq(default_console)
     end
   end
 

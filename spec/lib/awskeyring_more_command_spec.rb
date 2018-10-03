@@ -321,6 +321,7 @@ describe AwskeyringCommand do
       )
 
       allow(Awskeyring).to receive(:update_account).and_return(true)
+      allow(Awskeyring).to receive(:key_age).and_return(90)
 
       allow(Awskeyring::Awsapi).to receive(:rotate).with(
         account: 'test',
