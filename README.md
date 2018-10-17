@@ -36,7 +36,7 @@ Alternatively you can create a profile using the credential_process config varia
 
     [profile personal]
     region = us-west-1
-    credential_process = awskeyring json personal-aws 
+    credential_process = /usr/local/bin/awskeyring json personal-aws
 
 See below and in the [wiki](https://github.com/vibrato/awskeyring/wiki) for more details on usage.
 
