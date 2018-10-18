@@ -311,7 +311,6 @@ describe AwskeyringCommand do
 
   context 'when we try to rotate keys' do
     before do
-      ENV['AWS_DEFAULT_REGION'] = nil
       allow(Awskeyring).to receive(:get_valid_creds).and_return(
         account: 'test',
         key: 'AKIAIOSFODNN7EXAMPLE',
@@ -364,7 +363,6 @@ describe AwskeyringCommand do
     end
 
     before do
-      ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
       allow(Awskeyring).to receive(:get_valid_creds).and_return(
         account: 'test',
         key: 'AKIAIOSFODNN7EXAMPLE',

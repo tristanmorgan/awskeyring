@@ -8,8 +8,7 @@ describe Awskeyring::Awsapi do
     let(:rofa_token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
     let(:fed_token) { 'AQoEXAMPLEH4aoAH0gNCAPget_federated_token5TthT+FvwqnKwRcOIfrRh3c/LTo6UDdyJwOOvEVP' }
     before do
-      ENV['AWS_DEFAULT_REGION'] = nil
-      ENV['AWS_REGION'] = nil
+      allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
       allow_any_instance_of(Aws::STS::Client).to receive(:assume_role).and_return({})
       allow_any_instance_of(Aws::STS::Client).to receive(:get_federation_token).and_return({})
       allow_any_instance_of(Aws::STS::Client).to receive(:assume_role).with(
@@ -93,11 +92,9 @@ describe Awskeyring::Awsapi do
                token: role_token,
                expiry: Time.parse('2011-07-15T23:28:33.359Z')
              )
-      expect(ENV['AWS_DEFAULT_REGION']).to eq 'us-east-1'
     end
 
     it 'assume a role with mfa' do
-      ENV['AWS_DEFAULT_REGION'] = 'us-west-2'
       expect(subject.get_token(
                key: 'blah', secret: 'blah',
                role_arn: 'blah',
@@ -110,7 +107,6 @@ describe Awskeyring::Awsapi do
                token: rofa_token,
                expiry: Time.parse('2011-07-15T23:28:33.359Z')
              )
-      expect(ENV['AWS_DEFAULT_REGION']).to eq 'us-west-2'
     end
 
     it 'retrieves a session with mfa' do
@@ -168,8 +164,7 @@ describe Awskeyring::Awsapi do
     end
 
     before do
-      ENV['AWS_DEFAULT_REGION'] = nil
-      ENV['AWS_REGION'] = nil
+      allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
       allow_any_instance_of(Aws::STS::Client).to receive(:get_federation_token)
         .and_return(
           double(
@@ -191,18 +186,15 @@ describe Awskeyring::Awsapi do
                token: nil, path: 'test',
                user: 'rspec-user'
              )).to eq('https://signin.aws.amazon.com/federation?Action=login&SigninToken=%2A%2A%2A+the+SigninToken+string+%2A%2A%2A&Destination=https%3A%2F%2Fconsole.aws.amazon.com%2Ftest%2Fhome')
-      expect(ENV['AWS_DEFAULT_REGION']).to eq 'us-east-1'
     end
 
     it 'return a login_url to the AWS Console using a token' do
-      ENV['AWS_DEFAULT_REGION'] = 'us-west-2'
       expect_any_instance_of(Aws::STS::Client).to_not receive(:get_federation_token)
       expect(subject.get_login_url(
                key: 'blah', secret: 'secretblah',
                token: 'doubleblah', path: nil,
                user: 'rspec-user'
              )).to eq('https://signin.aws.amazon.com/federation?Action=login&SigninToken=%2A%2A%2A+the+SigninToken+string+%2A%2A%2A&Destination=https%3A%2F%2Fconsole.aws.amazon.com%2F%2Fhome')
-      expect(ENV['AWS_DEFAULT_REGION']).to eq 'us-west-2'
     end
   end
 
@@ -210,8 +202,7 @@ describe Awskeyring::Awsapi do
     let(:key) { 'AKIA1234567890ABCDEF' }
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     before do
-      ENV['AWS_DEFAULT_REGION'] = nil
-      ENV['AWS_REGION'] = nil
+      allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
       allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity).and_return(
         account: '123456789012',
         arn: 'arn:aws:iam::123456789012:user/Alice',
@@ -220,26 +211,13 @@ describe Awskeyring::Awsapi do
     end
 
     it 'calls get_caller_identity' do
-      ENV['AWS_DEFAULT_REGION'] = 'us-west-1'
       allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity)
       expect(subject.verify_cred(key: key, secret: secret)).to be(true)
-      expect(ENV['AWS_DEFAULT_REGION']).to eq 'us-west-1'
     end
 
     it 'calls get_caller_identity and sets default region' do
-      ENV['AWS_DEFAULT_REGION'] = nil
       allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity)
       expect(subject.verify_cred(key: key, secret: secret)).to be(true)
-      expect(ENV['AWS_DEFAULT_REGION']).to eq 'us-east-1'
-    end
-
-    it 'retrieves the current region' do
-      ENV['AWS_DEFAULT_REGION'] = 'us-west-1'
-      expect(subject.region).to eq 'us-west-1'
-    end
-
-    it 'can not retrieve the current region' do
-      expect(subject.region).to be nil
     end
   end
 
@@ -252,7 +230,7 @@ describe Awskeyring::Awsapi do
     let(:key_message) { '# You have two access keys for account test' }
 
     before do
-      ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
+      allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
       allow_any_instance_of(Aws::IAM::Client).to receive(:list_access_keys).and_return(
         access_key_metadata: [
           {
@@ -291,7 +269,7 @@ describe Awskeyring::Awsapi do
     let(:key_message) { '# You have two access keys for account test' }
 
     before do
-      ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
+      allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
       allow_any_instance_of(Aws::IAM::Client).to receive(:list_access_keys).and_return(
         access_key_metadata: [
           {
@@ -317,6 +295,29 @@ describe Awskeyring::Awsapi do
       expect do
         subject.rotate(account: account, key: key, secret: secret, key_message: key_message)
       end.to raise_error(SystemExit).and output(/# You have two access keys for account test/).to_stderr
+    end
+  end
+
+  context 'When there is no region set' do
+    let(:sharedcfg) do
+      double(
+        region: nil
+      )
+    end
+    before do
+      ENV['AWS_DEFAULT_REGION'] = nil
+      ENV['AWS_REGION'] = nil
+      ENV['AMAZON_REGION'] = nil
+      allow(Aws).to receive(:shared_config).and_return(sharedcfg)
+    end
+
+    it 'retrieves the current region' do
+      ENV['AWS_DEFAULT_REGION'] = 'us-west-1'
+      expect(subject.region).to eq 'us-west-1'
+    end
+
+    it 'can not retrieve the current region' do
+      expect(subject.region).to be nil
     end
   end
 end

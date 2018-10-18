@@ -182,7 +182,8 @@ module Awskeyring
     # @return [String] key The aws_access_key_id
     # @return [String] secret The aws_secret_access_key
     # @return [String] account the associated account name.
-    def self.rotate(account:, key:, secret:, key_message:) # rubocop:disable  Metrics/MethodLength
+    def self.rotate(account:, key:, secret:, key_message:) # rubocop:disable  Metrics/MethodLength, Metrics/AbcSize
+      ENV['AWS_DEFAULT_REGION'] = 'us-east-1' unless region
       iam = Aws::IAM::Client.new(access_key_id: key, secret_access_key: secret)
 
       if iam.list_access_keys[:access_key_metadata].length > 1

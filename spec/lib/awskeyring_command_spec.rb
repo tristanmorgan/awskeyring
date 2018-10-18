@@ -110,6 +110,7 @@ describe AwskeyringCommand do
         updated: Time.parse('2011-08-11T22:20:01Z')
       )
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
+      allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
     end
 
     it 'removes an account' do
@@ -125,9 +126,9 @@ describe AwskeyringCommand do
     it 'export an AWS Access key' do
       expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false)
 
-      ENV['AWS_DEFAULT_REGION'] = 'us-east-1'
       expect { AwskeyringCommand.start(%w[env test]) }
-        .to output(%(export AWS_ACCOUNT_NAME="test"
+        .to output(%(export AWS_DEFAULT_REGION="us-east-1"
+export AWS_ACCOUNT_NAME="test"
 export AWS_ACCESS_KEY_ID="AKIATESTTEST"
 export AWS_ACCESS_KEY="AKIATESTTEST"
 export AWS_SECRET_ACCESS_KEY="biglongbase64"
@@ -150,8 +151,7 @@ unset AWS_SESSION_TOKEN
         'AWS_SESSION_TOKEN' => 'evenlongerbase64token' }
     end
     before do
-      ENV['AWS_DEFAULT_REGION'] = nil
-      ENV['AWS_REGION'] = nil
+      allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
       allow(Awskeyring).to receive(:delete_token)
       allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false).and_return(
         account: 'test',
