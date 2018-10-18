@@ -219,7 +219,7 @@ unset AWS_SESSION_TOKEN
           AccessKeyId: 'ASIATESTTEST',
           SecretAccessKey: 'bigerlongbase64',
           SessionToken: 'evenlongerbase64token',
-          Expiration: Time.at(Time.parse('2011-07-11T19:55:29.611Z').to_i)
+          Expiration: Time.at(Time.parse('2011-07-11T19:55:29.611Z').to_i).iso8601
         ) + "\n").to_stdout
     end
 

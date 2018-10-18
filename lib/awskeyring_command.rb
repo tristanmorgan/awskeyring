@@ -92,7 +92,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       key: cred[:key],
       secret: cred[:secret],
       token: cred[:token],
-      expiry: expiry || Time.new + Awskeyring::Awsapi::ONE_HOUR
+      expiry: (expiry || Time.new + Awskeyring::Awsapi::ONE_HOUR).iso8601
     )
   end
 
