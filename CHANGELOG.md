@@ -1,6 +1,14 @@
 # Change Log
 
-## [v0.5.3](https://github.com/vibrato/awskeyring/tree/v0.5.3) (2018-10-04)
+## [v0.6.0](https://github.com/vibrato/awskeyring/tree/v0.6.0) (2018-10-18)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.5.3...v0.6.0)
+
+**Fixed bugs:**
+
+- Use a default Region for Rotate. [\#33](https://github.com/vibrato/awskeyring/pull/33) ([tristanmorgan](https://github.com/tristanmorgan))
+- Fix JSON time format to use ISO8601. [\#32](https://github.com/vibrato/awskeyring/pull/32) ([tristanmorgan](https://github.com/tristanmorgan))
+
+## [v0.5.3](https://github.com/vibrato/awskeyring/tree/v0.5.3) (2018-10-03)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.5.2...v0.5.3)
 
 **Implemented enhancements:**
