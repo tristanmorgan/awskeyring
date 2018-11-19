@@ -9,7 +9,7 @@ describe AwskeyringCommand do
       allow(File).to receive(:exist?)
         .with(/\.awskeyring/)
         .and_return(false)
-      allow_any_instance_of(HighLine).to receive(:ask) { 'test' }
+      allow(Thor::LineEditor).to receive(:readline).and_return('test')
       allow(Awskeyring).to receive(:init_keychain)
     end
 

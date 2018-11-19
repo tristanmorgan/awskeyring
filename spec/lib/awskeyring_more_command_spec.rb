@@ -99,7 +99,7 @@ describe AwskeyringCommand do
           expiry: '1422992424',
           updated: Time.parse('2011-08-01T22:20:01Z')
         )
-      allow_any_instance_of(HighLine).to receive(:ask) { 'invalid' }
+      allow(Thor::LineEditor).to receive(:readline).and_return('invalid')
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
     end
 
@@ -221,7 +221,7 @@ describe AwskeyringCommand do
     before do
       allow(Awskeyring).to receive(:add_account).and_return(nil)
       allow(Awskeyring).to receive(:update_account).and_return(nil)
-      allow_any_instance_of(HighLine).to receive(:ask) { '' }
+      allow(Thor::LineEditor).to receive(:readline).and_return('')
       allow(Awskeyring::Awsapi).to receive(:verify_cred)
         .and_return(true)
     end
@@ -277,7 +277,7 @@ describe AwskeyringCommand do
 
     before do
       allow(Awskeyring).to receive(:add_account).and_return(nil)
-      allow_any_instance_of(HighLine).to receive(:ask) { bad_mfa_arn }
+      allow(Thor::LineEditor).to receive(:readline).and_return(bad_mfa_arn)
     end
 
     it 'tries to add an invalid mfa' do
@@ -293,7 +293,7 @@ describe AwskeyringCommand do
 
     before do
       allow(Awskeyring).to receive(:add_role).and_return(nil)
-      allow_any_instance_of(HighLine).to receive(:ask) { '' }
+      allow(Thor::LineEditor).to receive(:readline).and_return('')
     end
 
     it 'tries to add a valid role' do
