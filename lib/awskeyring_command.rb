@@ -1,4 +1,3 @@
-require 'highline'
 require 'i18n'
 require 'thor'
 
@@ -467,11 +466,11 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   def ask(message:, secure: false, optional: false)
     if secure
-      HighLine.new.ask(message.rjust(20) + ': ') { |q| q.echo = '*' }
+      Thor::LineEditor.readline(message.rjust(20) + ': ', echo: false)
     elsif optional
-      HighLine.new.ask((message + ' (optional)').rjust(20) + ': ')
+      Thor::LineEditor.readline((message + ' (optional)').rjust(20) + ': ')
     else
-      HighLine.new.ask(message.rjust(20) + ': ')
+      Thor::LineEditor.readline(message.rjust(20) + ': ')
     end
   end
 end

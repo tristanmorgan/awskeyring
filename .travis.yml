@@ -4,7 +4,12 @@ os: osx
 rvm:
   - 2.3.3
   - 2.3.7
-before_install: gem install bundler
+  - ruby-head
+matrix:
+  allow_failures:
+    - rvm: ruby-head
+before_install:
+  - gem install bundler
 notifications:
   slack:
     secure: "okKLlQ93ogj8ut18MZazQD63XTIzCpTfneYQMlKPaLU5HnooAkUFmEpSN8ig\
