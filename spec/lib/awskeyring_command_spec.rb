@@ -111,9 +111,11 @@ describe AwskeyringCommand do
       )
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
       allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
+      allow(Awskeyring).to receive(:account_exists).and_return('test')
     end
 
     it 'removes an account' do
+      expect(Awskeyring).to receive(:account_exists).with('test')
       expect(Awskeyring).to receive(:delete_account).with(account: 'test', message: '# Removing account test')
       AwskeyringCommand.start(%w[remove test])
     end
@@ -176,9 +178,11 @@ unset AWS_SESSION_TOKEN
       ).and_return(8888)
       allow(Process).to receive(:wait).exactly(1).with(8888)
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
+      allow(Awskeyring).to receive(:account_exists).and_return('test')
     end
 
     it 'removes a token' do
+      expect(Awskeyring).to receive(:account_exists).with('test')
       expect(Awskeyring).to receive(:delete_token).with(account: 'test', message: '# Removing token for account test')
       AwskeyringCommand.start(%w[remove-token test])
     end
@@ -212,6 +216,7 @@ unset AWS_SESSION_TOKEN
     end
 
     it 'provides JSON for use with credential_process' do
+      expect(Awskeyring).to receive(:account_exists).with('test')
       expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false)
       expect { AwskeyringCommand.start(%w[json test]) }
         .to output(JSON.pretty_generate(
