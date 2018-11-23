@@ -1,5 +1,13 @@
 # Change Log
 
+## [v0.7.0](https://github.com/vibrato/awskeyring/tree/v0.7.0) (2018-11-26)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.6.0...v0.7.0)
+
+**Implemented enhancements:**
+
+- Validate existing account. [\#35](https://github.com/vibrato/awskeyring/pull/35) ([tristanmorgan](https://github.com/tristanmorgan))
+- Swap Highline for Thor::LineEditor [\#34](https://github.com/vibrato/awskeyring/pull/34) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v0.6.0](https://github.com/vibrato/awskeyring/tree/v0.6.0) (2018-10-18)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.5.3...v0.6.0)
 
