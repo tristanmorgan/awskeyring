@@ -115,13 +115,12 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   #
   # @param [String] role The role name to add
   # @param [String] arn The arn of the role
-  # @param [String] account The account associate (optional)
-  def self.add_role(role:, arn:, account:)
+  def self.add_role(role:, arn:)
     all_items.create(
       label: ROLE_PREFIX + role,
       account: arn,
       password: '',
-      comment: account
+      comment: ''
     )
   end
 
@@ -279,5 +278,14 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
 
     puts message if message
     role.delete
+  end
+
+  # Validate account exists
+  #
+  # @param [String] account_name the associated account name.
+  def self.account_exists(account_name)
+    raise 'Account does not exist' unless list_account_names.include?(account_name)
+
+    account_name
   end
 end

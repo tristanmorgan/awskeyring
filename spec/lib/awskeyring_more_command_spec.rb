@@ -16,9 +16,11 @@ describe AwskeyringCommand do
       allow(Process).to receive(:spawn).exactly(1).with('open "login-url"').and_return(9999)
       allow(Process).to receive(:wait).exactly(1).with(9999)
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
+      allow(Awskeyring).to receive(:account_exists).and_return('test')
     end
 
     it 'opens the AWS Console' do
+      expect(Awskeyring).to receive(:account_exists).with('test')
       expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false)
       expect(Awskeyring::Awsapi).to receive(:get_login_url).with(
         key: 'ASIATESTTEST',
@@ -60,6 +62,7 @@ describe AwskeyringCommand do
       allow(Process).to receive(:spawn).exactly(1).with('open "login-url"').and_return(9999)
       allow(Process).to receive(:wait).exactly(1).with(9999)
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
+      allow(Awskeyring).to receive(:account_exists).and_return('test')
     end
 
     it 'opens the AWS Console' do
@@ -101,9 +104,11 @@ describe AwskeyringCommand do
         )
       allow(Thor::LineEditor).to receive(:readline).and_return('invalid')
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
+      allow(Awskeyring).to receive(:account_exists).and_return('test')
     end
 
     it 'tries to receive a new token' do
+      expect(Awskeyring).to receive(:account_exists).with('test')
       expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: true)
       expect(Awskeyring).to receive(:get_role_arn).with(role_name: 'role')
       expect(Awskeyring).to receive(:add_token).with(
@@ -224,6 +229,7 @@ describe AwskeyringCommand do
       allow(Thor::LineEditor).to receive(:readline).and_return('')
       allow(Awskeyring::Awsapi).to receive(:verify_cred)
         .and_return(true)
+      allow(Awskeyring).to receive(:account_exists).and_return('test')
     end
 
     it 'tries to add a valid account' do
@@ -276,7 +282,6 @@ describe AwskeyringCommand do
     let(:bad_mfa_arn) { 'arn:azure:iamnot::ABCD45678901:Administrators' }
 
     before do
-      allow(Awskeyring).to receive(:add_account).and_return(nil)
       allow(Thor::LineEditor).to receive(:readline).and_return(bad_mfa_arn)
     end
 
@@ -293,7 +298,7 @@ describe AwskeyringCommand do
 
     before do
       allow(Awskeyring).to receive(:add_role).and_return(nil)
-      allow(Thor::LineEditor).to receive(:readline).and_return('')
+      allow(Thor::LineEditor).to receive(:readline).and_return(bad_role_arn)
     end
 
     it 'tries to add a valid role' do
@@ -333,9 +338,11 @@ describe AwskeyringCommand do
         secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY'
       )
       allow(Time).to receive(:new).and_return(Time.parse('2017-03-11T19:55:29.611Z'))
+      allow(Awskeyring).to receive(:account_exists).and_return('test')
     end
 
     it 'calls the rotate method' do
+      expect(Awskeyring).to receive(:account_exists).with('test')
       expect(Awskeyring).to receive(:update_account).with(
         account: 'test',
         key: 'AKIAIOSFODNN7EXAMPLE',
@@ -386,6 +393,7 @@ describe AwskeyringCommand do
           }
         ]
       )
+      allow(Awskeyring).to receive(:account_exists).and_return('test')
     end
 
     it 'calls the rotate method and fails' do

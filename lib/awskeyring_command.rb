@@ -67,7 +67,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # Print Env vars
   def env(account = nil)
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
     )
     cred = age_check_and_get(account: account, no_token: options['no-token'])
     put_env_string(
@@ -83,7 +83,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # Print JSON for use with credential_process
   def json(account = nil)
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
     )
     cred = age_check_and_get(account: account, no_token: options['no-token'])
     expiry = Time.at(cred[:expiry]) unless cred[:expiry].nil?
@@ -148,7 +148,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # Update an Account
   def update(account = nil) # rubocop:disable Metrics/MethodLength
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
     )
     key = ask_check(
       existing: options[:key], message: I18n.t('message.key'), validator: Awskeyring::Validate.method(:access_key)
@@ -170,7 +170,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   desc 'add-role ROLE', I18n.t('add_role.desc')
   method_option :arn, type: :string, aliases: '-a', desc: I18n.t('method_option.arn')
   # Add a role
-  def add_role(role = nil) # rubocop:disable Metrics/MethodLength
+  def add_role(role = nil)
     role = ask_check(
       existing: role, message: I18n.t('message.role'),
       validator: Awskeyring::Validate.method(:role_name)
@@ -179,15 +179,10 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       existing: options[:arn], message: I18n.t('message.arn'),
       validator: Awskeyring::Validate.method(:role_arn)
     )
-    account = ask_check(
-      existing: account, message: I18n.t('message.account'),
-      optional: true, validator: Awskeyring::Validate.method(:account_name)
-    )
 
     Awskeyring.add_role(
       role: role,
-      arn: arn,
-      account: account
+      arn: arn
     )
     puts I18n.t('message.addrole', role: role)
   end
@@ -196,7 +191,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # Remove an account
   def remove(account = nil)
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
     )
     Awskeyring.delete_account(account: account, message: I18n.t('message.delaccount', account: account))
   end
@@ -205,7 +200,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # remove a session token
   def remove_token(account = nil)
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
     )
     Awskeyring.delete_token(account: account, message: I18n.t('message.deltoken', account: account))
   end
@@ -224,7 +219,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # rotate Account keys
   def rotate(account = nil) # rubocop:disable Metrics/MethodLength
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
     )
     cred = Awskeyring.get_valid_creds(account: account, no_token: true)
 
@@ -256,7 +251,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # generate a sessiopn token
   def token(account = nil, role = nil, code = nil) # rubocop:disable all
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
     )
     role ||= options[:role]
     if role
@@ -313,7 +308,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # Open the AWS Console
   def console(account = nil) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
     )
     cred = age_check_and_get(account: account, no_token: options['no-token'])
 
