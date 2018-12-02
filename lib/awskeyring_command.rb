@@ -461,7 +461,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   def ask(message:, secure: false, optional: false)
     if secure
-      Thor::LineEditor.readline(message.rjust(20) + ': ', echo: false)
+      Thor::LineEditor.readline(message.rjust(20) + ': ', echo: false).strip
     elsif optional
       Thor::LineEditor.readline((message + ' (optional)').rjust(20) + ': ')
     else
