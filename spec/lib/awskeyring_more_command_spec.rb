@@ -232,6 +232,7 @@ describe AwskeyringCommand do
       allow(Awskeyring).to receive(:account_not_exists).with('test').and_return('test')
       allow(Awskeyring).to receive(:account_exists).with('tested').and_return('tested')
       allow(Awskeyring).to receive(:list_account_names).and_return(['tested'])
+      allow(Awskeyring::Input).to receive(:read_secret).and_return(bad_secret_access_key)
     end
 
     it 'tries to add a valid account' do
