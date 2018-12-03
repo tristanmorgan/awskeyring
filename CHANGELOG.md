@@ -1,5 +1,12 @@
 # Change Log
 
+## [v0.7.1](https://github.com/vibrato/awskeyring/tree/v0.7.1) (2018-12-03)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.7.0...v0.7.1)
+
+**Fixed bugs:**
+
+- Trailing LF was being passed to validator [\#37](https://github.com/vibrato/awskeyring/pull/37) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v0.7.0](https://github.com/vibrato/awskeyring/tree/v0.7.0) (2018-11-26)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.6.0...v0.7.0)
 
