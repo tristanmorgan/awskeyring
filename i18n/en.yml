@@ -68,6 +68,7 @@ en:
     delrole: '# Removing role %{role}'
     deltoken: '# Removing token for account %{account}'
     delexpired: '# Removing expired session credentials'
+    exec: '# COMMAND not provided'
     missing: '# Config missing, run `%{bin} initialise` to recreate.'
     rotate: '# You have two access keys for account %{account}'
     temporary: '# Using temporary session credentials.'

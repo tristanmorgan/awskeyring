@@ -236,5 +236,12 @@ unset AWS_SESSION_TOKEN
       )
       AwskeyringCommand.start(%w[exec test test-exec with params])
     end
+
+    it 'warns about a missing external command' do
+      expect(Process).to_not receive(:spawn)
+      expect do
+        AwskeyringCommand.start(%w[exec test])
+      end.to raise_error(SystemExit).and output(/COMMAND not provided/).to_stderr
+    end
   end
 end
