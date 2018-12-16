@@ -3,6 +3,17 @@ require_relative '../../../lib/awskeyring/validate'
 
 describe Awskeyring::Validate do
   context 'When validating inputs' do
+    let(:test_account) { 'test' }
+    let(:test_broken_account) { '' }
+
+    it 'validates an account name' do
+      expect { subject.account_name(test_account) }.to_not raise_error
+    end
+
+    it 'invalidates an account name' do
+      expect { subject.account_name(test_broken_account) }.to raise_error('Invalid Account Name')
+    end
+
     let(:test_key) { 'AKIA1234567890ABCDEF' }
     let(:test_broken_key) { 'AKIA1234567890' }
 

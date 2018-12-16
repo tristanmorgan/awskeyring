@@ -155,6 +155,7 @@ describe Awskeyring do
       allow(all_list).to receive(:where).with(label: 'session-token test').and_return([session_token])
       allow(subject).to receive(:all_items).and_return(all_list)
       allow(subject).to receive(:delete_expired).and_return([session_key, session_token])
+      allow(subject).to receive(:list_account_names).and_return(['test'])
       allow(item).to receive(:delete)
       allow(role).to receive(:delete)
       allow(session_key).to receive(:delete)
@@ -193,6 +194,14 @@ describe Awskeyring do
       expect(subject.get_role_arn(role_name: 'role')).to eq(
         'arn:aws:iam::012345678901:role/test'
       )
+    end
+
+    it 'validates an account name' do
+      expect { subject.account_exists('test') }.to_not raise_error
+    end
+
+    it 'invalidates an account name' do
+      expect { subject.account_not_exists('test') }.to raise_error('Account already exists')
     end
   end
 end

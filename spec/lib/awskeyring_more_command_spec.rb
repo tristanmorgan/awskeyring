@@ -229,7 +229,9 @@ describe AwskeyringCommand do
       allow(Thor::LineEditor).to receive(:readline).and_return('')
       allow(Awskeyring::Awsapi).to receive(:verify_cred)
         .and_return(true)
-      allow(Awskeyring).to receive(:account_exists).and_return('test')
+      allow(Awskeyring).to receive(:account_not_exists).with('test').and_return('test')
+      allow(Awskeyring).to receive(:account_exists).with('tested').and_return('tested')
+      allow(Awskeyring).to receive(:list_account_names).and_return(['tested'])
     end
 
     it 'tries to add a valid account' do
@@ -246,8 +248,8 @@ describe AwskeyringCommand do
       expect(Awskeyring).to receive(:update_account)
       expect(Awskeyring).to_not receive(:add_account)
       expect do
-        AwskeyringCommand.start(['update', 'test', '-k', access_key, '-s', secret_access_key])
-      end.to output("# Updated account test\n").to_stdout
+        AwskeyringCommand.start(['update', 'tested', '-k', access_key, '-s', secret_access_key])
+      end.to output("# Updated account tested\n").to_stdout
     end
 
     it 'tries to add a valid account without remote tests' do
@@ -283,6 +285,7 @@ describe AwskeyringCommand do
 
     before do
       allow(Thor::LineEditor).to receive(:readline).and_return(bad_mfa_arn)
+      allow(Awskeyring).to receive(:account_not_exists).with('test').and_return('test')
     end
 
     it 'tries to add an invalid mfa' do

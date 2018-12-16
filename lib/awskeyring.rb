@@ -1,5 +1,6 @@
 require 'json'
 require 'keychain'
+require 'awskeyring/validate'
 
 # Awskeyring Module,
 # gives you an interface to access keychains and items.
@@ -284,7 +285,18 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   #
   # @param [String] account_name the associated account name.
   def self.account_exists(account_name)
+    Awskeyring::Validate.account_name(account_name)
     raise 'Account does not exist' unless list_account_names.include?(account_name)
+
+    account_name
+  end
+
+  # Validate account does not exists
+  #
+  # @param [String] account_name the associated account name.
+  def self.account_not_exists(account_name)
+    Awskeyring::Validate.account_name(account_name)
+    raise 'Account already exists' if list_account_names.include?(account_name)
 
     account_name
   end
