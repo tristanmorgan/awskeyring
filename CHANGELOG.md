@@ -1,5 +1,13 @@
 # Change Log
 
+## [v0.7.2](https://github.com/vibrato/awskeyring/tree/v0.7.2) (2018-12-17)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.7.1...v0.7.2)
+
+**Fixed bugs:**
+
+- Validate that account doesn't already exists. [\#40](https://github.com/vibrato/awskeyring/pull/40) ([tristanmorgan](https://github.com/tristanmorgan))
+- Check for COMMAND param to exec. [\#38](https://github.com/vibrato/awskeyring/pull/38) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v0.7.1](https://github.com/vibrato/awskeyring/tree/v0.7.1) (2018-12-03)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.7.0...v0.7.1)
 
