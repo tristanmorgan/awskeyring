@@ -118,7 +118,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # Add an Account
   def add(account = nil) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring::Validate.method(:account_name)
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_not_exists)
     )
     key = ask_check(
       existing: options[:key], message: I18n.t('message.key'), validator: Awskeyring::Validate.method(:access_key)
