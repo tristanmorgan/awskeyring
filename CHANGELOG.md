@@ -1,5 +1,16 @@
 # Change Log
 
+## [v0.8.0](https://github.com/vibrato/awskeyring/tree/v0.8.0) (2018-12-19)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.7.2...v0.8.0)
+
+**Implemented enhancements:**
+
+- Provide input feedback for secret fields. [\#41](https://github.com/vibrato/awskeyring/pull/41) ([tristanmorgan](https://github.com/tristanmorgan))
+
+**Fixed bugs:**
+
+- Cannot enter secret access key when adding new accounts in 0.7.0   [\#36](https://github.com/vibrato/awskeyring/issues/36)
+
 ## [v0.7.2](https://github.com/vibrato/awskeyring/tree/v0.7.2) (2018-12-17)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.7.1...v0.7.2)
 
