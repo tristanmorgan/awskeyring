@@ -3,6 +3,7 @@ require 'thor'
 
 require 'awskeyring'
 require 'awskeyring/awsapi'
+require 'awskeyring/input'
 require 'awskeyring/validate'
 require 'awskeyring/version'
 
@@ -461,7 +462,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   def ask(message:, secure: false, optional: false)
     if secure
-      Thor::LineEditor.readline(message.rjust(20) + ': ', echo: false).strip
+      Awskeyring::Input.read_secret(message.rjust(20) + ': ')
     elsif optional
       Thor::LineEditor.readline((message + ' (optional)').rjust(20) + ': ')
     else
