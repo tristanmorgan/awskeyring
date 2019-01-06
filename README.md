@@ -18,6 +18,12 @@ the AWS Console from the cli.
 For Enterprise environments there are better suited tools to use
 like [HashiCorp Vault](https://vaultproject.io/).
 
+## Installation
+
+Install it with:
+
+    $ gem install awskeyring --user-install
+
 ## Quick start
 
 First you need to initialise your keychain to hold your AWS credentials.
@@ -39,12 +45,6 @@ Alternatively you can create a profile using the credential_process config varia
     credential_process = /usr/local/bin/awskeyring json personal-aws
 
 See below and in the [wiki](https://github.com/vibrato/awskeyring/wiki) for more details on usage.
-
-## Installation
-
-Install it with:
-
-    $ gem install awskeyring --user-install
 
 ## Usage
 
