@@ -1,5 +1,12 @@
 # Change Log
 
+## [v0.8.1](https://github.com/vibrato/awskeyring/tree/v0.8.1) (2019-02-06)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.8.0...v0.8.1)
+
+**Fixed bugs:**
+
+- Fix usage behind PROXIES [\#42](https://github.com/vibrato/awskeyring/pull/42) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v0.8.0](https://github.com/vibrato/awskeyring/tree/v0.8.0) (2018-12-19)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.7.2...v0.8.0)
 
