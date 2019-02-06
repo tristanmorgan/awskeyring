@@ -176,7 +176,12 @@ describe Awskeyring::Awsapi do
             }
           )
         )
-      allow(Net::HTTP).to receive(:get).and_return('{"SigninToken":"*** the SigninToken string ***"}')
+      allow_any_instance_of(Net::HTTP).to receive(:get)
+        .and_return(
+          double(
+            body: '{"SigninToken":"*** the SigninToken string ***"}'
+          )
+        )
     end
 
     it 'return a login_url to the AWS Console' do

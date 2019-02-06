@@ -159,7 +159,10 @@ module Awskeyring
       get_signin_token_url = AWS_SIGNIN_URL + '?Action=getSigninToken' \
                              '&Session=' + CGI.escape(session_json)
 
-      returned_content = Net::HTTP.get(URI.parse(get_signin_token_url))
+      uri       = URI(get_signin_token_url)
+      request   = Net::HTTP.new(uri.host, uri.port)
+      request.use_ssl = true
+      returned_content = request.get(uri).body
 
       signin_token = JSON.parse(returned_content)['SigninToken']
       '&SigninToken=' + CGI.escape(signin_token)
