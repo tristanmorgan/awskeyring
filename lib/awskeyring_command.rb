@@ -105,8 +105,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       pid = Process.spawn(env_vars, command.join(' '))
       Process.wait pid
       $CHILD_STATUS
-    rescue Errno::ENOENT => err
-      warn err.to_s
+    rescue Errno::ENOENT => e
+      warn e.to_s
       exit 1
     end
   end
