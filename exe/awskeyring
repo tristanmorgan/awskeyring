@@ -9,7 +9,7 @@ end
 
 begin
   AwskeyringCommand.start
-rescue Keychain::UserCancelledError => err
-  warn err.to_s
+rescue Keychain::UserCancelledError => e
+  warn e.to_s
   exit 1
 end

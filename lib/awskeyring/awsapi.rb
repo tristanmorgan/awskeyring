@@ -70,8 +70,8 @@ module Awskeyring
               duration_seconds: params[:duration]
             )
           end
-      rescue Aws::STS::Errors::AccessDenied => err
-        warn err.to_s
+      rescue Aws::STS::Errors::AccessDenied => e
+        warn e.to_s
         exit 1
       end
 
@@ -185,7 +185,7 @@ module Awskeyring
     # @return [String] key The aws_access_key_id
     # @return [String] secret The aws_secret_access_key
     # @return [String] account the associated account name.
-    def self.rotate(account:, key:, secret:, key_message:) # rubocop:disable  Metrics/MethodLength, Metrics/AbcSize
+    def self.rotate(account:, key:, secret:, key_message:) # rubocop:disable  Metrics/MethodLength
       ENV['AWS_DEFAULT_REGION'] = 'us-east-1' unless region
       iam = Aws::IAM::Client.new(access_key_id: key, secret_access_key: secret)
 
