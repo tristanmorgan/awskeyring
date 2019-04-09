@@ -1,5 +1,12 @@
 # Change Log
 
+## [v0.9.0](https://github.com/vibrato/awskeyring/tree/v0.9.0) (2019-04-09)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.8.1...v0.9.0)
+
+**Implemented enhancements:**
+
+- Strip whitespace from user input [\#43](https://github.com/vibrato/awskeyring/pull/43) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v0.8.1](https://github.com/vibrato/awskeyring/tree/v0.8.1) (2019-02-06)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.8.0...v0.8.1)
 

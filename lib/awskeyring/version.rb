@@ -1,4 +1,4 @@
 module Awskeyring
   # The Gems version number
-  VERSION = '0.8.1'.freeze
+  VERSION = '0.9.0'.freeze
 end
