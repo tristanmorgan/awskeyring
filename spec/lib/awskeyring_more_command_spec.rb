@@ -296,6 +296,30 @@ describe AwskeyringCommand do
     end
   end
 
+  context 'When we try to add an AWS account with white space' do
+    let(:access_key) { 'AKIA0123456789ABCDEF' }
+    let(:secret_access_key) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
+    let(:mfa_arn) { 'arn:aws:iam::012345678901:mfa/readonly' }
+
+    before do
+      allow(Thor::LineEditor).to receive(:readline).and_return(" #{access_key} \n")
+      allow(Awskeyring::Input).to receive(:read_secret).and_return(" #{secret_access_key} \t")
+      allow(Awskeyring).to receive(:account_not_exists).with('test').and_return('test')
+      allow(Awskeyring).to receive(:add_account).and_return(nil)
+      allow(Awskeyring::Awsapi).to receive(:verify_cred)
+        .and_return(true)
+    end
+
+    it 'tries to add an account with whitespace' do
+      expect(Awskeyring::Awsapi).to receive(:verify_cred)
+      expect(Awskeyring).to_not receive(:update_account)
+      expect(Awskeyring).to receive(:add_account)
+      expect do
+        AwskeyringCommand.start(['add', 'test', '-m', mfa_arn])
+      end.to output("# Added account test\n").to_stdout
+    end
+  end
+
   context 'When we try to add a Role' do
     let(:role_arn) { 'arn:aws:iam::012345678901:role/readonly' }
     let(:bad_role_arn) { 'arn:azure:iamnot::ABCD45678901:Administrators' }

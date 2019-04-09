@@ -457,7 +457,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   def ask_missing(existing:, message:, secure: false, optional: false)
-    existing || ask(message: message, secure: secure, optional: optional)
+    existing || ask(message: message, secure: secure, optional: optional).strip
   end
 
   def ask(message:, secure: false, optional: false)
