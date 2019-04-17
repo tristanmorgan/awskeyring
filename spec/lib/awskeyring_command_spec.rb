@@ -22,7 +22,7 @@ describe AwskeyringCommand do
 
     it 'returns the version number' do
       expect { AwskeyringCommand.start(%w[__version]) }
-        .to output(/\d\.\d\.\d/).to_stdout
+        .to output(/\d+\.\d+\.\d+/).to_stdout
     end
 
     it 'prints autocomplete help text' do
@@ -135,6 +135,20 @@ export AWS_ACCESS_KEY_ID="AKIATESTTEST"
 export AWS_ACCESS_KEY="AKIATESTTEST"
 export AWS_SECRET_ACCESS_KEY="biglongbase64"
 export AWS_SECRET_KEY="biglongbase64"
+unset AWS_SECURITY_TOKEN
+unset AWS_SESSION_TOKEN
+)).to_stdout
+    end
+
+    it 'unsets all AWS Access keys' do
+      expect(Awskeyring).to_not receive(:get_valid_creds)
+
+      expect { AwskeyringCommand.start(%w[env --unset]) }
+        .to output(%(export AWS_DEFAULT_REGION="us-east-1"
+unset AWS_ACCESS_KEY_ID
+unset AWS_ACCESS_KEY
+unset AWS_SECRET_ACCESS_KEY
+unset AWS_SECRET_KEY
 unset AWS_SECURITY_TOKEN
 unset AWS_SESSION_TOKEN
 )).to_stdout

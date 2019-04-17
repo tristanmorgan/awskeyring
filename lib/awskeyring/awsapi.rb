@@ -20,6 +20,16 @@ module Awskeyring
     # AWS Signin url
     AWS_SIGNIN_URL = 'https://signin.aws.amazon.com/federation'.freeze
 
+    # AWS Env vars
+    AWS_ENV_VARS = %w[
+      AWS_ACCESS_KEY_ID
+      AWS_ACCESS_KEY
+      AWS_SECRET_ACCESS_KEY
+      AWS_SECRET_KEY
+      AWS_SECURITY_TOKEN
+      AWS_SESSION_TOKEN
+    ].freeze
+
     # Twelve hours in seconds
     TWELVE_HOUR = (60 * 60 * 12)
     # One hour in seconds
@@ -99,6 +109,35 @@ module Awskeyring
         SessionToken: token,
         Expiration: expiry
       )
+    end
+
+    # Generates Environment Variables for the AWS CLI
+    #
+    # @param [Hash] params including
+    #    [String] account The aws_access_key_id
+    #    [String] secret The aws_secret_access_key
+    #    [String] token The aws_session_token
+    # @return [Hash] env_var hash
+    def self.get_env_array(params = {})
+      env_var = {}
+      env_var['AWS_DEFAULT_REGION'] = 'us-east-1' unless region
+      env_var['AWS_ACCOUNT_NAME'] = params[:account] if params[:account]
+
+      if params[:key]
+        env_var['AWS_ACCESS_KEY_ID'] = params[:key]
+        env_var['AWS_ACCESS_KEY'] = params[:key]
+      end
+
+      if params[:secret]
+        env_var['AWS_SECRET_ACCESS_KEY'] = params[:secret]
+        env_var['AWS_SECRET_KEY'] = params[:secret]
+      end
+
+      if params[:token]
+        env_var['AWS_SECURITY_TOKEN'] = params[:token]
+        env_var['AWS_SESSION_TOKEN'] = params[:token]
+      end
+      env_var
     end
 
     # Verify Credentials are active and valid
