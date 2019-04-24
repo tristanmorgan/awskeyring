@@ -1,5 +1,12 @@
 # Change Log
 
+## [v0.10.0](https://github.com/vibrato/awskeyring/tree/v0.10.0) (2019-04-24)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.9.0...v0.10.0)
+
+**Implemented enhancements:**
+
+- Add --unset flag to env command [\#44](https://github.com/vibrato/awskeyring/pull/44) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v0.9.0](https://github.com/vibrato/awskeyring/tree/v0.9.0) (2019-04-09)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.8.1...v0.9.0)
 
