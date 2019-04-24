@@ -65,13 +65,19 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   desc 'env ACCOUNT', I18n.t('env.desc')
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
+  method_option 'unset', type: :boolean, aliases: '-u', desc: I18n.t('method_option.unset'), default: false
   # Print Env vars
   def env(account = nil)
-    account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
-    )
-    cred = age_check_and_get(account: account, no_token: options['no-token'])
-    put_env_string(cred)
+    if options['unset']
+      put_env_string(account: nil, key: nil, secret: nil, token: nil)
+    else
+      account = ask_check(
+        existing: account, message: I18n.t('message.account'),
+        validator: Awskeyring.method(:account_exists)
+      )
+      cred = age_check_and_get(account: account, no_token: options['no-token'])
+      put_env_string(cred)
+    end
   end
 
   desc 'json ACCOUNT', I18n.t('json.desc')
@@ -100,7 +106,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       exit 1
     end
     cred = age_check_and_get(account: account, no_token: options['no-token'])
-    env_vars = env_vars(cred)
+    env_vars = Awskeyring::Awsapi.get_env_array(cred)
     begin
       pid = Process.spawn(env_vars, command.join(' '))
       Process.wait pid
@@ -419,27 +425,10 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       self.class.all_commands[command].options.values.map(&:switch_name)
   end
 
-  def env_vars(cred)
-    env_var = {}
-    env_var['AWS_DEFAULT_REGION'] = 'us-east-1' unless Awskeyring::Awsapi.region
-    env_var['AWS_ACCOUNT_NAME'] = cred[:account]
-    env_var['AWS_ACCESS_KEY_ID'] = cred[:key]
-    env_var['AWS_ACCESS_KEY'] = cred[:key]
-    env_var['AWS_SECRET_ACCESS_KEY'] = cred[:secret]
-    env_var['AWS_SECRET_KEY'] = cred[:secret]
-    if cred[:token]
-      env_var['AWS_SECURITY_TOKEN'] = cred[:token]
-      env_var['AWS_SESSION_TOKEN'] = cred[:token]
-    end
-    env_var
-  end
-
   def put_env_string(cred)
-    env_var = env_vars(cred)
+    env_var = Awskeyring::Awsapi.get_env_array(cred)
     env_var.each { |var, value| puts "export #{var}=\"#{value}\"" }
-
-    puts 'unset AWS_SECURITY_TOKEN' unless cred[:token]
-    puts 'unset AWS_SESSION_TOKEN' unless cred[:token]
+    Awskeyring::Awsapi::AWS_ENV_VARS.each { |key| puts "unset #{key}" unless env_var.key?(key) }
   end
 
   def ask_check(existing:, message:, secure: false, optional: false, validator: nil)

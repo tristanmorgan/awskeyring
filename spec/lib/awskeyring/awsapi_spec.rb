@@ -304,6 +304,7 @@ describe Awskeyring::Awsapi do
   end
 
   context 'When there is no region set' do
+    let(:role_token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
     let(:sharedcfg) do
       double(
         region: nil
@@ -323,6 +324,24 @@ describe Awskeyring::Awsapi do
 
     it 'can not retrieve the current region' do
       expect(subject.region).to be nil
+    end
+
+    it 'returns an array of env vars for the Credential' do
+      expect(subject.get_env_array(
+               account: 'test',
+               key: 'ASIAIOSFODNN7EXAMPLE',
+               secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+               token: role_token
+             )).to eq(
+               'AWS_ACCESS_KEY' => 'ASIAIOSFODNN7EXAMPLE',
+               'AWS_ACCESS_KEY_ID' => 'ASIAIOSFODNN7EXAMPLE',
+               'AWS_ACCOUNT_NAME' => 'test',
+               'AWS_DEFAULT_REGION' => 'us-east-1',
+               'AWS_SECRET_ACCESS_KEY' => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+               'AWS_SECRET_KEY' => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+               'AWS_SECURITY_TOKEN' => role_token,
+               'AWS_SESSION_TOKEN' => role_token
+             )
     end
   end
 end

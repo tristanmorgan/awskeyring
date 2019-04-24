@@ -47,6 +47,7 @@ en:
     path: 'The service PATH to open.'
     role: 'The ROLE to assume.'
     secret: 'AWS account secret.'
+    unset: 'Unset environment variables.'
   message:
     keychain: 'Name for new keychain (default: awskeyring)'
     account: 'account name'
