@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'thor'
 require_relative '../../lib/awskeyring_command'
@@ -385,7 +387,12 @@ describe AwskeyringCommand do
     it 'warns about the age of the creds' do
       expect do
         AwskeyringCommand.start(%w[env test])
-      end.to output(/# Creds for account test are 99 days old./).to_stderr
+      end.to output(
+        /# Creds for account test are 99 days old./
+      ).to_stderr
+        .and output(
+          /export AWS_ACCOUNT_NAME="test"/
+        ).to_stdout
     end
   end
 

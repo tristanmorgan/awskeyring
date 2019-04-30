@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 require 'thor'
 require_relative '../../lib/awskeyring_command'

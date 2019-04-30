@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Awskeyring Module,
 # gives you an interface to access keychains and items.
 module Awskeyring
