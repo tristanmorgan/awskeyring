@@ -83,7 +83,7 @@ To set your environment easily the following bash function helps:
 
 ## Development
 
-After checking out the repo, run `bundle update` to install dependencies. Then, run `rake` to run the tests. Run `bundle exec awskeyring` to use the gem in this directory, ignoring other installed copies of this gem.
+After checking out the repo, run `bundle update` to install dependencies. Then, run `rake` to run the tests. Run `bundle exec awskeyring` to use the gem in this directory, ignoring other installed copies of this gem. Awskeyring is tested against the last two versions of Ruby shipped with macOS.
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 

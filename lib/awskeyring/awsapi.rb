@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'aws-sdk-iam'
 require 'cgi'
 require 'json'
@@ -18,7 +20,7 @@ module Awskeyring
     }.to_json.freeze
 
     # AWS Signin url
-    AWS_SIGNIN_URL = 'https://signin.aws.amazon.com/federation'.freeze
+    AWS_SIGNIN_URL = 'https://signin.aws.amazon.com/federation'
 
     # AWS Env vars
     AWS_ENV_VARS = %w[
@@ -149,8 +151,8 @@ module Awskeyring
         ENV['AWS_DEFAULT_REGION'] = 'us-east-1' unless region
         sts = Aws::STS::Client.new(access_key_id: key, secret_access_key: secret)
         sts.get_caller_identity
-      rescue Aws::Errors::ServiceError => err
-        warn err.to_s
+      rescue Aws::Errors::ServiceError => e
+        warn e.to_s
         exit 1
       end
       true
@@ -257,13 +259,13 @@ module Awskeyring
       retries ||= 1
       begin
         yield block
-      rescue Aws::IAM::Errors::InvalidClientTokenId => err
+      rescue Aws::IAM::Errors::InvalidClientTokenId => e
         if retries < 4
           sleep 2**retries
           retries += 1
           retry
         end
-        warn err.message
+        warn e.message
         exit 1
       end
     end

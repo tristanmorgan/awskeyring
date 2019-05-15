@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'json'
 require 'keychain'
 require 'awskeyring/validate'
@@ -8,13 +10,13 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   # Default rpeferences fole path
   PREFS_FILE = (File.expand_path '~/.awskeyring').freeze
   # Prefix for Roles
-  ROLE_PREFIX = 'role '.freeze
+  ROLE_PREFIX = 'role '
   # Prefix for Accounts
-  ACCOUNT_PREFIX = 'account '.freeze
+  ACCOUNT_PREFIX = 'account '
   # Prefix for Session Keys
-  SESSION_KEY_PREFIX = 'session-key '.freeze
+  SESSION_KEY_PREFIX = 'session-key '
   # Prefix for Session Tokens
-  SESSION_TOKEN_PREFIX = 'session-token '.freeze
+  SESSION_TOKEN_PREFIX = 'session-token '
   # Default keychain Lock period
   FIVE_MINUTES = 300
   # Default warning of key age in days.

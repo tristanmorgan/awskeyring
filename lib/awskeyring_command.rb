@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'i18n'
 require 'thor'
 
@@ -14,6 +16,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   map %w[--version -v] => :__version
   map ['init'] => :initialise
+  map ['adr'] => :add_role
   map ['con'] => :console
   map ['ls'] => :list
   map ['lsr'] => :list_role
@@ -27,7 +30,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   desc '--version, -v', I18n.t('__version.desc')
   # print the version number
   def __version
-    puts Awskeyring::VERSION
+    puts "Awskeyring v#{Awskeyring::VERSION}"
+    puts "Homepage #{Awskeyring::HOMEPAGE}"
   end
 
   desc 'initialise', I18n.t('initialise.desc')
@@ -237,8 +241,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
         secret: cred[:secret],
         key_message: I18n.t('message.rotate', account: account)
       )
-    rescue Aws::Errors::ServiceError => err
-      warn err.to_s
+    rescue Aws::Errors::ServiceError => e
+      warn e.to_s
       exit 1
     end
 
@@ -291,8 +295,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
         user: ENV['USER']
       )
       Awskeyring.delete_token(account: account, message: '# Removing STS credentials')
-    rescue Aws::Errors::ServiceError => err
-      warn err.to_s
+    rescue Aws::Errors::ServiceError => e
+      warn e.to_s
       exit 1
     end
 
@@ -329,8 +333,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
         path: path,
         user: ENV['USER']
       )
-    rescue Aws::Errors::ServiceError => err
-      warn err.to_s
+    rescue Aws::Errors::ServiceError => e
+      warn e.to_s
       exit 1
     end
 
@@ -436,8 +440,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     begin
       value = ask_missing(existing: existing, message: message, secure: secure, optional: optional)
       value = validator.call(value) unless value.empty? && optional
-    rescue RuntimeError => err
-      warn err.message
+    rescue RuntimeError => e
+      warn e.message
       existing = nil
       retry unless (retries -= 1).zero?
       exit 1
