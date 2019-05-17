@@ -1,5 +1,7 @@
 # Awskeyring
 
+![Awskeyring](https://raw.githubusercontent.com/vibrato/awskeyring/master/awskeyring-144.png)
+
 * [![Build Status](https://travis-ci.org/vibrato/awskeyring.svg?branch=master)](https://travis-ci.org/vibrato/awskeyring)
 * [![Gem Version](https://badge.fury.io/rb/awskeyring.svg)](https://badge.fury.io/rb/awskeyring)
 * [![license MIT](http://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
