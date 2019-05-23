@@ -1,6 +1,17 @@
 # Change Log
 
-## [v1.0.0](https://github.com/vibrato/awskeyring/tree/v1.0.0) (2019-05-20)
+## [v1.0.1](https://github.com/vibrato/awskeyring/tree/v1.0.1) (2019-05-23)
+[Full Changelog](https://github.com/vibrato/awskeyring/compare/v1.0.0...v1.0.1)
+
+**Implemented enhancements:**
+
+- auto-complete the --version [\#47](https://github.com/vibrato/awskeyring/pull/47) ([tristanmorgan](https://github.com/tristanmorgan))
+
+**Fixed bugs:**
+
+- Unfreeze secret strings. [\#46](https://github.com/vibrato/awskeyring/pull/46) ([tristanmorgan](https://github.com/tristanmorgan))
+
+## [v1.0.0](https://github.com/vibrato/awskeyring/tree/v1.0.0) (2019-05-19)
 [Full Changelog](https://github.com/vibrato/awskeyring/compare/v0.10.0...v1.0.0)
 
 **Implemented enhancements:**
