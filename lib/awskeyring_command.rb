@@ -15,6 +15,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   I18n.backend.load_translations
 
   map %w[--version -v] => :__version
+  map %w[--help -h] => :help
   map ['init'] => :initialise
   map ['adr'] => :add_role
   map ['con'] => :console
@@ -379,7 +380,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     comp_len = 3 if curr.start_with?('-')
 
     case prev
-    when 'help'
+    when 'help', File.basename($PROGRAM_NAME)
       comp_len = 0
     when 'remove-role', '-r', 'rmr'
       comp_len = 2
