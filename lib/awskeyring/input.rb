@@ -15,7 +15,7 @@ module Awskeyring
     end
 
     private_class_method def self.hide_input # rubocop:disable Metrics/MethodLength
-      password = ''
+      password = +''
       loop do
         character = $stdin.getch
         break unless character
