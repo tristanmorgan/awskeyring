@@ -1,5 +1,8 @@
 ---
-require: rubocop-performance
+require:
+  - rubocop-performance
+  - rubocop-rspec
+
 Metrics/LineLength:
   Max: 120
 
@@ -17,6 +20,12 @@ Bundler/GemComment:
    Enabled: false
    Include:
      - Gemfile
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Enabled: false
 
 AllCops:
   Exclude:
