@@ -5,7 +5,7 @@ require 'thor'
 require_relative '../../lib/awskeyring_command'
 
 describe AwskeyringCommand do
-  context 'When things are left to the defaults' do
+  context 'when things are left to the defaults' do
     before do
       allow(File).to receive(:exist?).and_call_original
       allow(File).to receive(:exist?)
@@ -16,38 +16,38 @@ describe AwskeyringCommand do
     end
 
     it 'outputs help text' do
-      expect { AwskeyringCommand.start([]) }
+      expect { described_class.start([]) }
         .to output(/^  \w+ --version, -v\s+# Prints the version/).to_stdout
-      expect { AwskeyringCommand.start(%w[help]) }
+      expect { described_class.start(%w[help]) }
         .to output(/Commands:/).to_stdout
     end
 
     it 'returns the version number' do
-      expect { AwskeyringCommand.start(%w[__version]) }
+      expect { described_class.start(%w[__version]) }
         .to output(/\d+\.\d+\.\d+/).to_stdout
     end
 
     it 'prints autocomplete help text' do
-      expect { AwskeyringCommand.start(%w[awskeyring one two]) }.to raise_error(SystemExit)
+      expect { described_class.start(%w[awskeyring one two]) }.to raise_error(SystemExit)
         .and output(%r{enable autocomplete with 'complete -C \/.+\/\w+ \w+'}).to_stderr
     end
 
     it 'tells you that you must init the keychain' do
-      expect { AwskeyringCommand.start(%w[list]) }.to raise_error(SystemExit)
+      expect { described_class.start(%w[list]) }.to raise_error(SystemExit)
         .and output(/Config missing, run `\w+ initialise` to recreate./).to_stderr
     end
 
     it 'tells you it could not find the command test' do
-      expect { AwskeyringCommand.start(%w[test]) }.to output(/Could not find command "test"./).to_stderr
+      expect { described_class.start(%w[test]) }.to output(/Could not find command "test"./).to_stderr
     end
 
     it 'initialises the keychain' do
-      expect { AwskeyringCommand.start(%w[initialise]) }
+      expect { described_class.start(%w[initialise]) }
         .to output(/Add accounts to your test keychain with:/).to_stdout
     end
   end
 
-  context 'When accounts and roles are set' do
+  context 'when accounts and roles are set' do
     before do
       allow(Awskeyring).to receive(:list_account_names).and_return(%w[company personal vibrato])
       allow(Awskeyring).to receive(:list_role_names).and_return(%w[admin minion readonly])
@@ -55,52 +55,52 @@ describe AwskeyringCommand do
     end
 
     it 'list keychain items' do
-      expect { AwskeyringCommand.start(%w[list]) }
+      expect { described_class.start(%w[list]) }
         .to output("company\npersonal\nvibrato\n").to_stdout
     end
 
     it 'list keychain roles' do
-      expect { AwskeyringCommand.start(%w[list-role]) }
+      expect { described_class.start(%w[list-role]) }
         .to output("admin\nminion\nreadonly\n").to_stdout
     end
 
     it 'lists accounts with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring token vib'
-      expect { AwskeyringCommand.start(%w[awskeyring vib token]) }
+      expect { described_class.start(%w[awskeyring vib token]) }
         .to output("vibrato\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists roles with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring token vibrato min'
-      expect { AwskeyringCommand.start(%w[awskeyring min vibrato]) }
+      expect { described_class.start(%w[awskeyring min vibrato]) }
         .to output("minion\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists commands with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring '
-      expect { AwskeyringCommand.start(['awskeyring', '', 'awskeyring']) }
+      expect { described_class.start(['awskeyring', '', 'awskeyring']) }
         .to output(/--version\nadd\nadd-role\nconsole\nenv\nexec\nhelp/).to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists flags with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring token vibrato minion --dura'
-      expect { AwskeyringCommand.start(%w[awskeyring --dura minion]) }
+      expect { described_class.start(%w[awskeyring --dura minion]) }
         .to output("--duration\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists console paths with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring console vibrato --path cloud'
-      expect { AwskeyringCommand.start(%w[awskeyring cloud --path]) }
+      expect { described_class.start(%w[awskeyring cloud --path]) }
         .to output("cloudformation\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
   end
 
-  context 'When there is an account and a role' do
+  context 'when there is an account and a role' do
     before do
       allow(Awskeyring).to receive(:delete_account)
       allow(Awskeyring).to receive(:delete_role)
@@ -117,20 +117,19 @@ describe AwskeyringCommand do
     end
 
     it 'removes an account' do
-      expect(Awskeyring).to receive(:account_exists).with('test')
-      expect(Awskeyring).to receive(:delete_account).with(account: 'test', message: '# Removing account test')
-      AwskeyringCommand.start(%w[remove test])
+      described_class.start(%w[remove test])
+      expect(Awskeyring).to have_received(:account_exists).with('test')
+      expect(Awskeyring).to have_received(:delete_account)
+        .with(account: 'test', message: '# Removing account test')
     end
 
     it 'removes a role' do
-      expect(Awskeyring).to receive(:delete_role).with(role_name: 'test', message: '# Removing role test')
-      AwskeyringCommand.start(%w[remove-role test])
+      described_class.start(%w[remove-role test])
+      expect(Awskeyring).to have_received(:delete_role).with(role_name: 'test', message: '# Removing role test')
     end
 
     it 'export an AWS Access key' do
-      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false)
-
-      expect { AwskeyringCommand.start(%w[env test]) }
+      expect { described_class.start(%w[env test]) }
         .to output(%(export AWS_DEFAULT_REGION="us-east-1"
 export AWS_ACCOUNT_NAME="test"
 export AWS_ACCESS_KEY_ID="AKIATESTTEST"
@@ -140,12 +139,11 @@ export AWS_SECRET_KEY="biglongbase64"
 unset AWS_SECURITY_TOKEN
 unset AWS_SESSION_TOKEN
 )).to_stdout
+      expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: false)
     end
 
     it 'unsets all AWS Access keys' do
-      expect(Awskeyring).to_not receive(:get_valid_creds)
-
-      expect { AwskeyringCommand.start(%w[env --unset]) }
+      expect { described_class.start(%w[env --unset]) }
         .to output(%(export AWS_DEFAULT_REGION="us-east-1"
 unset AWS_ACCESS_KEY_ID
 unset AWS_ACCESS_KEY
@@ -154,10 +152,11 @@ unset AWS_SECRET_KEY
 unset AWS_SECURITY_TOKEN
 unset AWS_SESSION_TOKEN
 )).to_stdout
+      expect(Awskeyring).not_to have_received(:get_valid_creds)
     end
   end
 
-  context 'When there is an account, a role and a session token' do
+  context 'when there is an account, a role and a session token' do
     let(:env_vars) do
       { 'AWS_DEFAULT_REGION' => 'us-east-1',
         'AWS_ACCOUNT_NAME' => 'test',
@@ -168,6 +167,7 @@ unset AWS_SESSION_TOKEN
         'AWS_SECURITY_TOKEN' => 'evenlongerbase64token',
         'AWS_SESSION_TOKEN' => 'evenlongerbase64token' }
     end
+
     before do
       allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
       allow(Awskeyring).to receive(:delete_token)
@@ -198,14 +198,14 @@ unset AWS_SESSION_TOKEN
     end
 
     it 'removes a token' do
-      expect(Awskeyring).to receive(:account_exists).with('test')
-      expect(Awskeyring).to receive(:delete_token).with(account: 'test', message: '# Removing token for account test')
-      AwskeyringCommand.start(%w[remove-token test])
+      described_class.start(%w[remove-token test])
+      expect(Awskeyring).to have_received(:account_exists).with('test')
+      expect(Awskeyring).to have_received(:delete_token)
+        .with(account: 'test', message: '# Removing token for account test')
     end
 
     it 'export an AWS Session Token' do
-      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false)
-      expect { AwskeyringCommand.start(%w[env test]) }
+      expect { described_class.start(%w[env test]) }
         .to output(%(export AWS_DEFAULT_REGION="us-east-1"
 export AWS_ACCOUNT_NAME="test"
 export AWS_ACCESS_KEY_ID="ASIATESTTEST"
@@ -215,11 +215,11 @@ export AWS_SECRET_KEY="bigerlongbase64"
 export AWS_SECURITY_TOKEN="evenlongerbase64token"
 export AWS_SESSION_TOKEN="evenlongerbase64token"
 )).to_stdout
+      expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: false)
     end
 
     it 'export an AWS Keys' do
-      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: true)
-      expect { AwskeyringCommand.start(%w[env test --no-token]) }
+      expect { described_class.start(%w[env test --no-token]) }
         .to output(%(export AWS_DEFAULT_REGION="us-east-1"
 export AWS_ACCOUNT_NAME="test"
 export AWS_ACCESS_KEY_ID="AKIATESTTEST"
@@ -229,12 +229,11 @@ export AWS_SECRET_KEY="biglongbase64"
 unset AWS_SECURITY_TOKEN
 unset AWS_SESSION_TOKEN
 )).to_stdout
+      expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: true)
     end
 
     it 'provides JSON for use with credential_process' do
-      expect(Awskeyring).to receive(:account_exists).with('test')
-      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false)
-      expect { AwskeyringCommand.start(%w[json test]) }
+      expect { described_class.start(%w[json test]) }
         .to output(JSON.pretty_generate(
           Version: 1,
           AccessKeyId: 'ASIATESTTEST',
@@ -242,22 +241,24 @@ unset AWS_SESSION_TOKEN
           SessionToken: 'evenlongerbase64token',
           Expiration: Time.at(Time.parse('2011-07-11T19:55:29.611Z').to_i).iso8601
         ) + "\n").to_stdout
+      expect(Awskeyring).to have_received(:account_exists).with('test')
+      expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: false)
     end
 
     it 'runs an external command' do
-      expect(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false)
-      expect(Process).to receive(:spawn).exactly(1).with(
+      described_class.start(%w[exec test test-exec with params])
+      expect(Process).to have_received(:spawn).exactly(1).with(
         env_vars,
         'test-exec with params'
       )
-      AwskeyringCommand.start(%w[exec test test-exec with params])
+      expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: false)
     end
 
     it 'warns about a missing external command' do
-      expect(Process).to_not receive(:spawn)
       expect do
-        AwskeyringCommand.start(%w[exec test])
+        described_class.start(%w[exec test])
       end.to raise_error(SystemExit).and output(/COMMAND not provided/).to_stderr
+      expect(Process).not_to have_received(:spawn)
     end
   end
 end

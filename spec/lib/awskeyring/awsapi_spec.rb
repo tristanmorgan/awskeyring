@@ -4,23 +4,30 @@ require 'spec_helper'
 require_relative '../../../lib/awskeyring/awsapi'
 
 describe Awskeyring::Awsapi do
-  context 'STS token is created' do
+  subject(:awsapi) { described_class }
+
+  context 'with STS tokens created' do
     let(:mfa_token) { 'AQoEXAMPLEH4aoAH0gNCAPget_session_token5TthT+FvwqnKwRcOIfrRh3c/LTo6UDdyJwOOvEVP' }
     let(:role_token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
     let(:rofa_token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
     let(:fed_token) { 'AQoEXAMPLEH4aoAH0gNCAPget_federated_token5TthT+FvwqnKwRcOIfrRh3c/LTo6UDdyJwOOvEVP' }
+
+    let(:sts_client) { instance_double(Aws::STS::Client) }
+
     before do
-      allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
-      allow_any_instance_of(Aws::STS::Client).to receive(:assume_role).and_return({})
-      allow_any_instance_of(Aws::STS::Client).to receive(:get_federation_token).and_return({})
-      allow_any_instance_of(Aws::STS::Client).to receive(:assume_role).with(
+      allow(described_class).to receive(:region).and_return(nil)
+      allow(Aws::STS::Client).to receive(:new).and_return(sts_client)
+      allow(sts_client).to receive(:assume_role).and_return({})
+      allow(sts_client).to receive(:get_federation_token).and_return({})
+      allow(sts_client).to receive(:assume_role).with(
         duration_seconds: 3600,
         role_arn: 'blah',
         role_session_name: 'rspec-user',
         serial_number: nil,
         token_code: nil
       ).and_return(
-        double(
+        instance_double(
+          'HashMap',
           assumed_role_user: {
             arn: 'arn:aws:sts::123456789012:assumed-role/demo/Bob',
             assumed_role_id: 'ARO123EXAMPLE123:Bob'
@@ -34,14 +41,15 @@ describe Awskeyring::Awsapi do
           packed_policy_size: 6
         )
       )
-      allow_any_instance_of(Aws::STS::Client).to receive(:assume_role).with(
+      allow(sts_client).to receive(:assume_role).with(
         duration_seconds: 3600,
         role_arn: 'blah',
         role_session_name: 'rspec-user',
         serial_number: 'arn:mfa',
         token_code: '654321'
       ).and_return(
-        double(
+        instance_double(
+          'HashMap',
           assumed_role_user: {
             arn: 'arn:aws:sts::123456789012:assumed-role/demo/Bob',
             assumed_role_id: 'ARO123EXAMPLE123:Bob'
@@ -55,8 +63,9 @@ describe Awskeyring::Awsapi do
           packed_policy_size: 6
         )
       )
-      allow_any_instance_of(Aws::STS::Client).to receive(:get_session_token).and_return(
-        double(
+      allow(sts_client).to receive(:get_session_token).and_return(
+        instance_double(
+          'HashMap',
           credentials: {
             access_key_id: 'ASIAIOSFODNN7EXAMPLE',
             expiration: Time.parse('2011-07-11T19:55:29.611Z'),
@@ -65,12 +74,13 @@ describe Awskeyring::Awsapi do
           }
         )
       )
-      allow_any_instance_of(Aws::STS::Client).to receive(:get_federation_token).with(
+      allow(sts_client).to receive(:get_federation_token).with(
         name: 'rspec-user',
         policy: Awskeyring::Awsapi::ADMIN_POLICY,
         duration_seconds: 3600
       ).and_return(
-        double(
+        instance_double(
+          'HashMap',
           credentials: {
             access_key_id: 'ASIAIUGFODNN7EXAMPLE',
             expiration: Time.parse('2012-07-11T19:55:29.611Z'),
@@ -82,7 +92,7 @@ describe Awskeyring::Awsapi do
     end
 
     it 'assume a role no mfa' do
-      expect(subject.get_token(
+      expect(awsapi.get_token(
                key: 'blah', secret: 'blah',
                role_arn: 'blah',
                code: nil, mfa: nil,
@@ -97,7 +107,7 @@ describe Awskeyring::Awsapi do
     end
 
     it 'assume a role with mfa' do
-      expect(subject.get_token(
+      expect(awsapi.get_token(
                key: 'blah', secret: 'blah',
                role_arn: 'blah',
                code: '654321', mfa: 'arn:mfa',
@@ -112,7 +122,7 @@ describe Awskeyring::Awsapi do
     end
 
     it 'retrieves a session with mfa' do
-      expect(subject.get_token(
+      expect(awsapi.get_token(
                key: 'blah', secret: 'blah',
                role_arn: nil,
                code: '654321', mfa: 'arn:mfa',
@@ -127,7 +137,7 @@ describe Awskeyring::Awsapi do
     end
 
     it 'retrieves a federated token' do
-      expect(subject.get_token(
+      expect(awsapi.get_token(
                key: 'blah', secret: 'blah',
                role_arn: nil,
                code: nil, mfa: nil,
@@ -142,7 +152,7 @@ describe Awskeyring::Awsapi do
     end
 
     it 'returns a JSON formatted Credential' do
-      expect(subject.get_cred_json(
+      expect(awsapi.get_cred_json(
                key: 'ASIAIOSFODNN7EXAMPLE',
                secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
                token: role_token,
@@ -157,19 +167,24 @@ describe Awskeyring::Awsapi do
     end
   end
 
-  context 'When we try to access AWS Console' do
+  context 'when we try to access AWS Console' do
     let(:item) do
-      double(
+      instance_double(
+        'HashMap',
         attributes: { label: 'account test', account: 'AKIATESTTEST' },
         password: 'biglongbase64'
       )
     end
+    let(:sts_client) { instance_double(Aws::STS::Client) }
+    let(:net_http) { instance_double(Net::HTTP) }
 
     before do
-      allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
-      allow_any_instance_of(Aws::STS::Client).to receive(:get_federation_token)
+      allow(described_class).to receive(:region).and_return(nil)
+      allow(Aws::STS::Client).to receive(:new).and_return(sts_client)
+      allow(sts_client).to receive(:get_federation_token)
         .and_return(
-          double(
+          instance_double(
+            'HashMap',
             credentials: {
               access_key_id: 'ASIATESTETSTTETS',
               secret_access_key: 'verybiglonghexkey',
@@ -178,39 +193,46 @@ describe Awskeyring::Awsapi do
             }
           )
         )
-      allow_any_instance_of(Net::HTTP).to receive(:get)
+      allow(Net::HTTP).to receive(:new).and_return(net_http)
+      allow(net_http).to receive(:get)
         .and_return(
-          double(
+          instance_double(
+            'HashMap',
             body: '{"SigninToken":"*** the SigninToken string ***"}'
           )
         )
+      allow(net_http).to receive(:use_ssl=)
     end
 
     it 'return a login_url to the AWS Console' do
-      expect_any_instance_of(Aws::STS::Client).to receive(:get_federation_token)
-      expect(subject.get_login_url(
+      expect(awsapi.get_login_url(
                key: 'blah', secret: 'secretblah',
                token: nil, path: 'test',
                user: 'rspec-user'
              )).to eq('https://signin.aws.amazon.com/federation?Action=login&SigninToken=%2A%2A%2A+the+SigninToken+string+%2A%2A%2A&Destination=https%3A%2F%2Fconsole.aws.amazon.com%2Ftest%2Fhome')
+      expect(sts_client).to have_received(:get_federation_token)
     end
 
     it 'return a login_url to the AWS Console using a token' do
-      expect_any_instance_of(Aws::STS::Client).to_not receive(:get_federation_token)
-      expect(subject.get_login_url(
+      expect(awsapi.get_login_url(
                key: 'blah', secret: 'secretblah',
                token: 'doubleblah', path: nil,
                user: 'rspec-user'
              )).to eq('https://signin.aws.amazon.com/federation?Action=login&SigninToken=%2A%2A%2A+the+SigninToken+string+%2A%2A%2A&Destination=https%3A%2F%2Fconsole.aws.amazon.com%2F%2Fhome')
+      expect(sts_client).not_to have_received(:get_federation_token)
     end
   end
 
-  context 'verify a credential' do
+  context 'when credentials are verified' do
     let(:key) { 'AKIA1234567890ABCDEF' }
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
+
+    let(:sts_client) { instance_double(Aws::STS::Client) }
+
     before do
-      allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
-      allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity).and_return(
+      allow(described_class).to receive(:region).and_return(nil)
+      allow(Aws::STS::Client).to receive(:new).and_return(sts_client)
+      allow(sts_client).to receive(:get_caller_identity).and_return(
         account: '123456789012',
         arn: 'arn:aws:iam::123456789012:user/Alice',
         user_id: 'AKIAI44QH8DHBEXAMPLE'
@@ -218,17 +240,11 @@ describe Awskeyring::Awsapi do
     end
 
     it 'calls get_caller_identity' do
-      allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity)
-      expect(subject.verify_cred(key: key, secret: secret)).to be(true)
-    end
-
-    it 'calls get_caller_identity and sets default region' do
-      allow_any_instance_of(Aws::STS::Client).to receive(:get_caller_identity)
-      expect(subject.verify_cred(key: key, secret: secret)).to be(true)
+      expect(awsapi.verify_cred(key: key, secret: secret)).to be(true)
     end
   end
 
-  context 'roate a key' do
+  context 'when keys are roated' do
     let(:account) { 'test' }
     let(:key) { 'AKIA1234567890ABCDEF' }
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
@@ -236,9 +252,12 @@ describe Awskeyring::Awsapi do
     let(:new_secret) { 'wJalrXUtnFEMI/K7MDENG/bPxRiCYzEXAMPLEKEY' }
     let(:key_message) { '# You have two access keys for account test' }
 
+    let(:iam_client) { instance_double(Aws::IAM::Client) }
+
     before do
-      allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
-      allow_any_instance_of(Aws::IAM::Client).to receive(:list_access_keys).and_return(
+      allow(described_class).to receive(:region).and_return(nil)
+      allow(Aws::IAM::Client).to receive(:new).and_return(iam_client)
+      allow(iam_client).to receive(:list_access_keys).and_return(
         access_key_metadata: [
           {
             access_key_id: 'AKIATESTTEST',
@@ -248,7 +267,7 @@ describe Awskeyring::Awsapi do
           }
         ]
       )
-      allow_any_instance_of(Aws::IAM::Client).to receive(:create_access_key).and_return(
+      allow(iam_client).to receive(:create_access_key).and_return(
         access_key: {
           access_key_id: new_key,
           create_date: Time.parse('2015-03-09T18:39:23.411Z'),
@@ -257,11 +276,11 @@ describe Awskeyring::Awsapi do
           user_name: 'Bob'
         }
       )
-      allow_any_instance_of(Aws::IAM::Client).to receive(:delete_access_key).and_return({})
+      allow(iam_client).to receive(:delete_access_key).and_return({})
     end
 
     it 'rotates a secret access key' do
-      expect(subject.rotate(account: account, key: key, secret: secret, key_message: key_message)).to eq(
+      expect(awsapi.rotate(account: account, key: key, secret: secret, key_message: key_message)).to eq(
         account: account,
         key: new_key,
         secret: new_secret
@@ -269,15 +288,17 @@ describe Awskeyring::Awsapi do
     end
   end
 
-  context 'fail to roate a key' do
+  context 'when key rotation fails' do
     let(:account) { 'test' }
     let(:key) { 'AKIA1234567890ABCDEF' }
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     let(:key_message) { '# You have two access keys for account test' }
+    let(:iam_client) { instance_double(Aws::IAM::Client) }
 
     before do
-      allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
-      allow_any_instance_of(Aws::IAM::Client).to receive(:list_access_keys).and_return(
+      allow(described_class).to receive(:region).and_return(nil)
+      allow(Aws::IAM::Client).to receive(:new).and_return(iam_client)
+      allow(iam_client).to receive(:list_access_keys).and_return(
         access_key_metadata: [
           {
             access_key_id: key,
@@ -293,25 +314,29 @@ describe Awskeyring::Awsapi do
           }
         ]
       )
+      allow(iam_client).to receive(:create_access_key)
+      allow(iam_client).to receive(:delete_access_key)
     end
 
     it 'calls the rotate method and fails' do
-      expect_any_instance_of(Aws::IAM::Client).to_not receive(:create_access_key)
-      expect_any_instance_of(Aws::IAM::Client).to_not receive(:delete_access_key)
-
       expect do
-        subject.rotate(account: account, key: key, secret: secret, key_message: key_message)
+        awsapi.rotate(account: account, key: key, secret: secret, key_message: key_message)
       end.to raise_error(SystemExit).and output(/# You have two access keys for account test/).to_stderr
+
+      expect(iam_client).not_to have_received(:create_access_key)
+      expect(iam_client).not_to have_received(:delete_access_key)
     end
   end
 
-  context 'When there is no region set' do
+  context 'when there is no region set' do
     let(:role_token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
     let(:sharedcfg) do
-      double(
+      instance_double(
+        'HashMap',
         region: nil
       )
     end
+
     before do
       ENV['AWS_DEFAULT_REGION'] = nil
       ENV['AWS_REGION'] = nil
@@ -321,15 +346,15 @@ describe Awskeyring::Awsapi do
 
     it 'retrieves the current region' do
       ENV['AWS_DEFAULT_REGION'] = 'us-west-1'
-      expect(subject.region).to eq 'us-west-1'
+      expect(awsapi.region).to eq 'us-west-1'
     end
 
     it 'can not retrieve the current region' do
-      expect(subject.region).to be nil
+      expect(awsapi.region).to be nil
     end
 
     it 'returns an array of env vars for the Credential' do
-      expect(subject.get_env_array(
+      expect(awsapi.get_env_array(
                account: 'test',
                key: 'ASIAIOSFODNN7EXAMPLE',
                secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
