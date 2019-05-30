@@ -43,6 +43,6 @@ This is rendered as Web pages on [Rubydoc.info][awskeyring on Rubydoc.info].
 
 [wiki]: https://github.com/vibrato/awskeyring/wiki
 [YARD]: https://yardoc.org/
-[awskeyring on Rubydoc.info]: http://www.rubydoc.info/gems/awskeyring
-[RuboCop]: http://rubocop.readthedocs.io/en/latest/
+[awskeyring on Rubydoc.info]: https://www.rubydoc.info/gems/awskeyring
+[RuboCop]: https://rubocop.readthedocs.io/en/latest/
 [Rspec]: https://rspec.info

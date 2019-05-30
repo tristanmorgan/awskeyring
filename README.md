@@ -4,10 +4,10 @@
 
 * [![Build Status](https://travis-ci.org/vibrato/awskeyring.svg?branch=master)](https://travis-ci.org/vibrato/awskeyring)
 * [![Gem Version](https://badge.fury.io/rb/awskeyring.svg)](https://badge.fury.io/rb/awskeyring)
-* [![license MIT](http://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
-* [![All Downloads](http://ruby-gem-downloads-badge.herokuapp.com/awskeyring?type=total)](https://rubygems.org/gems/awskeyring)
-* [![Version Downloads](http://ruby-gem-downloads-badge.herokuapp.com/awskeyring?label=downloads-current-version)](https://rubygems.org/gems/awskeyring)
-* [![Documentation](http://img.shields.io/badge/yard-docs-brightgreen.svg)](http://www.rubydoc.info/gems/awskeyring)
+* [![license MIT](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
+* [![All Downloads](https://ruby-gem-downloads-badge.herokuapp.com/awskeyring?type=total)](https://rubygems.org/gems/awskeyring)
+* [![Version Downloads](https://ruby-gem-downloads-badge.herokuapp.com/awskeyring?label=downloads-current-version)](https://rubygems.org/gems/awskeyring)
+* [![Documentation](https://img.shields.io/badge/yard-docs-brightgreen.svg)](https://www.rubydoc.info/gems/awskeyring)
 
 Awskeyring is a small tool to manage AWS account keys in the macOS Keychain.
 
@@ -40,7 +40,7 @@ Now your keys are stored safely in the macOS keychain. To print environment vari
 
     awskeyring env personal-aws
 
-Alternatively you can create a profile using the credential_process config variable. See the [AWS CLI Config docs](http://docs.aws.amazon.com/cli/latest/topic/config-vars.html#cli-aws-help-config-vars) for more details on this config option.
+Alternatively you can create a profile using the credential_process config variable. See the [AWS CLI Config docs](https://docs.aws.amazon.com/cli/latest/topic/config-vars.html#cli-aws-help-config-vars) for more details on this config option.
 
     [profile personal]
     region = us-west-1
@@ -95,9 +95,9 @@ If you believe you have found a security issue in Awskeyring, please responsibly
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/vibrato/awskeyring. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/vibrato/awskeyring. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](https://contributor-covenant.org) code of conduct.
 
 ## License
 
-The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
+The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
