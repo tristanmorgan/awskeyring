@@ -1,6 +1,7 @@
 # Awskeyring
 
 ![Awskeyring](https://raw.githubusercontent.com/vibrato/awskeyring/master/awskeyring-144.png)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvibrato%2Fawskeyring.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvibrato%2Fawskeyring?ref=badge_shield)
 
 * [![Build Status](https://travis-ci.org/vibrato/awskeyring.svg?branch=master)](https://travis-ci.org/vibrato/awskeyring)
 * [![Gem Version](https://badge.fury.io/rb/awskeyring.svg)](https://badge.fury.io/rb/awskeyring)
@@ -101,3 +102,6 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/vibrat
 
 The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
 
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fvibrato%2Fawskeyring.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fvibrato%2Fawskeyring?ref=badge_large)
