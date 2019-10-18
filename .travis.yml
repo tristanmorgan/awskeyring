@@ -1,6 +1,7 @@
 ---
 language: ruby
 os: osx
+osx_image: xcode11
 rvm:
   - 2.3.7
   - 2.6.3
@@ -12,13 +13,13 @@ before_install:
   - gem install bundler
 notifications:
   slack:
-    secure: "okKLlQ93ogj8ut18MZazQD63XTIzCpTfneYQMlKPaLU5HnooAkUFmEpSN8ig\
-TJD0GuEQ7Jf8+BkFlhECWl1FwtzIW6z/yMadiiLwY6qA/O1ZVVYZmkS4kpcKtCMrvO0Hf3iPL\
-XpJX0sQGfGsMsho6NZuNs0dzlrr4+HX/cEGmDXBocDDxdv2d25HzHtqt4l+4axeJ+PJdHDmYl\
-DzhtMAXhkGoPfzws7MPvkVcqY0eZRW2WqccO52zlQrBNcphp7BI8mLTW/BwkEY9YndJf2xoBa\
-oEOuaIJbGgHbmskGMRui3vZnd08/fiWkNsCI/EhB5BDJ41bwobsHEtuqu+Qx92kI+hzjtU4D1\
-6k1v/6HDm61T6gh6BTp0QEXJeOkiecjVGyzrMlBf5BEyIB7JfLvGPa7RUbvvvUxFGcEtnSbUZ\
-49cXAG7cKiiSgcNOocCrMNIRAe864Tm606Mud1RbOv8tEiS9BJ96ktOpOfvrYPyYMRFTte2gR\
-LwNDwcpXIWTI39CXD2EBxSfRK/OqmggLYMG5AKhxyS/Vl7E2p9gii6syB0LnpFBIZ6t+OSve7\
-fZtCU/wruC5IrI/vHtWfApvADYKsXG6FEYJoJ1LsCDjIRlrkwV1dEVsp/HSSO6zRh9KhJ3b7y\
-zL97Dyi6dCi+nM7aKGrox/8kvcn9alrdRt8sz3c="
+    secure: "OFMz4pcCoe2qtSzdOV8/R/JJ4tONpoSX94x3Q+jzTVCkzoWIHX5zZIJX9snF\
+0o0zIv5AtPBT6lug5VBdC/Qd1uXN5H20nCwGtkaLTByiNlkgmIX2nVS5bHCLZGTMzY3KPowap\
+O2Wo22c6ZSFmqV957YgUXIO4hXPMwge32RFTlaDQbS+rt7f76D2HcGbCY50yF1sJL7JbXI6uT\
+er/xit2d6QZkj18Az4E9VS9e/bSHwhxUO2XV3w1YkqKu9fL9pvPGlqGEpH09wStGQEozcO6jW\
+y1O5BAb8u2TIoUQXPWEwWkYNOE+POyEHTWaycaV7cH/XLvxG3B8zsqUPyuLsq/a+SbJLMWnOE\
+yoG8rIB/gUrp+q/fRayQm0UAt/3H/604sbel0/8JpWzOM1JGYUAfH/cJ+X7SyXkR4DLuGU1kb\
+ZifMrXCY+dGUeY7QNTHEjXYkc4tSvQjHq0SIlmWZ/nj8yaAzToryk2hlMbI9Yb+4F/ET3R+vo\
+mjbQ1nWLoP7oXEevwrXwH7uZt9mPw5ZVHRuw88U4zPCiA/4SKfw9kslyjCyu38bEF3b592m1c\
+yJa83kvQjGncGNrbgb0O/5nCZXGIOu+7qhDK/lfL01Kmr7cf7d83MghddzH+bwV+pbmr5siUZ\
+QqgQRw3vjPjxzvG6wV7ZdmI/Gfs8Jk8/IkgFDAU="
