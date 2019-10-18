@@ -1,8 +1,8 @@
 # Awskeyring
 
-![Awskeyring](https://raw.githubusercontent.com/vibrato/awskeyring/master/awskeyring-144.png)
+![Awskeyring](https://raw.githubusercontent.com/servian/awskeyring/master/awskeyring-144.png)
 
-* [![Build Status](https://travis-ci.org/vibrato/awskeyring.svg?branch=master)](https://travis-ci.org/vibrato/awskeyring)
+* [![Build Status](https://travis-ci.org/servian/awskeyring.svg?branch=master)](https://travis-ci.org/servian/awskeyring)
 * [![Gem Version](https://badge.fury.io/rb/awskeyring.svg)](https://badge.fury.io/rb/awskeyring)
 * [![license MIT](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 * [![All Downloads](https://ruby-gem-downloads-badge.herokuapp.com/awskeyring?type=total)](https://rubygems.org/gems/awskeyring)
@@ -28,7 +28,7 @@ Install it with:
 
 ## Wiki
 
-Please see the [Wiki](https://github.com/vibrato/awskeyring/wiki) for full usage instructions and tips.
+Please see the [Wiki](https://github.com/servian/awskeyring/wiki) for full usage instructions and tips.
 
 ## Quick start
 
@@ -97,7 +97,7 @@ If you believe you have found a security issue in Awskeyring, please responsibly
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/vibrato/awskeyring. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](https://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/servian/awskeyring. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](https://contributor-covenant.org) code of conduct.
 
 ## License
 

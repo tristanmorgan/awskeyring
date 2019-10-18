@@ -5,7 +5,7 @@ Bug reports and pull requests from users are what keep this project working.
 ## Basics
 
 1. Create an issue and describe your idea
-2. [Fork it](https://github.com/vibrato/awskeyring/fork)
+2. [Fork it](https://github.com/servian/awskeyring/fork)
 3. Create your feature branch (`git checkout -b my-new-feature`)
 4. Commit your changes (`git commit -am 'Add some feature'`)
 5. Publish the branch (`git push origin my-new-feature`)
@@ -41,7 +41,7 @@ API documentation is written as [YARD] docblocks in the Ruby code.
 
 This is rendered as Web pages on [Rubydoc.info][awskeyring on Rubydoc.info].
 
-[wiki]: https://github.com/vibrato/awskeyring/wiki
+[wiki]: https://github.com/servian/awskeyring/wiki
 [YARD]: https://yardoc.org/
 [awskeyring on Rubydoc.info]: https://www.rubydoc.info/gems/awskeyring
 [RuboCop]: https://rubocop.readthedocs.io/en/latest/

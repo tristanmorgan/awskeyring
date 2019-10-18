@@ -6,7 +6,6 @@ source 'https://rubygems.org'
 gemspec
 
 group :development do
-  gem 'bundler'
   gem 'github_changelog_generator'
   gem 'rake'
   gem 'rspec'
