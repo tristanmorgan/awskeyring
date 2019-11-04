@@ -302,4 +302,24 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
 
     account_name
   end
+
+  # Validate role exists
+  #
+  # @param [String] role_name the associated role name.
+  def self.role_exists(role_name)
+    Awskeyring::Validate.role_name(role_name)
+    raise 'Role does not exist' unless list_role_names.include?(role_name)
+
+    role_name
+  end
+
+  # Validate role does not exists
+  #
+  # @param [String] role_name the associated role name.
+  def self.role_not_exists(role_name)
+    Awskeyring::Validate.role_name(role_name)
+    raise 'Role already exists' if list_role_names.include?(role_name)
+
+    role_name
+  end
 end
