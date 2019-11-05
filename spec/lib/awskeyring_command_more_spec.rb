@@ -107,6 +107,7 @@ describe AwskeyringCommand do
       allow(Thor::LineEditor).to receive(:readline).and_return('invalid')
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
       allow(Awskeyring).to receive(:account_exists).and_return('test')
+      allow(Awskeyring).to receive(:role_exists).and_return('role')
     end
 
     it 'tries to receive a new token' do
@@ -330,6 +331,7 @@ describe AwskeyringCommand do
     before do
       allow(Awskeyring).to receive(:add_role).and_return(nil)
       allow(Thor::LineEditor).to receive(:readline).and_return(bad_role_arn)
+      allow(Awskeyring).to receive(:role_not_exists).and_return('readonly')
     end
 
     it 'tries to add a valid role' do

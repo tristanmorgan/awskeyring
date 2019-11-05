@@ -114,6 +114,7 @@ describe AwskeyringCommand do
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
       allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
       allow(Awskeyring).to receive(:account_exists).and_return('test')
+      allow(Awskeyring).to receive(:role_exists).and_return('test')
     end
 
     it 'removes an account' do

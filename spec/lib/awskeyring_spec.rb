@@ -230,5 +230,13 @@ describe Awskeyring do
     it 'invalidates an account name' do
       expect { awskeyring.account_not_exists('test') }.to raise_error('Account already exists')
     end
+
+    it 'validates a role name' do
+      expect { awskeyring.role_exists('test') }.not_to raise_error
+    end
+
+    it 'invalidates a role name' do
+      expect { awskeyring.role_not_exists('test') }.to raise_error('Role already exists')
+    end
   end
 end

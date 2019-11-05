@@ -185,7 +185,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   def add_role(role = nil)
     role = ask_check(
       existing: role, message: I18n.t('message.role'),
-      validator: Awskeyring::Validate.method(:role_name)
+      validator: Awskeyring.method(:role_not_exists)
     )
     arn = ask_check(
       existing: options[:arn], message: I18n.t('message.arn'),
@@ -222,7 +222,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # remove a role
   def remove_role(role = nil)
     role = ask_check(
-      existing: role, message: I18n.t('message.role'), validator: Awskeyring::Validate.method(:role_name)
+      existing: role, message: I18n.t('message.role'), validator: Awskeyring.method(:role_exists)
     )
     Awskeyring.delete_role(role_name: role, message: I18n.t('message.delrole', role: role))
   end
@@ -268,7 +268,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     role ||= options[:role]
     if role
       role = ask_check(
-        existing: role, message: I18n.t('message.role'), validator: Awskeyring::Validate.method(:role_name)
+        existing: role, message: I18n.t('message.role'), validator: Awskeyring.method(:role_exists)
       )
     end
     code ||= options[:code]
