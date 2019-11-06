@@ -7,7 +7,10 @@ require 'github_changelog_generator/task'
 require 'yard'
 
 GitHubChangelogGenerator::RakeTask.new :changelog do |config|
+  config.user = 'servian'
+  config.project = 'awskeyring'
   config.future_release = "v#{Awskeyring::VERSION}"
+  config.since_tag = 'v0.10.0'
 end
 
 RuboCop::RakeTask.new do |rubocop|
