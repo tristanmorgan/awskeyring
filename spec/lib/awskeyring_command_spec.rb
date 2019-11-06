@@ -115,6 +115,8 @@ describe AwskeyringCommand do
       allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
       allow(Awskeyring).to receive(:account_exists).and_return('test')
       allow(Awskeyring).to receive(:role_exists).and_return('test')
+      allow(Awskeyring).to receive(:list_account_names).and_return(['test'])
+      allow(Awskeyring).to receive(:list_role_names).and_return(['test'])
     end
 
     it 'removes an account' do
@@ -196,6 +198,7 @@ unset AWS_SESSION_TOKEN
       allow(Process).to receive(:wait).exactly(1).with(8888)
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
       allow(Awskeyring).to receive(:account_exists).and_return('test')
+      allow(Awskeyring).to receive(:list_account_names).and_return(['test'])
     end
 
     it 'removes a token' do

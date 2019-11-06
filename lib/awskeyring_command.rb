@@ -44,7 +44,12 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       exit 1
     end
 
-    keychain = ask_missing(existing: options[:keychain], message: I18n.t('message.keychain'))
+    keychain = ask_check(
+      existing: options[:keychain],
+      flags: 'optional',
+      message: I18n.t('message.keychain'),
+      validator: Awskeyring::Validate.method(:account_name)
+    )
     keychain = 'awskeyring' if keychain.empty?
 
     puts I18n.t('message.newkeychain')
@@ -78,7 +83,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     else
       account = ask_check(
         existing: account, message: I18n.t('message.account'),
-        validator: Awskeyring.method(:account_exists)
+        validator: Awskeyring.method(:account_exists),
+        limited_to: Awskeyring.list_account_names
       )
       cred = age_check_and_get(account: account, no_token: options['no-token'])
       put_env_string(cred)
@@ -88,7 +94,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   desc 'json ACCOUNT', I18n.t('json.desc')
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   # Print JSON for use with credential_process
-  def json(account = nil)
+  def json(account)
     account = ask_check(
       existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
     )
@@ -137,11 +143,11 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     )
     secret = ask_check(
       existing: options[:secret], message: I18n.t('message.secret'),
-      secure: true, validator: Awskeyring::Validate.method(:secret_access_key)
+      flags: 'secure', validator: Awskeyring::Validate.method(:secret_access_key)
     )
     mfa = ask_check(
       existing: options[:mfa], message: I18n.t('message.mfa'),
-      optional: true, validator: Awskeyring::Validate.method(:mfa_arn)
+      flags: 'optional', validator: Awskeyring::Validate.method(:mfa_arn)
     )
     Awskeyring::Awsapi.verify_cred(key: key, secret: secret) unless options['no-remote']
     Awskeyring.add_account(
@@ -158,16 +164,18 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option :secret, type: :string, aliases: '-s', desc: I18n.t('method_option.secret')
   method_option 'no-remote', type: :boolean, aliases: '-r', desc: I18n.t('method_option.noremote'), default: false
   # Update an Account
-  def update(account = nil) # rubocop:disable Metrics/MethodLength
+  def update(account = nil) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
+      existing: account, message: I18n.t('message.account'),
+      validator: Awskeyring.method(:account_exists),
+      limited_to: Awskeyring.list_account_names
     )
     key = ask_check(
       existing: options[:key], message: I18n.t('message.key'), validator: Awskeyring::Validate.method(:access_key)
     )
     secret = ask_check(
       existing: options[:secret], message: I18n.t('message.secret'),
-      secure: true, validator: Awskeyring::Validate.method(:secret_access_key)
+      flags: 'secure', validator: Awskeyring::Validate.method(:secret_access_key)
     )
     Awskeyring::Awsapi.verify_cred(key: key, secret: secret) unless options['no-remote']
     Awskeyring.update_account(
@@ -203,7 +211,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # Remove an account
   def remove(account = nil)
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists),
+      limited_to: Awskeyring.list_account_names
     )
     Awskeyring.delete_account(account: account, message: I18n.t('message.delaccount', account: account))
   end
@@ -212,7 +221,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # remove a session token
   def remove_token(account = nil)
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists),
+      limited_to: Awskeyring.list_account_names
     )
     Awskeyring.delete_token(account: account, message: I18n.t('message.deltoken', account: account))
   end
@@ -222,7 +232,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # remove a role
   def remove_role(role = nil)
     role = ask_check(
-      existing: role, message: I18n.t('message.role'), validator: Awskeyring.method(:role_exists)
+      existing: role, message: I18n.t('message.role'), validator: Awskeyring.method(:role_exists),
+      limited_to: Awskeyring.list_role_names
     )
     Awskeyring.delete_role(role_name: role, message: I18n.t('message.delrole', role: role))
   end
@@ -231,7 +242,10 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # rotate Account keys
   def rotate(account = nil) # rubocop:disable Metrics/MethodLength
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
+      existing: account,
+      message: I18n.t('message.account'),
+      validator: Awskeyring.method(:account_exists),
+      limited_to: Awskeyring.list_account_names
     )
     cred = Awskeyring.get_valid_creds(account: account, no_token: true)
 
@@ -263,12 +277,16 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # generate a sessiopn token
   def token(account = nil, role = nil, code = nil) # rubocop:disable all
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
+      existing: account,
+      message: I18n.t('message.account'),
+      validator: Awskeyring.method(:account_exists),
+      limited_to: Awskeyring.list_account_names
     )
     role ||= options[:role]
     if role
       role = ask_check(
-        existing: role, message: I18n.t('message.role'), validator: Awskeyring.method(:role_exists)
+        existing: role, message: I18n.t('message.role'), validator: Awskeyring.method(:role_exists),
+        limited_to: Awskeyring.list_role_names
       )
     end
     code ||= options[:code]
@@ -320,7 +338,10 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # Open the AWS Console
   def console(account = nil) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
+      existing: account,
+      message: I18n.t('message.account'),
+      validator: Awskeyring.method(:account_exists),
+      limited_to: Awskeyring.list_account_names
     )
     cred = age_check_and_get(account: account, no_token: options['no-token'])
 
@@ -436,11 +457,17 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     Awskeyring::Awsapi::AWS_ENV_VARS.each { |key| puts "unset #{key}" unless env_var.key?(key) }
   end
 
-  def ask_check(existing:, message:, secure: false, optional: false, validator: nil)
+  def ask_check(existing:, message:, flags: nil, validator: nil, limited_to: nil) # rubocop:disable Metrics/MethodLength
     retries ||= 3
     begin
-      value = ask_missing(existing: existing, message: message, secure: secure, optional: optional)
-      value = validator.call(value) unless value.empty? && optional
+      value = ask_missing(
+        existing: existing,
+        message: message,
+        secure: 'secure'.eql?(flags),
+        optional: 'optional'.eql?(flags),
+        limited_to: limited_to
+      )
+      value = validator.call(value) unless value.empty? && 'optional'.eql?(flags)
     rescue RuntimeError => e
       warn e.message
       existing = nil
@@ -450,15 +477,17 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     value
   end
 
-  def ask_missing(existing:, message:, secure: false, optional: false)
-    existing || ask(message: message, secure: secure, optional: optional).strip
+  def ask_missing(existing:, message:, secure: false, optional: false, limited_to: nil)
+    existing || ask(message: message, secure: secure, optional: optional, limited_to: limited_to).strip
   end
 
-  def ask(message:, secure: false, optional: false)
+  def ask(message:, secure: false, optional: false, limited_to: nil)
     if secure
       Awskeyring::Input.read_secret(message.rjust(20) + ': ')
     elsif optional
       Thor::LineEditor.readline((message + ' (optional)').rjust(20) + ': ')
+    elsif limited_to
+      Thor::LineEditor.readline(message.rjust(20) + ': ', limited_to: limited_to)
     else
       Thor::LineEditor.readline(message.rjust(20) + ': ')
     end
