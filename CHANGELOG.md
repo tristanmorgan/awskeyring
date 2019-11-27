@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.1.1](https://github.com/servian/awskeyring/tree/v1.1.1) (2019-11-28)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.1.0...v1.1.1)
+
+**Implemented enhancements:**
+
+- Add --detail flag for roles. [\#54](https://github.com/servian/awskeyring/pull/54) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.1.0](https://github.com/servian/awskeyring/tree/v1.1.0) (2019-11-06)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.0.2...v1.1.0)
