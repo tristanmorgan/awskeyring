@@ -138,7 +138,7 @@ describe Awskeyring do
     let(:role) do
       instance_double(
         'HashMap',
-        attributes: { label: 'role test', account: 'arn:aws:iam::012345678901:role/test' },
+        attributes: { label: 'role role', account: 'arn:aws:iam::012345678901:role/test' },
         password: ''
       )
     end
@@ -231,12 +231,30 @@ describe Awskeyring do
       expect { awskeyring.account_not_exists('test') }.to raise_error('Account already exists')
     end
 
+    it 'lists all accounts' do
+      expect(awskeyring.list_account_names).to eq(
+        ['test']
+      )
+    end
+
     it 'validates a role name' do
-      expect { awskeyring.role_exists('test') }.not_to raise_error
+      expect { awskeyring.role_exists('role') }.not_to raise_error
     end
 
     it 'invalidates a role name' do
-      expect { awskeyring.role_not_exists('test') }.to raise_error('Role already exists')
+      expect { awskeyring.role_not_exists('role') }.to raise_error('Role already exists')
+    end
+
+    it 'lists all roles' do
+      expect(awskeyring.list_role_names).to eq(
+        ['role']
+      )
+    end
+
+    it 'lists all roles with detail' do
+      expect(awskeyring.list_role_names_plus).to eq(
+        ["role\tarn:aws:iam::012345678901:role/test"]
+      )
     end
   end
 end

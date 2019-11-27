@@ -38,6 +38,7 @@ en:
     arn: 'AWS role arn.'
     code: 'Virtual mfa CODE.'
     duration: 'Session DURATION in seconds.'
+    detail: 'Show more detail.'
     key: 'AWS account key id.'
     keychain: 'Name of KEYCHAIN to initialise.'
     mfa: 'AWS virtual mfa arn.'
