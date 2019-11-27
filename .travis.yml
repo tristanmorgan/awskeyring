@@ -3,7 +3,6 @@ language: ruby
 os: osx
 osx_image: xcode11
 rvm:
-  - 2.3.7
   - 2.6.3
   - ruby-head
 matrix:

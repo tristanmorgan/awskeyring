@@ -51,6 +51,8 @@ describe AwskeyringCommand do
     before do
       allow(Awskeyring).to receive(:list_account_names).and_return(%w[company personal vibrato])
       allow(Awskeyring).to receive(:list_role_names).and_return(%w[admin minion readonly])
+      allow(Awskeyring).to receive(:list_role_names_plus)
+        .and_return(%W[admin\tarn1 minion\tarn2 readonly\tarn3])
       allow(Awskeyring).to receive(:list_console_path).and_return(%w[iam cloudformation vpc])
     end
 
@@ -62,6 +64,11 @@ describe AwskeyringCommand do
     it 'list keychain roles' do
       expect { described_class.start(%w[list-role]) }
         .to output("admin\nminion\nreadonly\n").to_stdout
+    end
+
+    it 'list keychain roles with detail' do
+      expect { described_class.start(%w[list-role -d]) }
+        .to output("admin\tarn1\nminion\tarn2\nreadonly\tarn3\n").to_stdout
     end
 
     it 'lists accounts with autocomplete' do

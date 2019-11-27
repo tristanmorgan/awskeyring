@@ -68,9 +68,14 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   map 'list-role' => :list_role
   desc 'list-role', I18n.t('list_role.desc')
+  method_option 'detail', type: :boolean, aliases: '-d', desc: I18n.t('method_option.detail'), default: false
   # List roles
   def list_role
-    puts Awskeyring.list_role_names.join("\n")
+    if options['detail']
+      puts Awskeyring.list_role_names_plus.join("\n")
+    else
+      puts Awskeyring.list_role_names.join("\n")
+    end
   end
 
   desc 'env ACCOUNT', I18n.t('env.desc')

@@ -174,6 +174,11 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     list_roles.map { |elem| elem.attributes[:label][(ROLE_PREFIX.length)..-1] }
   end
 
+  # Return a list role item names and arns
+  def self.list_role_names_plus
+    list_roles.map { |elem| "#{elem.attributes[:label][(ROLE_PREFIX.length)..-1]}\t#{elem.attributes[:account]}" }
+  end
+
   # Return a list of console paths
   def self.list_console_path
     prefs.key?('console') ? prefs['console'] : DEFAULT_CONSOLE_LIST
