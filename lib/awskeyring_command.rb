@@ -28,6 +28,11 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   map ['tok'] => :token
   map ['up'] => :update
 
+  # default to returning an error on failure.
+  def self.exit_on_failure?
+    true
+  end
+
   desc '--version, -v', I18n.t('__version.desc')
   # print the version number
   def __version

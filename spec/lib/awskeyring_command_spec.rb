@@ -38,7 +38,8 @@ describe AwskeyringCommand do
     end
 
     it 'tells you it could not find the command test' do
-      expect { described_class.start(%w[test]) }.to output(/Could not find command "test"./).to_stderr
+      expect { described_class.start(%w[test]) }.to raise_error(SystemExit)
+        .and output(/Could not find command "test"./).to_stderr
     end
 
     it 'initialises the keychain' do
