@@ -1,9 +1,12 @@
 ---
 require:
+  - rubocop-md
   - rubocop-performance
+  - rubocop-rake
   - rubocop-rspec
+  - rubocop-rubycw
 
-Metrics/LineLength:
+Layout/LineLength:
   Max: 120
 
 Metrics/MethodLength:
@@ -26,6 +29,10 @@ RSpec/MultipleExpectations:
 
 RSpec/ExampleLength:
   Enabled: false
+
+Rubycw/Rubycw:
+  Exclude:
+    - ./*.md
 
 AllCops:
   Exclude:
