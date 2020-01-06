@@ -1,6 +1,14 @@
 # Changelog
 
-## [v1.1.1](https://github.com/servian/awskeyring/tree/v1.1.1) (2019-11-28)
+## [v1.1.2](https://github.com/servian/awskeyring/tree/v1.1.2) (2020-01-06)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.1.1...v1.1.2)
+
+**Fixed bugs:**
+
+- Deprecation warning for exit\_on\_failure [\#55](https://github.com/servian/awskeyring/pull/55) ([tristanmorgan](https://github.com/tristanmorgan))
+
+## [v1.1.1](https://github.com/servian/awskeyring/tree/v1.1.1) (2019-11-27)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.1.0...v1.1.1)
 
