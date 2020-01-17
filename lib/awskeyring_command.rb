@@ -149,7 +149,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_not_exists)
     )
     key = ask_check(
-      existing: options[:key], message: I18n.t('message.key'), validator: Awskeyring::Validate.method(:access_key)
+      existing: options[:key], message: I18n.t('message.key'), validator: Awskeyring.method(:access_key_not_exists)
     )
     secret = ask_check(
       existing: options[:secret], message: I18n.t('message.secret'),
@@ -181,7 +181,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       limited_to: Awskeyring.list_account_names
     )
     key = ask_check(
-      existing: options[:key], message: I18n.t('message.key'), validator: Awskeyring::Validate.method(:access_key)
+      existing: options[:key], message: I18n.t('message.key'), validator: Awskeyring.method(:access_key_not_exists)
     )
     secret = ask_check(
       existing: options[:secret], message: I18n.t('message.secret'),
@@ -207,7 +207,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     )
     arn = ask_check(
       existing: options[:arn], message: I18n.t('message.arn'),
-      validator: Awskeyring::Validate.method(:role_arn)
+      validator: Awskeyring.method(:role_arn_not_exists)
     )
 
     Awskeyring.add_role(

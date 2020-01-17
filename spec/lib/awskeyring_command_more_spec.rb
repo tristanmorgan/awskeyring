@@ -239,6 +239,7 @@ describe AwskeyringCommand do
       allow(Awskeyring).to receive(:account_not_exists).with('test').and_return('test')
       allow(Awskeyring).to receive(:account_exists).with('tested').and_return('tested')
       allow(Awskeyring).to receive(:list_account_names).and_return(['tested'])
+      allow(Awskeyring).to receive(:item_by_account).and_return(nil)
       allow(Awskeyring::Input).to receive(:read_secret).and_return(bad_secret_access_key)
       allow(Awskeyring).to receive(:list_role_names).and_return(['role'])
     end
@@ -295,6 +296,7 @@ describe AwskeyringCommand do
     before do
       allow(Thor::LineEditor).to receive(:readline).and_return(bad_mfa_arn)
       allow(Awskeyring).to receive(:account_not_exists).with('test').and_return('test')
+      allow(Awskeyring).to receive(:item_by_account).and_return(nil)
     end
 
     it 'tries to add an invalid mfa' do
@@ -312,6 +314,7 @@ describe AwskeyringCommand do
     before do
       allow(Thor::LineEditor).to receive(:readline).and_return(" #{access_key} \n")
       allow(Awskeyring::Input).to receive(:read_secret).and_return(" #{secret_access_key} \t")
+      allow(Awskeyring).to receive(:item_by_account).and_return(nil)
       allow(Awskeyring).to receive(:account_not_exists).with('test').and_return('test')
       allow(Awskeyring).to receive(:add_account).and_return(nil)
       allow(Awskeyring::Awsapi).to receive(:verify_cred)
@@ -336,6 +339,7 @@ describe AwskeyringCommand do
     before do
       allow(Awskeyring).to receive(:add_role).and_return(nil)
       allow(Thor::LineEditor).to receive(:readline).and_return(bad_role_arn)
+      allow(Awskeyring).to receive(:item_by_account).and_return(nil)
       allow(Awskeyring).to receive(:role_not_exists).and_return('readonly')
     end
 
