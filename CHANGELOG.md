@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.2.0](https://github.com/servian/awskeyring/tree/v1.2.0) (2020-01-20)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.1.2...v1.2.0)
+
+**Implemented enhancements:**
+
+- Check for existing account keys and role arns [\#56](https://github.com/servian/awskeyring/pull/56) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.1.2](https://github.com/servian/awskeyring/tree/v1.1.2) (2020-01-06)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.1.1...v1.1.2)
