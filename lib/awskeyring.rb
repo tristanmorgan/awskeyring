@@ -87,6 +87,11 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     load_keychain.generic_passwords
   end
 
+  # return an item by accout
+  private_class_method def self.item_by_account(account)
+    all_items.where(account: account).first
+  end
+
   # Add an account item
   #
   # @param [String] account The account name to create
@@ -308,6 +313,16 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     account_name
   end
 
+  # Validate access key does not exists
+  #
+  # @param [String] access_key the associated access key.
+  def self.access_key_not_exists(access_key)
+    Awskeyring::Validate.access_key(access_key)
+    raise 'Access KEY already exists' if item_by_account(access_key)
+
+    access_key
+  end
+
   # Validate role exists
   #
   # @param [String] role_name the associated role name.
@@ -326,5 +341,15 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     raise 'Role already exists' if list_role_names.include?(role_name)
 
     role_name
+  end
+
+  # Validate role arn not exists
+  #
+  # @param [String] role_arn the associated role arn.
+  def self.role_arn_not_exists(role_arn)
+    Awskeyring::Validate.role_arn(role_arn)
+    raise 'Role ARN already exists' if item_by_account(role_arn)
+
+    role_arn
   end
 end

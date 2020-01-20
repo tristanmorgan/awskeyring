@@ -123,12 +123,14 @@ describe Awskeyring do
   end
 
   context 'when there is accounts and roles and tokens' do
+    let(:access_key) { 'AKIA1234567890ABCDEF' }
+    let(:role_arn) { 'arn:aws:iam::012345678901:role/test' }
     let(:item) do
       instance_double(
         'HashMap',
         attributes: {
           label: 'account test',
-          account: 'AKIATESTTEST',
+          account: access_key,
           comment: 'arn:aws:iam::012345678901:mfa/ec2-user',
           updated_at: Time.parse('2016-12-01T22:20:01Z')
         },
@@ -138,7 +140,7 @@ describe Awskeyring do
     let(:role) do
       instance_double(
         'HashMap',
-        attributes: { label: 'role role', account: 'arn:aws:iam::012345678901:role/test' },
+        attributes: { label: 'role role', account: role_arn },
         password: ''
       )
     end
@@ -181,7 +183,9 @@ describe Awskeyring do
       allow(all_list).to receive(:all).and_return(all_list)
       allow(all_list).to receive(:where).and_return([nil])
       allow(all_list).to receive(:where).with(label: 'account test').and_return([item])
+      allow(all_list).to receive(:where).with(account: access_key).and_return([item])
       allow(all_list).to receive(:where).with(label: 'role role').and_return([role])
+      allow(all_list).to receive(:where).with(account: role_arn).and_return([role])
       allow(all_list).to receive(:where).with(label: 'session-key test').and_return([session_key])
       allow(all_list).to receive(:where).with(label: 'session-token test').and_return([session_token])
       allow(session_key).to receive(:delete)
@@ -208,7 +212,7 @@ describe Awskeyring do
     it 'returns a hash with the only the creds' do
       expect(awskeyring.get_valid_creds(account: 'test', no_token: true)).to eq(
         account: 'test',
-        key: 'AKIATESTTEST',
+        key: access_key,
         secret: 'biglongbase64',
         token: nil,
         expiry: nil,
@@ -231,6 +235,14 @@ describe Awskeyring do
       expect { awskeyring.account_not_exists('test') }.to raise_error('Account already exists')
     end
 
+    it 'invalidates an access key' do
+      expect { awskeyring.access_key_not_exists('test') }.to raise_error('Invalid Access Key')
+    end
+
+    it 'finds an existing access key' do
+      expect { awskeyring.access_key_not_exists(access_key) }.to raise_error('Access KEY already exists')
+    end
+
     it 'lists all accounts' do
       expect(awskeyring.list_account_names).to eq(
         ['test']
@@ -243,6 +255,14 @@ describe Awskeyring do
 
     it 'invalidates a role name' do
       expect { awskeyring.role_not_exists('role') }.to raise_error('Role already exists')
+    end
+
+    it 'invalidates a role arn' do
+      expect { awskeyring.role_arn_not_exists('role') }.to raise_error('Invalid Role ARN')
+    end
+
+    it 'finds a existing role arn' do
+      expect { awskeyring.role_arn_not_exists(role_arn) }.to raise_error('Role ARN already exists')
     end
 
     it 'lists all roles' do
