@@ -288,7 +288,7 @@ describe AwskeyringCommand do
     end
   end
 
-  context 'when we try to add an AWS account' do
+  context 'when we try to add an AWS account and test an mfa' do
     let(:access_key) { 'AKIA0123456789ABCDEF' }
     let(:secret_access_key) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     let(:bad_mfa_arn) { 'arn:azure:iamnot::ABCD45678901:Administrators' }
