@@ -277,4 +277,24 @@ describe Awskeyring do
       )
     end
   end
+
+  context 'when we try to find the latest version' do
+    let(:net_http) { instance_double(Net::HTTP) }
+
+    before do
+      allow(Net::HTTP).to receive(:new).and_return(net_http)
+      allow(net_http).to receive(:get)
+        .and_return(
+          instance_double(
+            'HashMap',
+            body: '{"version":"1.2.3"}'
+          )
+        )
+      allow(net_http).to receive(:use_ssl=)
+    end
+
+    it 'return the version number' do
+      expect(awskeyring.latest_version).to eq('1.2.3')
+    end
+  end
 end

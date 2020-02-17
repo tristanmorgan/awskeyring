@@ -6,6 +6,10 @@ require_relative '../../lib/awskeyring_command'
 
 describe AwskeyringCommand do
   context 'when things are left to the defaults' do
+    let(:current_version) { Awskeyring::VERSION }
+    let(:latest_version) { '1.1.1' }
+    let(:home_page) { Awskeyring::HOMEPAGE }
+
     before do
       allow(File).to receive(:exist?).and_call_original
       allow(File).to receive(:exist?)
@@ -13,6 +17,7 @@ describe AwskeyringCommand do
         .and_return(false)
       allow(Thor::LineEditor).to receive(:readline).and_return('test')
       allow(Awskeyring).to receive(:init_keychain)
+      allow(Awskeyring).to receive(:latest_version).and_return(latest_version)
     end
 
     it 'outputs help text' do
@@ -23,8 +28,14 @@ describe AwskeyringCommand do
     end
 
     it 'returns the version number' do
+      expect(Awskeyring).not_to have_received(:latest_version)
+      expect { described_class.start(%w[__version -r]) }
+        .to output("Awskeyring v#{current_version}\nHomepage #{home_page}\n").to_stdout
+    end
+
+    it 'returns the version number with checks online' do
       expect { described_class.start(%w[__version]) }
-        .to output(/\d+\.\d+\.\d+/).to_stdout
+        .to output(/latest version v1\.1\.1/).to_stdout
     end
 
     it 'prints autocomplete help text' do

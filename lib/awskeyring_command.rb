@@ -34,9 +34,13 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   desc '--version, -v', I18n.t('__version.desc')
+  method_option 'no-remote', type: :boolean, aliases: '-r', desc: I18n.t('method_option.noremote'), default: false
   # print the version number
   def __version
     puts "Awskeyring v#{Awskeyring::VERSION}"
+    if !options['no-remote'] && Awskeyring::VERSION != Awskeyring.latest_version
+      puts "the latest version v#{Awskeyring.latest_version}"
+    end
     puts "Homepage #{Awskeyring::HOMEPAGE}"
   end
 
