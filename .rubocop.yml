@@ -20,9 +20,9 @@ Metrics/AbcSize:
   Max: 20
 
 Bundler/GemComment:
-   Enabled: false
-   Include:
-     - Gemfile
+  Enabled: false
+  Include:
+    - Gemfile
 
 RSpec/MultipleExpectations:
   Enabled: false
@@ -35,13 +35,13 @@ Rubycw/Rubycw:
     - ./*.md
 
 Style/HashEachMethods:
-   Enabled: true
+  Enabled: true
 
 Style/HashTransformKeys:
-   Enabled: true
+  Enabled: true
 
 Style/HashTransformValues:
-   Enabled: true
+  Enabled: true
 
 AllCops:
   Exclude:

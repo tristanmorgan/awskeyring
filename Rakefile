@@ -35,9 +35,15 @@ task :filemode do
   print "\n"
 end
 
+desc 'generate manpage'
+task :ronn do
+  system('ronn -w -r man/awskeyring.5.ronn')
+  puts
+end
+
 YARD::Rake::YardocTask.new do |t|
   t.options = ['--fail-on-warning', '--no-progress']
   t.stats_options = ['--list-undoc']
 end
 
-task default: %i[filemode rubocop spec yard]
+task default: %i[filemode rubocop spec ronn yard]

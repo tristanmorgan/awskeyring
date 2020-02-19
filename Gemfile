@@ -8,6 +8,7 @@ gemspec
 group :development do
   gem 'github_changelog_generator'
   gem 'rake'
+  gem 'ronn'
   gem 'rspec'
   gem 'rubocop'
   gem 'rubocop-md'

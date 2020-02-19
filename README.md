@@ -87,7 +87,7 @@ To set your environment easily the following bash function helps:
 
 ## Development
 
-After checking out the repo, run `bundle update` to install dependencies. Then, run `rake` to run the tests. Run `bundle exec awskeyring` to use the gem in this directory, ignoring other installed copies of this gem. Awskeyring is tested against the last two versions of Ruby shipped with macOS.
+After checking out the repo, run `bundle update` to install dependencies. Then, run `bundle exec rake` to run the tests. Run `bundle exec awskeyring` to use the gem in this directory, ignoring other installed copies of this gem. Awskeyring is tested against the last two versions of Ruby shipped with macOS.
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 
@@ -98,6 +98,11 @@ If you believe you have found a security issue in Awskeyring, please responsibly
 ## Contributing
 
 Bug reports and pull requests are welcome on GitHub at https://github.com/servian/awskeyring. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](https://contributor-covenant.org) code of conduct.
+
+### Contributors
+
+ * Tristan [tristanmorgan](https://github.com/tristanmorgan)
+ * Adam Sir [AzySir](https://github.com/AzySir)
 
 ## License
 

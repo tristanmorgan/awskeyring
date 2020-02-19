@@ -1,0 +1,129 @@
+# Awskeyring -- is a small tool to manage AWS account keys in the macOS Keychain.
+
+## SYNOPSIS
+
+awskeyring COMMAND [ACCOUNT|ROLE] [OPTIONS]
+
+awskeyring help COMMAND
+
+## DESCRIPTION
+
+The Awskeyring utility stores and manages AWS access keys and provides the facailty to generate access tokens with combinations of assumed roles and multi-factor-authentication codes. It includes autocompletion features and multiple validation checks for input parsing. It also includes the ability for the AWS CLI to call it directly to provide authentication.
+
+The commands are as follows:
+
+  *  --version, -v:
+
+    Prints the version
+
+  *  add ACCOUNT:
+
+    Adds an ACCOUNT to the keyring
+
+  *  add-role ROLE:
+
+    Adds a ROLE to the keyring
+
+*  console ACCOUNT:
+
+    Open the AWS Console for the ACCOUNT
+
+*  env ACCOUNT:
+
+    Outputs bourne shell environment exports for an ACCOUNT
+
+*  exec ACCOUNT command...:
+
+    Execute a COMMAND with the environment set for an ACCOUNT
+
+*  help [COMMAND]:
+
+    Describe available commands or one specific command
+
+*  initialise:
+
+    Initialises a new KEYCHAIN
+
+*  json ACCOUNT:
+
+    Outputs AWS CLI compatible JSON for an ACCOUNT
+
+*  list:
+
+    Prints a list of accounts in the keyring
+
+*  list-role:
+
+    Prints a list of roles in the keyring
+
+*  remove ACCOUNT:
+
+    Removes an ACCOUNT from the keyring
+
+*  remove-role ROLE:
+
+    Removes a ROLE from the keyring
+
+*  remove-token ACCOUNT:
+
+    Removes a token for ACCOUNT from the keyring
+
+*  rotate ACCOUNT:
+
+    Rotate access keys for an ACCOUNT
+
+*  token ACCOUNT [ROLE] [MFA]:
+
+    Create an STS Token from a ROLE or an MFA code
+
+*  update ACCOUNT:
+
+    Updates an ACCOUNT in the keyring
+
+## ENVIRONMENT
+
+The AWS_DEFAULT_REGION environment variable will be used for AWS API calls where specified or fall back to us-east-1 when not.
+
+## EXIT STATUS
+
+The Awskeyring utility exits 0 on success, and >0 if an error occurs.
+
+## EXAMPLES
+
+First you need to initialise your keychain to hold your AWS credentials.
+
+    awskeyring initialise
+
+Then add your keys to it.
+
+    awskeyring add personal-aws
+
+Now your keys are stored safely in the macOS keychain. To print environment variables run...
+
+    awskeyring env personal-aws
+
+## HISTORY
+
+The motivation of this application is to provide a local secure store of AWS
+credentials using specifically in the macOS Keychain, to have them easily accessed
+from the Terminal, and to provide useful functions like assuming roles and opening
+the AWS Console from the cli.
+For Enterprise environments there are better suited tools to use
+like [HashiCorp Vault](https://vaultproject.io/).
+
+## SECURITY
+
+If you believe you have found a security issue in Awskeyring, please responsibly disclose by contacting me at [tristan@vibrato.com.au](mailto:tristan@vibrato.com.au). Awskeyring is a Ruby script and as such Ruby is whitelisted to access your "awskeyring" keychain. Use a strong password and keep the unlock time short.
+
+## AUTHOR
+
+Tristan Morgan <tristan@vibrato.com.au> is the maintainer of Awskeyring.
+
+## CONTRIBUTORS
+
+ * Tristan [tristanmorgan](https://github.com/tristanmorgan)
+ * Adam Sir [AzySir](https://github.com/AzySir)
+
+## LICENSE
+
+The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
