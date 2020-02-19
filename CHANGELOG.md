@@ -1,5 +1,14 @@
 # Changelog
 
+## [v1.3.0](https://github.com/servian/awskeyring/tree/v1.3.0) (2020-02-20)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.2.0...v1.3.0)
+
+**Implemented enhancements:**
+
+- Add a man-page and tweak README. [\#58](https://github.com/servian/awskeyring/pull/58) ([tristanmorgan](https://github.com/tristanmorgan))
+- Enhanced version [\#57](https://github.com/servian/awskeyring/pull/57) ([AzySir](https://github.com/AzySir))
+
 ## [v1.2.0](https://github.com/servian/awskeyring/tree/v1.2.0) (2020-01-20)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.1.2...v1.2.0)
