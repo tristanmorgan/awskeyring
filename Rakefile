@@ -3,6 +3,7 @@
 require 'bundler/gem_tasks'
 require 'rspec/core/rake_task'
 require 'rubocop/rake_task'
+require 'ronn'
 require 'github_changelog_generator/task'
 require 'yard'
 
@@ -37,8 +38,10 @@ end
 
 desc 'generate manpage'
 task :ronn do
-  system('ronn -w -r man/awskeyring.5.ronn')
-  puts
+  puts 'Writing manpage'
+  roff_text = Ronn::Document.new('man/awskeyring.5.ronn').to_roff
+  File.write('man/awskeyring.5', roff_text)
+  puts "done\n\n"
 end
 
 YARD::Rake::YardocTask.new do |t|
