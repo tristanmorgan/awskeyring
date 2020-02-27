@@ -167,6 +167,7 @@ unset AWS_SESSION_TOKEN
     it 'unsets all AWS Access keys' do
       expect { described_class.start(%w[env --unset]) }
         .to output(%(export AWS_DEFAULT_REGION="us-east-1"
+unset AWS_ACCOUNT_NAME
 unset AWS_ACCESS_KEY_ID
 unset AWS_ACCESS_KEY
 unset AWS_SECRET_ACCESS_KEY

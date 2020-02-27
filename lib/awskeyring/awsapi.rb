@@ -24,6 +24,7 @@ module Awskeyring
 
     # AWS Env vars
     AWS_ENV_VARS = %w[
+      AWS_ACCOUNT_NAME
       AWS_ACCESS_KEY_ID
       AWS_ACCESS_KEY
       AWS_SECRET_ACCESS_KEY
@@ -116,29 +117,23 @@ module Awskeyring
     # Generates Environment Variables for the AWS CLI
     #
     # @param [Hash] params including
-    #    [String] account The aws_access_key_id
+    #    [String] account The aws account name
+    #    [String] key The aws_access_key_id
     #    [String] secret The aws_secret_access_key
     #    [String] token The aws_session_token
     # @return [Hash] env_var hash
     def self.get_env_array(params = {})
       env_var = {}
       env_var['AWS_DEFAULT_REGION'] = 'us-east-1' unless region
-      env_var['AWS_ACCOUNT_NAME'] = params[:account] if params[:account]
 
-      if params[:key]
-        env_var['AWS_ACCESS_KEY_ID'] = params[:key]
-        env_var['AWS_ACCESS_KEY'] = params[:key]
+      params.each_key do |param_name|
+        AWS_ENV_VARS.each do |var_name|
+          if var_name.include?(param_name.to_s.upcase) && !params[param_name].nil?
+            env_var[var_name] = params[param_name]
+          end
+        end
       end
 
-      if params[:secret]
-        env_var['AWS_SECRET_ACCESS_KEY'] = params[:secret]
-        env_var['AWS_SECRET_KEY'] = params[:secret]
-      end
-
-      if params[:token]
-        env_var['AWS_SECURITY_TOKEN'] = params[:token]
-        env_var['AWS_SESSION_TOKEN'] = params[:token]
-      end
       env_var
     end
 
@@ -166,29 +161,21 @@ module Awskeyring
     # @param [String] user The local username
     # @param [String] path within the Console to access
     # @return [String] login_url to access
-    def self.get_login_url(key:, secret:, token:, path:, user:) # rubocop:disable Metrics/MethodLength
+    def self.get_login_url(key:, secret:, token:, path:, user:)
       console_url = "https://console.aws.amazon.com/#{path}/home"
 
-      if token
-        session_json = {
-          sessionId: key,
-          sessionKey: secret,
-          sessionToken: token
-        }.to_json
-      else
-        ENV['AWS_DEFAULT_REGION'] = 'us-east-1' unless region
-        sts = Aws::STS::Client.new(access_key_id: key,
-                                   secret_access_key: secret)
-
-        session = sts.get_federation_token(name: user,
-                                           policy: ADMIN_POLICY,
-                                           duration_seconds: TWELVE_HOUR)
-        session_json = {
-          sessionId: session.credentials[:access_key_id],
-          sessionKey: session.credentials[:secret_access_key],
-          sessionToken: session.credentials[:session_token]
-        }.to_json
+      unless token
+        cred = get_token({ key: key, secret: secret, user: user, duration: TWELVE_HOUR })
+        key = cred[:key]
+        secret = cred[:secret]
+        token = cred[:token]
       end
+
+      session_json = {
+        sessionId: key,
+        sessionKey: secret,
+        sessionToken: token
+      }.to_json
 
       destination_param = '&Destination=' + CGI.escape(console_url)
 
@@ -235,10 +222,10 @@ module Awskeyring
         exit 1
       end
 
-      new_key = iam.create_access_key
+      new_key = iam.create_access_key[:access_key]
       iam = Aws::IAM::Client.new(
-        access_key_id: new_key[:access_key][:access_key_id],
-        secret_access_key: new_key[:access_key][:secret_access_key]
+        access_key_id: new_key[:access_key_id],
+        secret_access_key: new_key[:secret_access_key]
       )
       retry_backoff do
         iam.delete_access_key(
@@ -247,8 +234,8 @@ module Awskeyring
       end
       {
         account: account,
-        key: new_key[:access_key][:access_key_id],
-        secret: new_key[:access_key][:secret_access_key]
+        key: new_key[:access_key_id],
+        secret: new_key[:secret_access_key]
       }
     end
 
