@@ -289,7 +289,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option :code, type: :string, aliases: '-c', desc: I18n.t('method_option.code')
   method_option :duration, type: :string, aliases: '-d', desc: I18n.t('method_option.duration')
   # generate a sessiopn token
-  def token(account = nil, role = nil, code = nil) # rubocop:disable all
+  def token(account = nil, role = nil, code = nil) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     account = ask_check(
       existing: account,
       message: I18n.t('message.account'),
@@ -309,19 +309,13 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
         existing: code, message: I18n.t('message.code'), validator: Awskeyring::Validate.method(:mfa_code)
       )
     end
-    duration = options[:duration]
-    duration ||= Awskeyring::Awsapi::ONE_HOUR.to_s if role
-    duration ||= Awskeyring::Awsapi::TWELVE_HOUR.to_s if code
-    duration ||= Awskeyring::Awsapi::ONE_HOUR.to_s
-
     item_hash = age_check_and_get(account: account, no_token: true)
-    role_arn = Awskeyring.get_role_arn(role_name: role) if role
 
     begin
       new_creds = Awskeyring::Awsapi.get_token(
         code: code,
-        role_arn: role_arn,
-        duration: duration,
+        role_arn: (Awskeyring.get_role_arn(role_name: role) if role),
+        duration: default_duration(options[:duration], role, code),
         mfa: item_hash[:mfa],
         key: item_hash[:key],
         secret: item_hash[:secret],
@@ -469,6 +463,12 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     env_var = Awskeyring::Awsapi.get_env_array(cred)
     env_var.each { |var, value| puts "export #{var}=\"#{value}\"" }
     Awskeyring::Awsapi::AWS_ENV_VARS.each { |key| puts "unset #{key}" unless env_var.key?(key) }
+  end
+
+  def default_duration(duration, role, code)
+    duration ||= Awskeyring::Awsapi::ONE_HOUR.to_s if role
+    duration ||= Awskeyring::Awsapi::TWELVE_HOUR.to_s if code
+    duration || Awskeyring::Awsapi::ONE_HOUR.to_s
   end
 
   def ask_check(existing:, message:, flags: nil, validator: nil, limited_to: nil) # rubocop:disable Metrics/MethodLength
