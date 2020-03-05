@@ -44,7 +44,9 @@ Now your keys are stored safely in the macOS keychain. To print environment vari
 
     awskeyring env personal-aws
 
-Alternatively you can create a profile using the credential_process config variable. See the [AWS CLI Config docs](https://docs.aws.amazon.com/cli/latest/topic/config-vars.html#cli-aws-help-config-vars) for more details on this config option.
+Alternatively you can create a profile using the credential_process config variable. See the
+[AWS CLI Config docs](https://docs.aws.amazon.com/cli/latest/topic/config-vars.html#cli-aws-help-config-vars) for
+more details on this config option.
 
     [profile personal]
     region = us-west-1
@@ -87,22 +89,28 @@ To set your environment easily the following bash function helps:
 
 ## Development
 
-After checking out the repo, run `bundle update` to install dependencies. Then, run `bundle exec rake` to run the tests. Run `bundle exec awskeyring` to use the gem in this directory, ignoring other installed copies of this gem. Awskeyring is tested against the last two versions of Ruby shipped with macOS.
+After checking out the repo, run `bundle update` to install dependencies. Then, run `bundle exec rake` to run the
+tests. Run `bundle exec awskeyring` to use the gem in this directory, ignoring other installed copies of this gem.
+Awskeyring is tested against the last two versions of Ruby shipped with macOS.
 
 To install this gem onto your local machine, run `bundle exec rake install`.
 
 ## Security
 
-If you believe you have found a security issue in Awskeyring, please responsibly disclose by contacting me at [tristan@vibrato.com.au](mailto:tristan@vibrato.com.au). Awskeyring is a Ruby script and as such Ruby is whitelisted to access your "awskeyring" keychain. Use a strong password and keep the unlock time short.
+If you believe you have found a security issue in Awskeyring, please responsibly disclose by contacting me at
+[tristan@vibrato.com.au](mailto:tristan@vibrato.com.au). Awskeyring is a Ruby script and as such Ruby is whitelisted
+to access your "awskeyring" keychain. Use a strong password and keep the unlock time short.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/servian/awskeyring. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](https://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at [https://github.com/servian/awskeyring](https://github.com/servian/awskeyring).
+This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to
+the [Contributor Covenant](https://contributor-covenant.org) code of conduct.
 
 ### Contributors
 
- * Tristan [tristanmorgan](https://github.com/tristanmorgan)
- * Adam Sir [AzySir](https://github.com/AzySir)
+* Tristan [tristanmorgan](https://github.com/tristanmorgan)
+* Adam Sir [AzySir](https://github.com/AzySir)
 
 ## License
 

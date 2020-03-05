@@ -39,17 +39,17 @@ describe AwskeyringCommand do
     end
 
     it 'prints autocomplete help text' do
-      expect { described_class.start(%w[awskeyring one two]) }.to raise_error(SystemExit)
+      expect { described_class.start(%w[awskeyring one two]) }.to raise_error
         .and output(%r{enable autocomplete with 'complete -C \/.+\/\w+ \w+'}).to_stderr
     end
 
     it 'tells you that you must init the keychain' do
-      expect { described_class.start(%w[list]) }.to raise_error(SystemExit)
+      expect { described_class.start(%w[list]) }.to raise_error
         .and output(/Config missing, run `\w+ initialise` to recreate./).to_stderr
     end
 
     it 'tells you it could not find the command test' do
-      expect { described_class.start(%w[test]) }.to raise_error(SystemExit)
+      expect { described_class.start(%w[test]) }.to raise_error
         .and output(/Could not find command "test"./).to_stderr
     end
 
@@ -281,7 +281,7 @@ unset AWS_SESSION_TOKEN
     it 'warns about a missing external command' do
       expect do
         described_class.start(%w[exec test])
-      end.to raise_error(SystemExit).and output(/COMMAND not provided/).to_stderr
+      end.to raise_error.and output(/COMMAND not provided/).to_stderr
       expect(Process).not_to have_received(:spawn)
     end
   end

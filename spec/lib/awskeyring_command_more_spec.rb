@@ -218,7 +218,7 @@ describe AwskeyringCommand do
     it 'tries to receive a new token with an invalid MFA' do
       expect do
         described_class.start(%w[token test -c invalid])
-      end.to raise_error(SystemExit).and output(/Invalid MFA CODE/).to_stderr
+      end.to raise_error.and output(/Invalid MFA CODE/).to_stderr
     end
   end
 
@@ -278,13 +278,13 @@ describe AwskeyringCommand do
     it 'tries to add an invalid access_key' do
       expect do
         described_class.start(['add', 'test', '-k', bad_access_key, '-s', secret_access_key, '-m', mfa_arn])
-      end.to raise_error(SystemExit).and output(/Invalid Access Key/).to_stderr
+      end.to raise_error.and output(/Invalid Access Key/).to_stderr
     end
 
     it 'tries to add an invalid secret' do
       expect do
         described_class.start(['add', 'test', '-k', access_key, '-s', bad_secret_access_key, '-m', mfa_arn])
-      end.to raise_error(SystemExit).and output(/Secret Access Key is not 40 chars/).to_stderr
+      end.to raise_error.and output(/Secret Access Key is not 40 chars/).to_stderr
     end
   end
 
@@ -302,7 +302,7 @@ describe AwskeyringCommand do
     it 'tries to add an invalid mfa' do
       expect do
         described_class.start(['add', 'test', '-k', access_key, '-s', secret_access_key, '-m', bad_mfa_arn])
-      end.to raise_error(SystemExit).and output(/Invalid MFA ARN/).to_stderr
+      end.to raise_error.and output(/Invalid MFA ARN/).to_stderr
     end
   end
 
@@ -352,7 +352,7 @@ describe AwskeyringCommand do
     it 'tries to add an invalid role arn' do
       expect do
         described_class.start(['add-role', 'readonly', '-a', bad_role_arn])
-      end.to raise_error(SystemExit).and output(/Invalid Role ARN/).to_stderr
+      end.to raise_error.and output(/Invalid Role ARN/).to_stderr
     end
   end
 
@@ -448,7 +448,7 @@ describe AwskeyringCommand do
     it 'calls the rotate method and fails' do
       expect do
         described_class.start(%w[rotate test])
-      end.to raise_error(SystemExit).and output(/# You have two access keys for account test/).to_stderr
+      end.to raise_error.and output(/# You have two access keys for account test/).to_stderr
 
       expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: true)
       expect(Awskeyring).not_to have_received(:update_account)
