@@ -1,6 +1,19 @@
 # Changelog
 
-## [v1.3.0](https://github.com/servian/awskeyring/tree/v1.3.0) (2020-02-20)
+## [v1.3.1](https://github.com/servian/awskeyring/tree/v1.3.1) (2020-03-20)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.3.0...v1.3.1)
+
+**Implemented enhancements:**
+
+- Markdown linting changes and removed Rubocop-MD. [\#61](https://github.com/servian/awskeyring/pull/61) ([tristanmorgan](https://github.com/tristanmorgan))
+- Removed some redundant code. [\#60](https://github.com/servian/awskeyring/pull/60) ([tristanmorgan](https://github.com/tristanmorgan))
+
+**Merged pull requests:**
+
+- Update Ronn code and PR template. [\#59](https://github.com/servian/awskeyring/pull/59) ([tristanmorgan](https://github.com/tristanmorgan))
+
+## [v1.3.0](https://github.com/servian/awskeyring/tree/v1.3.0) (2020-02-19)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.2.0...v1.3.0)
 
