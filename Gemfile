@@ -11,7 +11,6 @@ group :development do
   gem 'ronn'
   gem 'rspec'
   gem 'rubocop'
-  gem 'rubocop-md'
   gem 'rubocop-performance'
   gem 'rubocop-rake'
   gem 'rubocop-rspec'

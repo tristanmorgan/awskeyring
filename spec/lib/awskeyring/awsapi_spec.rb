@@ -321,7 +321,7 @@ describe Awskeyring::Awsapi do
     it 'calls the rotate method and fails' do
       expect do
         awsapi.rotate(account: account, key: key, secret: secret, key_message: key_message)
-      end.to raise_error(SystemExit).and output(/# You have two access keys for account test/).to_stderr
+      end.to raise_error.and output(/# You have two access keys for account test/).to_stderr
 
       expect(iam_client).not_to have_received(:create_access_key)
       expect(iam_client).not_to have_received(:delete_access_key)
