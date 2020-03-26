@@ -32,6 +32,12 @@ Style/HashTransformKeys:
 Style/HashTransformValues:
   Enabled: true
 
+Lint/RaiseException:
+  Enabled: true
+
+Lint/StructNewOverride:
+  Enabled: true
+
 AllCops:
   Exclude:
     - bin/*

@@ -26,9 +26,10 @@ RSpec::Core::RakeTask.new(:spec)
 
 desc 'Check filemode bits'
 task :filemode do
-  files = `git ls-files -z`.split("\x0")
+  files = Set.new(`git ls-files -z`.split("\x0"))
+  dirs = Set.new(files.map { |file| File.dirname(file) })
   failure = false
-  files.each do |file|
+  files.merge(dirs).each do |file|
     mode = File.stat(file).mode
     print '.'
     if (mode & 0x7) != (mode >> 3 & 0x7)

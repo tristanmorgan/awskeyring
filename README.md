@@ -9,7 +9,8 @@
 * [![Version Downloads](https://ruby-gem-downloads-badge.herokuapp.com/awskeyring?label=downloads-current-version)](https://rubygems.org/gems/awskeyring)
 * [![Documentation](https://img.shields.io/badge/yard-docs-brightgreen.svg)](https://www.rubydoc.info/gems/awskeyring)
 
-Awskeyring is a small tool to manage AWS account keys in the macOS Keychain.
+Awskeyring is a small tool to manage AWS account keys in the macOS Keychain. It has
+grown to incorporate a lot of [features](https://github.com/servian/awskeyring/wiki/Awskeyring-features).
 
 ## Motivation
 
@@ -34,15 +35,15 @@ Please see the [Wiki](https://github.com/servian/awskeyring/wiki) for full usage
 
 First you need to initialise your keychain to hold your AWS credentials.
 
-    awskeyring initialise
+    $ awskeyring initialise
 
 Then add your keys to it.
 
-    awskeyring add personal-aws
+    $ awskeyring add personal-aws
 
 Now your keys are stored safely in the macOS keychain. To print environment variables run...
 
-    awskeyring env personal-aws
+    $ awskeyring env personal-aws
 
 Alternatively you can create a profile using the credential_process config variable. See the
 [AWS CLI Config docs](https://docs.aws.amazon.com/cli/latest/topic/config-vars.html#cli-aws-help-config-vars) for
