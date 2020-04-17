@@ -9,7 +9,7 @@ module Awskeyring
     #
     # @param [String] account_name the associated account name.
     def self.account_name(account_name)
-      raise 'Invalid Account Name' unless account_name =~ /\S+/
+      raise 'Invalid Account Name' unless /\S+/.match?(account_name)
 
       account_name
     end
@@ -18,7 +18,7 @@ module Awskeyring
     #
     # @param [String] aws_access_key The aws_access_key_id
     def self.access_key(aws_access_key)
-      raise 'Invalid Access Key' unless aws_access_key =~ /\AAKIA[A-Z0-9]{12,16}\z/
+      raise 'Invalid Access Key' unless /\AAKIA[A-Z0-9]{12,16}\z/.match?(aws_access_key)
 
       aws_access_key
     end
@@ -36,7 +36,7 @@ module Awskeyring
     #
     # @param [String] mfa_arn The users MFA arn
     def self.mfa_arn(mfa_arn)
-      raise 'Invalid MFA ARN' unless mfa_arn =~ %r(\Aarn:aws:iam::[0-9]{12}:mfa\/\S*\z)
+      raise 'Invalid MFA ARN' unless %r(\Aarn:aws:iam::[0-9]{12}:mfa\/\S*\z).match?(mfa_arn)
 
       mfa_arn
     end
@@ -45,7 +45,7 @@ module Awskeyring
     #
     # @param [String] role_name
     def self.role_name(role_name)
-      raise 'Invalid Role Name' unless role_name =~ /\S+/
+      raise 'Invalid Role Name' unless /\S+/.match?(role_name)
 
       role_name
     end
@@ -54,7 +54,7 @@ module Awskeyring
     #
     # @param [String] role_arn The role arn
     def self.role_arn(role_arn)
-      raise 'Invalid Role ARN' unless role_arn =~ %r(\Aarn:aws:iam::[0-9]{12}:role\/\S*\z)
+      raise 'Invalid Role ARN' unless %r(\Aarn:aws:iam::[0-9]{12}:role\/\S*\z).match?(role_arn)
 
       role_arn
     end
@@ -63,7 +63,7 @@ module Awskeyring
     #
     # @param [String] mfa_code The mfa code
     def self.mfa_code(mfa_code)
-      raise 'Invalid MFA CODE' unless mfa_code =~ /\A\d{6}\z/
+      raise 'Invalid MFA CODE' unless /\A\d{6}\z/.match?(mfa_code)
 
       mfa_code
     end
