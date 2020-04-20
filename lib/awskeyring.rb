@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'i18n'
 require 'json'
 require 'keychain'
 require 'awskeyring/validate'
@@ -7,6 +8,9 @@ require 'awskeyring/validate'
 # Awskeyring Module,
 # gives you an interface to access keychains and items.
 module Awskeyring # rubocop:disable Metrics/ModuleLength
+  I18n.load_path = Dir.glob(File.join(File.realpath(__dir__), '..', 'i18n', '*.{yml,yaml}'))
+  I18n.backend.load_translations
+
   # Default rpeferences fole path
   PREFS_FILE = (File.expand_path '~/.awskeyring').freeze
   # Prefix for Roles
