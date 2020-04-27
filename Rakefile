@@ -28,16 +28,13 @@ desc 'Check filemode bits'
 task :filemode do
   files = Set.new(`git ls-files -z`.split("\x0"))
   dirs = Set.new(files.map { |file| File.dirname(file) })
-  failure = false
+  failure = []
   files.merge(dirs).each do |file|
     mode = File.stat(file).mode
     print '.'
-    if (mode & 0x7) != (mode >> 3 & 0x7)
-      puts file
-      failure = true
-    end
+    failure << file if (mode & 0x7) != (mode >> 3 & 0x7)
   end
-  abort 'Error: Incorrect file mode found' if failure
+  abort "\nError: Incorrect file mode found\n#{failure.join("\n")}" unless failure.empty?
   print "\n"
 end
 
