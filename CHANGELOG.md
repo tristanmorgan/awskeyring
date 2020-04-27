@@ -1,6 +1,14 @@
 # Changelog
 
-## [v1.3.1](https://github.com/servian/awskeyring/tree/v1.3.1) (2020-03-20)
+## [v1.3.2](https://github.com/servian/awskeyring/tree/v1.3.2) (2020-04-27)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.3.1...v1.3.2)
+
+**Fixed bugs:**
+
+- Fix I18n message load when used as a library. [\#63](https://github.com/servian/awskeyring/pull/63) ([tristanmorgan](https://github.com/tristanmorgan))
+
+## [v1.3.1](https://github.com/servian/awskeyring/tree/v1.3.1) (2020-03-19)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.3.0...v1.3.1)
 
