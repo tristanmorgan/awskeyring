@@ -61,7 +61,7 @@ describe AwskeyringCommand do
 
   context 'when accounts and roles are set' do
     before do
-      allow(Awskeyring).to receive(:list_account_names).and_return(%w[company personal vibrato])
+      allow(Awskeyring).to receive(:list_account_names).and_return(%w[company personal servian])
       allow(Awskeyring).to receive(:list_role_names).and_return(%w[admin minion readonly])
       allow(Awskeyring).to receive(:list_role_names_plus)
         .and_return(%W[admin\tarn1 minion\tarn2 readonly\tarn3])
@@ -70,7 +70,7 @@ describe AwskeyringCommand do
 
     it 'list keychain items' do
       expect { described_class.start(%w[list]) }
-        .to output("company\npersonal\nvibrato\n").to_stdout
+        .to output("company\npersonal\nservian\n").to_stdout
     end
 
     it 'list keychain roles' do
@@ -84,15 +84,15 @@ describe AwskeyringCommand do
     end
 
     it 'lists accounts with autocomplete' do
-      ENV['COMP_LINE'] = 'awskeyring token vib'
-      expect { described_class.start(%w[awskeyring vib token]) }
-        .to output("vibrato\n").to_stdout
+      ENV['COMP_LINE'] = 'awskeyring token ser'
+      expect { described_class.start(%w[awskeyring ser token]) }
+        .to output("servian\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists roles with autocomplete' do
-      ENV['COMP_LINE'] = 'awskeyring token vibrato min'
-      expect { described_class.start(%w[awskeyring min vibrato]) }
+      ENV['COMP_LINE'] = 'awskeyring token servian min'
+      expect { described_class.start(%w[awskeyring min servian]) }
         .to output("minion\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
@@ -105,14 +105,14 @@ describe AwskeyringCommand do
     end
 
     it 'lists flags with autocomplete' do
-      ENV['COMP_LINE'] = 'awskeyring token vibrato minion --dura'
+      ENV['COMP_LINE'] = 'awskeyring token servian minion --dura'
       expect { described_class.start(%w[awskeyring --dura minion]) }
         .to output("--duration\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists console paths with autocomplete' do
-      ENV['COMP_LINE'] = 'awskeyring console vibrato --path cloud'
+      ENV['COMP_LINE'] = 'awskeyring console servian --path cloud'
       expect { described_class.start(%w[awskeyring cloud --path]) }
         .to output("cloudformation\n").to_stdout
       ENV['COMP_LINE'] = nil

@@ -99,7 +99,7 @@ To install this gem onto your local machine, run `bundle exec rake install`.
 ## Security
 
 If you believe you have found a security issue in Awskeyring, please responsibly disclose by contacting me at
-[tristan@vibrato.com.au](mailto:tristan@vibrato.com.au). Awskeyring is a Ruby script and as such Ruby is whitelisted
+[tristan.morgan@servian.com](mailto:tristan.morgan@servian.com). Awskeyring is a Ruby script and as such Ruby is whitelisted
 to access your "awskeyring" keychain. Use a strong password and keep the unlock time short.
 
 ## Contributing
