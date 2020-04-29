@@ -117,12 +117,12 @@ like [HashiCorp Vault](https://vaultproject.io/).
 ## SECURITY
 
 If you believe you have found a security issue in Awskeyring, please responsibly disclose by contacting me at
-[tristan@vibrato.com.au](mailto:tristan@vibrato.com.au). Awskeyring is a Ruby script and as such Ruby is whitelisted to
+[tristan.morgan@servian.com](mailto:tristan.morgan@servian.com). Awskeyring is a Ruby script and as such Ruby is whitelisted to
 access your "awskeyring" keychain. Use a strong password and keep the unlock time short.
 
 ## AUTHOR
 
-Tristan Morgan <tristan@vibrato.com.au> is the maintainer of Awskeyring.
+Tristan Morgan <tristan.morgan@servian.com> is the maintainer of Awskeyring.
 
 ## CONTRIBUTORS
 
