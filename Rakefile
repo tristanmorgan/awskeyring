@@ -15,14 +15,16 @@ GitHubChangelogGenerator::RakeTask.new :changelog do |config|
 end
 
 RuboCop::RakeTask.new do |rubocop|
-  rubocop.options = ['-D']
+  rubocop.options = %w[-D --enable-pending-cops]
   rubocop.requires << 'rubocop-performance'
   rubocop.requires << 'rubocop-rake'
   rubocop.requires << 'rubocop-rspec'
   rubocop.requires << 'rubocop-rubycw'
 end
 
-RSpec::Core::RakeTask.new(:spec)
+RSpec::Core::RakeTask.new(:spec) do |rspec|
+  rspec.rspec_opts = %w[--order rand --format documentation --color]
+end
 
 desc 'Check filemode bits'
 task :filemode do

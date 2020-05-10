@@ -8,17 +8,25 @@ Gem::Specification.new do |spec|
   spec.name          = 'awskeyring'
   spec.version       = Awskeyring::VERSION
   spec.authors       = ['Tristan Morgan']
-  spec.email         = ['tristan.morgan@servian.com']
+  spec.email         = 'tristan.morgan@servian.com'
 
   spec.summary       = 'Manages AWS credentials in the macOS keychain'
   spec.description   = 'Manages AWS credentials in the macOS keychain'
   spec.homepage      = Awskeyring::HOMEPAGE
-  spec.license       = 'MIT'
+  spec.licenses      = ['MIT']
 
   spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^spec/|^\..*|^.*\.png}) }
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
+
+  spec.metadata = {
+    'bug_tracker_uri' => "#{Awskeyring::HOMEPAGE}/issues",
+    'changelog_uri' => "#{Awskeyring::HOMEPAGE}/blob/master/CHANGELOG.md",
+    'documentation_uri' => "https://rubydoc.info/gems/#{spec.name}/#{Awskeyring::VERSION}",
+    'source_code_uri' => "#{Awskeyring::HOMEPAGE}/tree/v#{Awskeyring::VERSION}",
+    'wiki_uri' => "#{Awskeyring::HOMEPAGE}/wiki"
+  }
 
   spec.add_dependency('aws-sdk-iam')
   spec.add_dependency('i18n')

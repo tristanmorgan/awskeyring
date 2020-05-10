@@ -36,7 +36,7 @@ module Awskeyring
     #
     # @param [String] mfa_arn The users MFA arn
     def self.mfa_arn(mfa_arn)
-      raise 'Invalid MFA ARN' unless %r(\Aarn:aws:iam::[0-9]{12}:mfa\/\S*\z).match?(mfa_arn)
+      raise 'Invalid MFA ARN' unless %r(\Aarn:aws:iam::[0-9]{12}:mfa/\S*\z).match?(mfa_arn)
 
       mfa_arn
     end
@@ -54,7 +54,7 @@ module Awskeyring
     #
     # @param [String] role_arn The role arn
     def self.role_arn(role_arn)
-      raise 'Invalid Role ARN' unless %r(\Aarn:aws:iam::[0-9]{12}:role\/\S*\z).match?(role_arn)
+      raise 'Invalid Role ARN' unless %r(\Aarn:aws:iam::[0-9]{12}:role/\S*\z).match?(role_arn)
 
       role_arn
     end

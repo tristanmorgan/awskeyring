@@ -40,7 +40,7 @@ describe AwskeyringCommand do
 
     it 'prints autocomplete help text' do
       expect { described_class.start(%w[awskeyring one two]) }.to raise_error
-        .and output(%r{enable autocomplete with 'complete -C \/.+\/\w+ \w+'}).to_stderr
+        .and output(%r{enable autocomplete with 'complete -C /.+/\w+ \w+'}).to_stderr
     end
 
     it 'tells you that you must init the keychain' do
