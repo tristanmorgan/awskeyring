@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.3.3](https://github.com/servian/awskeyring/tree/v1.3.3) (2020-06-04)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.3.2...v1.3.3)
+
+**Implemented enhancements:**
+
+- Change email references from Vibrato to Servian [\#64](https://github.com/servian/awskeyring/pull/64) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.3.2](https://github.com/servian/awskeyring/tree/v1.3.2) (2020-04-27)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.3.1...v1.3.2)
