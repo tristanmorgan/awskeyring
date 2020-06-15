@@ -218,12 +218,14 @@ unset AWS_SESSION_TOKEN
       allow(Process).to receive(:wait).exactly(1).with(8888)
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
       allow(Awskeyring).to receive(:account_exists).and_return('test')
+      allow(Awskeyring).to receive(:token_exists).and_return('test')
       allow(Awskeyring).to receive(:list_account_names).and_return(['test'])
+      allow(Awskeyring).to receive(:list_token_names).and_return(['test'])
     end
 
     it 'removes a token' do
       described_class.start(%w[remove-token test])
-      expect(Awskeyring).to have_received(:account_exists).with('test')
+      expect(Awskeyring).to have_received(:token_exists).with('test')
       expect(Awskeyring).to have_received(:delete_token)
         .with(account: 'test', message: '# Removing token for account test')
     end

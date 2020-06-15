@@ -72,18 +72,17 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
 
   # Return a list of all acount items
   private_class_method def self.list_items
-    items = all_items.all.sort do |elem_a, elem_b|
-      elem_a.attributes[:label] <=> elem_b.attributes[:label]
-    end
-    items.select { |elem| elem.attributes[:label].start_with?(ACCOUNT_PREFIX) }
+    all_items.all.select { |elem| elem.attributes[:label].start_with?(ACCOUNT_PREFIX) }
   end
 
   # Return a list of all role items
   private_class_method def self.list_roles
-    items = all_items.all.sort do |elem_a, elem_b|
-      elem_a.attributes[:label] <=> elem_b.attributes[:label]
-    end
-    items.select { |elem| elem.attributes[:label].start_with?(ROLE_PREFIX) }
+    all_items.all.select { |elem| elem.attributes[:label].start_with?(ROLE_PREFIX) }
+  end
+
+  # Return a list of all acount items
+  private_class_method def self.list_tokens
+    all_items.all.select { |elem| elem.attributes[:label].start_with?(SESSION_KEY_PREFIX) }
   end
 
   # Return all keychain items
@@ -175,12 +174,21 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
 
   # Return a list account item names
   def self.list_account_names
-    list_items.map { |elem| elem.attributes[:label][(ACCOUNT_PREFIX.length)..-1] }
+    items = list_items.map { |elem| elem.attributes[:label][(ACCOUNT_PREFIX.length)..-1] }
+
+    tokens = list_tokens.map { |elem| elem.attributes[:label][(SESSION_KEY_PREFIX.length)..-1] }
+
+    (items + tokens).uniq.sort
   end
 
   # Return a list role item names
   def self.list_role_names
-    list_roles.map { |elem| elem.attributes[:label][(ROLE_PREFIX.length)..-1] }
+    list_roles.map { |elem| elem.attributes[:label][(ROLE_PREFIX.length)..-1] }.sort
+  end
+
+  # Return a list token item names
+  def self.list_token_names
+    list_tokens.map { |elem| elem.attributes[:label][(SESSION_KEY_PREFIX.length)..-1] }.sort
   end
 
   # Return a list role item names and arns
@@ -246,7 +254,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   # Delete session token items if expired
   private_class_method def self.delete_expired(key:, token:)
     expires_at = Time.at(token.attributes[:account].to_i)
-    if expires_at < Time.now
+    if expires_at < Time.new
       delete_pair(key: key, token: token, message: I18n.t('message.delexpired'))
       key = nil
       token = nil
@@ -345,6 +353,16 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     raise 'Role already exists' if list_role_names.include?(role_name)
 
     role_name
+  end
+
+  # Validate token exists
+  #
+  # @param [String] token_name the associated account name.
+  def self.token_exists(token_name)
+    Awskeyring::Validate.account_name(token_name)
+    raise 'Token does not exist' unless list_token_names.include?(token_name)
+
+    token_name
   end
 
   # Validate role arn not exists

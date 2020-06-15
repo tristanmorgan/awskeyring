@@ -190,7 +190,7 @@ describe Awskeyring do
       allow(all_list).to receive(:where).with(label: 'session-token test').and_return([session_token])
       allow(session_key).to receive(:delete)
       allow(session_token).to receive(:delete)
-      allow(Time).to receive(:now).and_return(Time.parse('2016-12-01T22:20:02Z'))
+      allow(Time).to receive(:new).and_return(Time.parse('2016-12-01T22:20:02Z'))
     end
 
     it 'returns a hash with the creds and token' do
@@ -235,6 +235,10 @@ describe Awskeyring do
       expect { awskeyring.account_not_exists('test') }.to raise_error('Account already exists')
     end
 
+    it 'validates an token name' do
+      expect { awskeyring.token_exists('test') }.not_to raise_error
+    end
+
     it 'invalidates an access key' do
       expect { awskeyring.access_key_not_exists('test') }.to raise_error('Invalid Access Key')
     end
@@ -245,6 +249,12 @@ describe Awskeyring do
 
     it 'lists all accounts' do
       expect(awskeyring.list_account_names).to eq(
+        ['test']
+      )
+    end
+
+    it 'lists all tokens' do
+      expect(awskeyring.list_token_names).to eq(
         ['test']
       )
     end
