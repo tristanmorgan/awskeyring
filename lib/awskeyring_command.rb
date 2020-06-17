@@ -451,6 +451,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       comp_len = 2
     when '--path', '-p'
       comp_len = 4
+    when 'remove-token', 'rmt'
+      comp_len = 5
     end
 
     [curr, comp_len, sub_cmd]
@@ -466,7 +468,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     self.class.map[sub_cmd].to_s
   end
 
-  def print_auto_resp(curr, len, sub_cmd)
+  def print_auto_resp(curr, len, sub_cmd) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity
     list = []
     case len
     when 0
@@ -479,6 +481,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       list = list_arguments(command: sub_cmd)
     when 4
       list = Awskeyring.list_console_path
+    when 5
+      list = Awskeyring.list_token_names
     else
       exit 1
     end
