@@ -22,12 +22,18 @@ RuboCop::RakeTask.new do |rubocop|
   rubocop.requires << 'rubocop-rubycw'
 end
 
-RSpec::Core::RakeTask.new(:spec) do |rspec|
-  rspec.rspec_opts = %w[--order rand --format documentation --color]
+desc 'Run RSpec code examples'
+task :spec do
+  puts 'Running RSpec...'
+  require 'rspec/core'
+  runner = RSpec::Core::Runner
+  xcode = runner.run(%w[--pattern spec/**{,/*/**}/*_spec.rb --order rand --format documentation --color])
+  abort 'RSpec failed' if xcode.positive?
 end
 
 desc 'Check filemode bits'
 task :filemode do
+  puts 'Running FileMode...'
   files = Set.new(`git ls-files -z`.split("\x0"))
   dirs = Set.new(files.map { |file| File.dirname(file) })
   failure = []
@@ -42,7 +48,7 @@ end
 
 desc 'generate manpage'
 task :ronn do
-  puts 'Writing manpage'
+  puts 'Running Ronn...'
   roff_text = Ronn::Document.new('man/awskeyring.5.ronn').to_roff
   File.write('man/awskeyring.5', roff_text)
   puts "done\n\n"
