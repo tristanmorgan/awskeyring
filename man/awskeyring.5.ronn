@@ -42,6 +42,10 @@ The commands are as follows:
 
     Describe available commands or one specific command
 
+* import:
+
+    Import an ACCOUNT to the keyring from ~/.aws/credentials
+
 * initialise:
 
     Initialises a new KEYCHAIN

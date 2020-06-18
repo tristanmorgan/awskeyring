@@ -141,16 +141,37 @@ module Awskeyring
     #
     # @param [String] key The aws_access_key_id
     # @param [String] secret The aws_secret_access_key
-    def self.verify_cred(key:, secret:)
+    # @param [String] token The aws_session_token
+    def self.verify_cred(key:, secret:, token:)
       begin
         ENV['AWS_DEFAULT_REGION'] = 'us-east-1' unless region
-        sts = Aws::STS::Client.new(access_key_id: key, secret_access_key: secret)
+        sts = Aws::STS::Client.new(access_key_id: key, secret_access_key: secret, session_token: token)
         sts.get_caller_identity
       rescue Aws::Errors::ServiceError => e
         warn e.to_s
         exit 1
       end
       true
+    end
+
+    # Retrieve credentials from the AWS Credentials file
+    #
+    # @param [String] account the profile name wanted
+    # @return [Hash] with the new credentials
+    #    key The aws_access_key_id
+    #    secret The aws_secret_access_key
+    #    token The aws_session_token
+    #    expiry expiry time
+    def self.get_credentials_from_file(account:)
+      creds = Aws::SharedCredentials.new(profile_name: account)
+      {
+        account: account,
+        key: creds.credentials.access_key_id,
+        secret: creds.credentials.secret_access_key,
+        token: creds.credentials.session_token,
+        expiry: Time.new + TWELVE_HOUR,
+        role: nil
+      }
     end
 
     # Retrieves an AWS Console login url

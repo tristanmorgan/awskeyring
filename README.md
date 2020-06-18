@@ -65,6 +65,7 @@ The CLI is using [Thor](http://whatisthor.com) with help provided interactively.
       awskeyring env ACCOUNT                 # Outputs bourne shell environment exports for an ACCOUNT
       awskeyring exec ACCOUNT command...     # Execute a COMMAND with the environment set for an ACCOUNT
       awskeyring help [COMMAND]              # Describe available commands or one specific command
+      awskeyring import ACCOUNT              # Import an ACCOUNT to the keyring from ~/.aws/credentials
       awskeyring initialise                  # Initialises a new KEYCHAIN
       awskeyring json ACCOUNT                # Outputs AWS CLI compatible JSON for an ACCOUNT
       awskeyring list                        # Prints a list of accounts in the keyring

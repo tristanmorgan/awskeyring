@@ -62,6 +62,7 @@ describe AwskeyringCommand do
   context 'when accounts and roles are set' do
     before do
       allow(Awskeyring).to receive(:list_account_names).and_return(%w[company personal servian])
+      allow(Awskeyring).to receive(:list_token_names).and_return(%w[personal servian])
       allow(Awskeyring).to receive(:list_role_names).and_return(%w[admin minion readonly])
       allow(Awskeyring).to receive(:list_role_names_plus)
         .and_return(%W[admin\tarn1 minion\tarn2 readonly\tarn3])
@@ -115,6 +116,13 @@ describe AwskeyringCommand do
       ENV['COMP_LINE'] = 'awskeyring console servian --path cloud'
       expect { described_class.start(%w[awskeyring cloud --path]) }
         .to output("cloudformation\n").to_stdout
+      ENV['COMP_LINE'] = nil
+    end
+
+    it 'lists token names with autocomplete' do
+      ENV['COMP_LINE'] = 'awskeyring remove-token ser'
+      expect { described_class.start(%w[awskeyring ser remove-token]) }
+        .to output("servian\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
   end
@@ -218,12 +226,14 @@ unset AWS_SESSION_TOKEN
       allow(Process).to receive(:wait).exactly(1).with(8888)
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
       allow(Awskeyring).to receive(:account_exists).and_return('test')
+      allow(Awskeyring).to receive(:token_exists).and_return('test')
       allow(Awskeyring).to receive(:list_account_names).and_return(['test'])
+      allow(Awskeyring).to receive(:list_token_names).and_return(['test'])
     end
 
     it 'removes a token' do
       described_class.start(%w[remove-token test])
-      expect(Awskeyring).to have_received(:account_exists).with('test')
+      expect(Awskeyring).to have_received(:token_exists).with('test')
       expect(Awskeyring).to have_received(:delete_token)
         .with(account: 'test', message: '# Removing token for account test')
     end

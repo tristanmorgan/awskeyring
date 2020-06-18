@@ -14,6 +14,8 @@ en:
     desc: Outputs bourne shell environment exports for an ACCOUNT
   exec:
     desc: Execute a COMMAND with the environment set for an ACCOUNT
+  import:
+    desc: Import an ACCOUNT to the keyring from ~/.aws/credentials
   initialise:
     desc: Initialises a new KEYCHAIN
   json:

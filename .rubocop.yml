@@ -1,7 +1,4 @@
 ---
-Layout/LineLength:
-  Max: 120
-
 Metrics/MethodLength:
   Max: 16
 
@@ -11,11 +8,6 @@ Metrics/BlockLength:
 
 Metrics/AbcSize:
   Max: 20
-
-Bundler/GemComment:
-  Enabled: false
-  Include:
-    - Gemfile
 
 RSpec/MultipleExpectations:
   Enabled: false

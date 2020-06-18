@@ -122,6 +122,42 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     )
   end
 
+  desc 'import ACCOUNT', I18n.t('import.desc')
+  method_option 'no-remote', type: :boolean, aliases: '-r', desc: I18n.t('method_option.noremote'), default: false
+  # Import an Account
+  def import(account = nil) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+    account = ask_check(
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_not_exists)
+    )
+    new_creds = Awskeyring::Awsapi.get_credentials_from_file(account: account)
+    unless options['no-remote']
+      Awskeyring::Awsapi.verify_cred(
+        key: new_creds[:key],
+        secret: new_creds[:secret],
+        token: new_creds[:token]
+      )
+    end
+    if new_creds[:token].nil?
+      Awskeyring.add_account(
+        account: new_creds[:account],
+        key: new_creds[:key],
+        secret: new_creds[:secret],
+        mfa: ''
+      )
+      puts I18n.t('message.addaccount', account: account)
+    else
+      Awskeyring.add_token(
+        account: new_creds[:account],
+        key: new_creds[:key],
+        secret: new_creds[:secret],
+        token: new_creds[:token],
+        expiry: new_creds[:expiry].to_i.to_s,
+        role: nil
+      )
+      puts I18n.t('message.addtoken', account: account, time: Time.at(new_creds[:expiry].to_i))
+    end
+  end
+
   desc 'exec ACCOUNT command...', I18n.t('exec.desc')
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   # execute an external command with env set
@@ -163,7 +199,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       existing: options[:mfa], message: I18n.t('message.mfa'),
       flags: 'optional', validator: Awskeyring::Validate.method(:mfa_arn)
     )
-    Awskeyring::Awsapi.verify_cred(key: key, secret: secret) unless options['no-remote']
+    Awskeyring::Awsapi.verify_cred(key: key, secret: secret, token: nil) unless options['no-remote']
     Awskeyring.add_account(
       account: account,
       key: key,
@@ -235,8 +271,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # remove a session token
   def remove_token(account = nil)
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists),
-      limited_to: Awskeyring.list_account_names
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:token_exists),
+      limited_to: Awskeyring.list_token_names
     )
     Awskeyring.delete_token(account: account, message: I18n.t('message.deltoken', account: account))
   end
@@ -415,6 +451,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       comp_len = 2
     when '--path', '-p'
       comp_len = 4
+    when 'remove-token', 'rmt'
+      comp_len = 5
     end
 
     [curr, comp_len, sub_cmd]
@@ -430,7 +468,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     self.class.map[sub_cmd].to_s
   end
 
-  def print_auto_resp(curr, len, sub_cmd)
+  def print_auto_resp(curr, len, sub_cmd) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity
     list = []
     case len
     when 0
@@ -443,6 +481,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       list = list_arguments(command: sub_cmd)
     when 4
       list = Awskeyring.list_console_path
+    when 5
+      list = Awskeyring.list_token_names
     else
       exit 1
     end

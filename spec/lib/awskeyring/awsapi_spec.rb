@@ -240,7 +240,7 @@ describe Awskeyring::Awsapi do
     end
 
     it 'calls get_caller_identity' do
-      expect(awsapi.verify_cred(key: key, secret: secret)).to be(true)
+      expect(awsapi.verify_cred(key: key, secret: secret, token: nil)).to be(true)
     end
   end
 
@@ -368,6 +368,71 @@ describe Awskeyring::Awsapi do
                'AWS_SECRET_KEY' => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
                'AWS_SECURITY_TOKEN' => role_token,
                'AWS_SESSION_TOKEN' => role_token
+             )
+    end
+  end
+
+  context 'when existing creds are loaded from a file' do
+    let(:key) { 'AKIA1234567890ABCDEF' }
+    let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
+    let(:token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
+    let(:account_key) { 'AKIAIOSFODNN7EXAMPLE' }
+    let(:account_secret) { 'wJalrXUtnFEMI/K7MDENG/bPxRiCYzEXAMPLEKEY' }
+    let(:sharedcfg) do
+      instance_double(
+        'HashMap',
+        credentials_path: "#{Dir.home}/.aws/credentials"
+      )
+    end
+
+    before do
+      allow(Aws).to receive(:shared_config).and_return(sharedcfg)
+      allow(sharedcfg).to receive(:credentials)
+        .with(profile: 'testaccount')
+        .and_return(
+          instance_double(
+            'HashMap',
+            access_key_id: account_key,
+            secret_access_key: account_secret,
+            session_token: nil
+          )
+        )
+      allow(sharedcfg).to receive(:credentials)
+        .with(profile: 'testtoken')
+        .and_return(
+          instance_double(
+            'HashMap',
+            access_key_id: key,
+            secret_access_key: secret,
+            session_token: token
+          )
+        )
+      allow(Time).to receive(:new).and_return(Time.parse('2017-03-11T19:55:29Z'))
+    end
+
+    it 'loads token creds from a file' do
+      expect(awsapi.get_credentials_from_file(
+               account: 'testtoken'
+             )).to eq(
+               account: 'testtoken',
+               key: key,
+               secret: secret,
+               token: token,
+               expiry: Time.parse('2017-03-12T07:55:29Z'),
+               role: nil
+             )
+    end
+
+    it 'loads account creds from a file' do
+      expect(awsapi.get_credentials_from_file(
+               account: 'testaccount'
+             )).to eq(
+               account: 'testaccount',
+               key: account_key,
+               secret: account_secret,
+               token: nil,
+               expiry: Time.parse('2017-03-12T07:55:29Z'),
+               role: nil
              )
     end
   end

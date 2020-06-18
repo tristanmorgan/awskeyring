@@ -237,11 +237,21 @@ describe AwskeyringCommand do
       allow(Awskeyring::Awsapi).to receive(:verify_cred)
         .and_return(true)
       allow(Awskeyring).to receive(:account_not_exists).with('test').and_return('test')
+      allow(Awskeyring).to receive(:account_not_exists).with('testaccount').and_return('testaccount')
       allow(Awskeyring).to receive(:account_exists).with('tested').and_return('tested')
       allow(Awskeyring).to receive(:list_account_names).and_return(['tested'])
       allow(Awskeyring).to receive(:item_by_account).and_return(nil)
       allow(Awskeyring::Input).to receive(:read_secret).and_return(bad_secret_access_key)
       allow(Awskeyring).to receive(:list_role_names).and_return(['role'])
+      allow(Awskeyring::Awsapi).to receive(:get_credentials_from_file)
+        .and_return({
+                      account: 'testaccount',
+                      key: access_key,
+                      secret: secret_access_key,
+                      token: nil,
+                      expiry: Time.parse('2017-03-12T07:55:29Z'),
+                      role: nil
+                    })
     end
 
     it 'tries to add a valid account' do
@@ -266,6 +276,13 @@ describe AwskeyringCommand do
       expect do
         described_class.start(['add', 'test', '-k', access_key, '-s', secret_access_key, '-r'])
       end.to output("# Added account test\n").to_stdout
+      expect(Awskeyring::Awsapi).not_to have_received(:verify_cred)
+    end
+
+    it 'tries to import a valid account without remote tests' do
+      expect do
+        described_class.start(['import', 'testaccount', '-r'])
+      end.to output("# Added account testaccount\n").to_stdout
       expect(Awskeyring::Awsapi).not_to have_received(:verify_cred)
     end
 
