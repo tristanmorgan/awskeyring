@@ -6,7 +6,7 @@ require 'json'
 # Version const and query of latest.
 module Awskeyring
   # The Gem's version number
-  VERSION = '1.3.3'
+  VERSION = '1.4.0'
   # The Gem's homepage
   HOMEPAGE = 'https://github.com/servian/awskeyring'
 
