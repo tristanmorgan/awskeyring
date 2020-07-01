@@ -280,12 +280,28 @@ unset AWS_SESSION_TOKEN
     end
 
     it 'runs an external command' do
+      ENV['BUNDLER_ORIG_TEST_ENV'] = 'BUNDLER_ENVIRONMENT_PRESERVER_INTENTIONALLY_NIL'
+      ENV['TEST_ENV'] = 'CHANGED'
       described_class.start(%w[exec test test-exec with params])
       expect(Process).to have_received(:spawn).exactly(1).with(
         env_vars,
         'test-exec with params'
       )
       expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: false)
+      expect(ENV['BUNDLER_ORIG_TEST_ENV']).to eq('BUNDLER_ENVIRONMENT_PRESERVER_INTENTIONALLY_NIL')
+      expect(ENV['TEST_ENV']).to eq('CHANGED')
+    end
+
+    it 'runs an external command and clears bundle' do
+      ENV['BUNDLER_ORIG_TEST_ENV'] = 'BUNDLER_ENVIRONMENT_PRESERVER_INTENTIONALLY_NIL'
+      ENV['TEST_ENV'] = 'CHANGED'
+      described_class.start(%w[exec test --no-bundle test-exec with params])
+      expect(Process).to have_received(:spawn).exactly(1).with(
+        env_vars,
+        'test-exec with params'
+      )
+      expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: false)
+      expect(ENV['TEST_ENV']).to eq(nil)
     end
 
     it 'warns about a missing external command' do

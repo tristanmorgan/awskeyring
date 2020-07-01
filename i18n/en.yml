@@ -44,6 +44,7 @@ en:
     key: 'AWS account key id.'
     keychain: 'Name of KEYCHAIN to initialise.'
     mfa: 'AWS virtual mfa arn.'
+    nobundle: 'Unset Bundler environment variables.'
     noopen: 'Do not open the url.'
     notoken: 'Do not use saved token.'
     noremote: 'Do not validate with remote api.'

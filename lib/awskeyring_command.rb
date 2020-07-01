@@ -160,6 +160,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   desc 'exec ACCOUNT command...', I18n.t('exec.desc')
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
+  method_option 'no-bundle', type: :boolean, aliases: '-b', desc: I18n.t('method_option.nobundle'), default: false
   # execute an external command with env set
   def exec(account, *command)
     if command.empty?
@@ -168,6 +169,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     end
     cred = age_check_and_get(account: account, no_token: options['no-token'])
     env_vars = Awskeyring::Awsapi.get_env_array(cred)
+    unbundle if options['no-bundle']
     begin
       pid = Process.spawn(env_vars, command.join(' '))
       Process.wait pid
@@ -544,6 +546,19 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       Thor::LineEditor.readline(message.rjust(20) + ': ', limited_to: limited_to)
     else
       Thor::LineEditor.readline(message.rjust(20) + ': ')
+    end
+  end
+
+  def unbundle
+    to_delete = ENV.keys.select { |elem| elem.start_with?('BUNDLER_ORIG_') }
+    bundled_env = to_delete.map { |elem| elem[('BUNDLER_ORIG_'.length)..-1] }
+    to_delete << 'BUNDLE_GEMFILE'
+    bundled_env.each do |env_name|
+      ENV[env_name] = ENV['BUNDLER_ORIG_' + env_name]
+      to_delete << env_name if ENV['BUNDLER_ORIG_' + env_name].start_with? 'BUNDLER_'
+    end
+    to_delete.each do |env_name|
+      ENV.delete(env_name)
     end
   end
 end
