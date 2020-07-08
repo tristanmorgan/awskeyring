@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.5.0](https://github.com/servian/awskeyring/tree/v1.5.0) (2020-07-08)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.4.0...v1.5.0)
+
+**Implemented enhancements:**
+
+- No-Bundle env changes for exec. [\#66](https://github.com/servian/awskeyring/pull/66) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.4.0](https://github.com/servian/awskeyring/tree/v1.4.0) (2020-06-19)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.3.3...v1.4.0)
