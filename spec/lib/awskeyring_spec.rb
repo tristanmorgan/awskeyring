@@ -6,11 +6,36 @@ describe Awskeyring do
   subject(:awskeyring) { described_class }
 
   context 'when there is no config file' do
+    let(:write_success) { 'great success' }
+    let(:prefs_file) do
+      instance_double(
+        'HashMap',
+        name: '.awskeyring',
+        write: ''
+      )
+    end
+    let(:test_keychain) do
+      instance_double(
+        'HashMap',
+        lock_interval: 0,
+        lock_on_sleep: false
+      )
+    end
+
     before do
       allow(File).to receive(:exist?).and_call_original
       allow(File).to receive(:exist?)
         .with(/\.awskeyring/)
         .and_return(false)
+      allow(File).to receive(:new).and_call_original
+      allow(File).to receive(:new)
+        .and_return(prefs_file)
+      allow(prefs_file).to receive(:write)
+        .and_return(write_success)
+      allow(Keychain).to receive(:create)
+        .and_return(test_keychain)
+      allow(test_keychain).to receive(:lock_interval=)
+      allow(test_keychain).to receive(:lock_on_sleep=)
     end
 
     it 'has a version number' do
@@ -23,6 +48,10 @@ describe Awskeyring do
 
     it 'can not load preferences' do
       expect(awskeyring.prefs).to eq({})
+    end
+
+    it 'creates a new file' do
+      expect(awskeyring.init_keychain(awskeyring: 'awskeyringtest')).to eq(write_success)
     end
   end
 
