@@ -112,6 +112,25 @@ describe AwskeyringCommand do
       allow(Awskeyring).to receive(:role_exists).and_return('role')
       allow(Awskeyring).to receive(:list_account_names).and_return(['test'])
       allow(Awskeyring).to receive(:list_role_names).and_return(['role'])
+      allow(Awskeyring::Awsapi).to receive(:verify_cred)
+        .and_return(true)
+      allow(Awskeyring::Awsapi).to receive(:get_credentials_from_file)
+        .and_return({
+                      account: 'testaccount',
+                      key: 'ASIAEXAMPLE',
+                      secret: 'bigishLongSecret',
+                      token: 'VeryveryVeryLongSecret',
+                      expiry: Time.parse('2017-03-12T07:55:29Z'),
+                      role: nil
+                    })
+    end
+
+    it 'tries to import a valid token without remote tests' do
+      expect do
+        described_class.start(['import', 'testaccount', '-r'])
+      end.to output("# Token saved for account testaccount\n"\
+        "# Authentication valid until #{Time.at(1_489_305_329)}\n").to_stdout
+      expect(Awskeyring::Awsapi).not_to have_received(:verify_cred)
     end
 
     it 'tries to receive a new token' do
@@ -279,6 +298,14 @@ describe AwskeyringCommand do
       expect(Awskeyring::Awsapi).not_to have_received(:verify_cred)
     end
 
+    it 'tries to import a valid account' do
+      expect do
+        described_class.start(%w[import testaccount])
+      end.to output("# Added account testaccount\n").to_stdout
+      expect(Awskeyring).to have_received(:add_account)
+      expect(Awskeyring::Awsapi).to have_received(:verify_cred)
+    end
+
     it 'tries to import a valid account without remote tests' do
       expect do
         described_class.start(['import', 'testaccount', '-r'])
@@ -308,38 +335,28 @@ describe AwskeyringCommand do
   context 'when we try to add an AWS account and test an mfa' do
     let(:access_key) { 'AKIA0123456789ABCDEF' }
     let(:secret_access_key) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
+    let(:mfa_arn) { 'arn:aws:iam::012345678901:mfa/readonly' }
     let(:bad_mfa_arn) { 'arn:azure:iamnot::ABCD45678901:Administrators' }
 
     before do
-      allow(Thor::LineEditor).to receive(:readline).and_return(bad_mfa_arn)
       allow(Awskeyring).to receive(:account_not_exists).with('test').and_return('test')
       allow(Awskeyring).to receive(:item_by_account).and_return(nil)
-    end
-
-    it 'tries to add an invalid mfa' do
-      expect do
-        described_class.start(['add', 'test', '-k', access_key, '-s', secret_access_key, '-m', bad_mfa_arn])
-      end.to raise_error.and output(/Invalid MFA ARN/).to_stderr
-    end
-  end
-
-  context 'when we try to add an AWS account with white space' do
-    let(:access_key) { 'AKIA0123456789ABCDEF' }
-    let(:secret_access_key) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
-    let(:mfa_arn) { 'arn:aws:iam::012345678901:mfa/readonly' }
-
-    before do
-      allow(Thor::LineEditor).to receive(:readline).and_return(" #{access_key} \n")
-      allow(Awskeyring::Input).to receive(:read_secret).and_return(" #{secret_access_key} \t")
-      allow(Awskeyring).to receive(:item_by_account).and_return(nil)
-      allow(Awskeyring).to receive(:account_not_exists).with('test').and_return('test')
       allow(Awskeyring).to receive(:add_account).and_return(nil)
       allow(Awskeyring::Awsapi).to receive(:verify_cred)
         .and_return(true)
       allow(Awskeyring).to receive(:update_account)
     end
 
+    it 'tries to add an invalid mfa' do
+      allow(Thor::LineEditor).to receive(:readline).and_return(bad_mfa_arn)
+      expect do
+        described_class.start(['add', 'test', '-k', access_key, '-s', secret_access_key, '-m', bad_mfa_arn])
+      end.to raise_error.and output(/Invalid MFA ARN/).to_stderr
+    end
+
     it 'tries to add an account with whitespace' do
+      allow(Thor::LineEditor).to receive(:readline).and_return(" #{access_key} \n")
+      allow(Awskeyring::Input).to receive(:read_secret).and_return(" #{secret_access_key} \t")
       expect do
         described_class.start(['add', 'test', '-m', mfa_arn])
       end.to output("# Added account test\n").to_stdout
@@ -355,7 +372,6 @@ describe AwskeyringCommand do
 
     before do
       allow(Awskeyring).to receive(:add_role).and_return(nil)
-      allow(Thor::LineEditor).to receive(:readline).and_return(bad_role_arn)
       allow(Awskeyring).to receive(:item_by_account).and_return(nil)
       allow(Awskeyring).to receive(:role_not_exists).and_return('readonly')
     end
@@ -367,6 +383,7 @@ describe AwskeyringCommand do
     end
 
     it 'tries to add an invalid role arn' do
+      allow(Thor::LineEditor).to receive(:readline).and_return(bad_role_arn)
       expect do
         described_class.start(['add-role', 'readonly', '-a', bad_role_arn])
       end.to raise_error.and output(/Invalid Role ARN/).to_stderr
