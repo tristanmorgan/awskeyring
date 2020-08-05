@@ -72,6 +72,10 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   desc 'list', I18n.t('list.desc')
   # list the accounts
   def list
+    if Awskeyring.list_account_names.empty?
+      warn I18n.t('message.missing_account', bin: File.basename($PROGRAM_NAME))
+      exit 1
+    end
     puts Awskeyring.list_account_names.join("\n")
   end
 
@@ -80,6 +84,10 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option 'detail', type: :boolean, aliases: '-d', desc: I18n.t('method_option.detail'), default: false
   # List roles
   def list_role
+    if Awskeyring.list_role_names.empty?
+      warn I18n.t('message.missing_role', bin: File.basename($PROGRAM_NAME))
+      exit 1
+    end
     if options['detail']
       puts Awskeyring.list_role_names_plus.join("\n")
     else

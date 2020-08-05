@@ -75,6 +75,8 @@ en:
     delexpired: '# Removing expired session credentials'
     exec: '# COMMAND not provided'
     missing: '# Config missing, run `%{bin} initialise` to recreate.'
+    missing_account: '# No accounts added, run `%{bin} add` to add.'
+    missing_role: '# No roles added, run `%{bin} add-role` to add.'
     rotate: '# You have two access keys for account %{account}'
     temporary: '# Using temporary session credentials.'
     timeout: '# It is STRONGLY recommended to set your keychain to lock in 5 minutes or less.'

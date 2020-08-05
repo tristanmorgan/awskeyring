@@ -59,6 +59,24 @@ describe AwskeyringCommand do
     end
   end
 
+  context 'when no accounts or roles are set' do
+    before do
+      allow(Awskeyring).to receive(:list_account_names).and_return([])
+      allow(Awskeyring).to receive(:list_role_names).and_return([])
+      allow(Awskeyring).to receive(:prefs).and_return('{"awskeyring": "awskeyringtest"}')
+    end
+
+    it 'tells you that you must add accounts' do
+      expect { described_class.start(%w[list]) }.to raise_error
+        .and output(/No accounts added, run `\w+ add` to add./).to_stderr
+    end
+
+    it 'tells you that you must add roles' do
+      expect { described_class.start(%w[list-role]) }.to raise_error
+        .and output(/No roles added, run `\w+ add-role` to add./).to_stderr
+    end
+  end
+
   context 'when accounts and roles are set' do
     before do
       allow(Awskeyring).to receive(:list_account_names).and_return(%w[company personal servian])
