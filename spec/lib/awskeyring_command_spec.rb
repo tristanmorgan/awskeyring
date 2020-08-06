@@ -268,13 +268,13 @@ unset AWS_SESSION_TOKEN
 
     it 'provides JSON for use with credential_process' do
       expect { described_class.start(%w[json test]) }
-        .to output(JSON.pretty_generate(
+        .to output("#{JSON.pretty_generate(
           Version: 1,
           AccessKeyId: 'ASIATESTTEST',
           SecretAccessKey: 'bigerlongbase64',
           SessionToken: 'evenlongerbase64token',
           Expiration: Time.at(Time.parse('2011-07-11T19:55:29.611Z').to_i).iso8601
-        ) + "\n").to_stdout
+        )}\n").to_stdout
       expect(Awskeyring).to have_received(:account_exists).with('test')
       expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: false)
     end
