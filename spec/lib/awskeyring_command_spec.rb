@@ -67,6 +67,7 @@ describe AwskeyringCommand do
       allow(Awskeyring).to receive(:list_role_names_plus)
         .and_return(%W[admin\tarn1 minion\tarn2 readonly\tarn3])
       allow(Awskeyring).to receive(:list_console_path).and_return(%w[iam cloudformation vpc])
+      allow(Awskeyring).to receive(:prefs).and_return('{"awskeyring": "awskeyringtest"}')
     end
 
     it 'list keychain items' do
@@ -92,8 +93,8 @@ describe AwskeyringCommand do
     end
 
     it 'lists roles with autocomplete' do
-      ENV['COMP_LINE'] = 'awskeyring token servian min'
-      expect { described_class.start(%w[awskeyring min servian]) }
+      ENV['COMP_LINE'] = 'awskeyring remove-role min'
+      expect { described_class.start(%w[awskeyring min remove-role]) }
         .to output("minion\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
@@ -102,6 +103,13 @@ describe AwskeyringCommand do
       ENV['COMP_LINE'] = 'awskeyring '
       expect { described_class.start(['awskeyring', '', 'awskeyring']) }
         .to output(/--version\nadd\nadd-role\nconsole\nenv\nexec\nhelp/).to_stdout
+      ENV['COMP_LINE'] = nil
+    end
+
+    it 'lists commands with autocomplete for help' do
+      ENV['COMP_LINE'] = 'awskeyring help con'
+      expect { described_class.start(%w[awskeyring con help]) }
+        .to output("console\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
@@ -124,6 +132,13 @@ describe AwskeyringCommand do
       expect { described_class.start(%w[awskeyring ser remove-token]) }
         .to output("servian\n").to_stdout
       ENV['COMP_LINE'] = nil
+    end
+
+    it 'doesnt try to re-initialises the keychain' do
+      expect do
+        described_class.start(%w[initialise])
+      end.to raise_error(SystemExit)
+        .and output(%r{# .+/\.awskeyring exists\. no need to initialise\.\n}).to_stdout
     end
   end
 
@@ -268,13 +283,13 @@ unset AWS_SESSION_TOKEN
 
     it 'provides JSON for use with credential_process' do
       expect { described_class.start(%w[json test]) }
-        .to output(JSON.pretty_generate(
+        .to output("#{JSON.pretty_generate(
           Version: 1,
           AccessKeyId: 'ASIATESTTEST',
           SecretAccessKey: 'bigerlongbase64',
           SessionToken: 'evenlongerbase64token',
           Expiration: Time.at(Time.parse('2011-07-11T19:55:29.611Z').to_i).iso8601
-        ) + "\n").to_stdout
+        )}\n").to_stdout
       expect(Awskeyring).to have_received(:account_exists).with('test')
       expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: false)
     end

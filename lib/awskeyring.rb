@@ -174,26 +174,26 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
 
   # Return a list account item names
   def self.list_account_names
-    items = list_items.map { |elem| elem.attributes[:label][(ACCOUNT_PREFIX.length)..-1] }
+    items = list_items.map { |elem| elem.attributes[:label][(ACCOUNT_PREFIX.length)..] }
 
-    tokens = list_tokens.map { |elem| elem.attributes[:label][(SESSION_KEY_PREFIX.length)..-1] }
+    tokens = list_tokens.map { |elem| elem.attributes[:label][(SESSION_KEY_PREFIX.length)..] }
 
     (items + tokens).uniq.sort
   end
 
   # Return a list role item names
   def self.list_role_names
-    list_roles.map { |elem| elem.attributes[:label][(ROLE_PREFIX.length)..-1] }.sort
+    list_roles.map { |elem| elem.attributes[:label][(ROLE_PREFIX.length)..] }.sort
   end
 
   # Return a list token item names
   def self.list_token_names
-    list_tokens.map { |elem| elem.attributes[:label][(SESSION_KEY_PREFIX.length)..-1] }.sort
+    list_tokens.map { |elem| elem.attributes[:label][(SESSION_KEY_PREFIX.length)..] }.sort
   end
 
   # Return a list role item names and arns
   def self.list_role_names_plus
-    list_roles.map { |elem| "#{elem.attributes[:label][(ROLE_PREFIX.length)..-1]}\t#{elem.attributes[:account]}" }
+    list_roles.map { |elem| "#{elem.attributes[:label][(ROLE_PREFIX.length)..]}\t#{elem.attributes[:account]}" }
   end
 
   # Return a list of console paths

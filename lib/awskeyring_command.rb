@@ -539,23 +539,23 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   def ask(message:, secure: false, optional: false, limited_to: nil)
     if secure
-      Awskeyring::Input.read_secret(message.rjust(20) + ': ')
+      Awskeyring::Input.read_secret("#{message.rjust(20)}: ")
     elsif optional
-      Thor::LineEditor.readline((message + ' (optional)').rjust(20) + ': ')
+      Thor::LineEditor.readline("#{"#{message} (optional)".rjust(20)}: ")
     elsif limited_to
-      Thor::LineEditor.readline(message.rjust(20) + ': ', limited_to: limited_to)
+      Thor::LineEditor.readline("#{message.rjust(20)}: ", limited_to: limited_to)
     else
-      Thor::LineEditor.readline(message.rjust(20) + ': ')
+      Thor::LineEditor.readline("#{message.rjust(20)}: ")
     end
   end
 
   def unbundle
     to_delete = ENV.keys.select { |elem| elem.start_with?('BUNDLER_ORIG_') }
-    bundled_env = to_delete.map { |elem| elem[('BUNDLER_ORIG_'.length)..-1] }
+    bundled_env = to_delete.map { |elem| elem[('BUNDLER_ORIG_'.length)..] }
     to_delete << 'BUNDLE_GEMFILE'
     bundled_env.each do |env_name|
-      ENV[env_name] = ENV['BUNDLER_ORIG_' + env_name]
-      to_delete << env_name if ENV['BUNDLER_ORIG_' + env_name].start_with? 'BUNDLER_'
+      ENV[env_name] = ENV["BUNDLER_ORIG_#{env_name}"]
+      to_delete << env_name if ENV["BUNDLER_ORIG_#{env_name}"].start_with? 'BUNDLER_'
     end
     to_delete.each do |env_name|
       ENV.delete(env_name)

@@ -198,9 +198,9 @@ module Awskeyring
         sessionToken: token
       }.to_json
 
-      destination_param = '&Destination=' + CGI.escape(console_url)
+      destination_param = "&Destination=#{CGI.escape(console_url)}"
 
-      AWS_SIGNIN_URL + '?Action=login' + token_param(session_json: session_json) + destination_param
+      "#{AWS_SIGNIN_URL}?Action=login#{token_param(session_json: session_json)}#{destination_param}"
     end
 
     # Get the signin token param
@@ -214,7 +214,7 @@ module Awskeyring
       returned_content = request.get(uri).body
 
       signin_token = JSON.parse(returned_content)['SigninToken']
-      '&SigninToken=' + CGI.escape(signin_token)
+      "&SigninToken=#{CGI.escape(signin_token)}"
     end
 
     # Get the current region

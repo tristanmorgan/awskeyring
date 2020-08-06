@@ -20,6 +20,8 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
 
+  spec.required_ruby_version = '>= 2.6.0'
+
   spec.metadata = {
     'bug_tracker_uri' => "#{Awskeyring::HOMEPAGE}/issues",
     'changelog_uri' => "#{Awskeyring::HOMEPAGE}/blob/master/CHANGELOG.md",
