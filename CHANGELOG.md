@@ -1,5 +1,15 @@
 # Changelog
 
+## [v1.6.0](https://github.com/servian/awskeyring/tree/v1.6.0) (2020-08-11)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.5.0...v1.6.0)
+
+**Implemented enhancements:**
+
+- Warn about missing accounts/roles [\#69](https://github.com/servian/awskeyring/pull/69) ([tristanmorgan](https://github.com/tristanmorgan))
+- RuboCop and Spec update [\#68](https://github.com/servian/awskeyring/pull/68) ([tristanmorgan](https://github.com/tristanmorgan))
+- Add SimpleCov reports. [\#67](https://github.com/servian/awskeyring/pull/67) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.5.0](https://github.com/servian/awskeyring/tree/v1.5.0) (2020-07-08)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.4.0...v1.5.0)
