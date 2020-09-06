@@ -12,6 +12,9 @@ Metrics/AbcSize:
 RSpec/MultipleExpectations:
   Enabled: false
 
+RSpec/MultipleMemoizedHelpers:
+  Max: 8
+
 RSpec/ExampleLength:
   Enabled: false
 

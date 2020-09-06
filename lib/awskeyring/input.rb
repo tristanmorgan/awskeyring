@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'io/console'
-
 # Awskeyring Module,
 module Awskeyring
   # Input methods for Awskeyring
@@ -15,18 +13,20 @@ module Awskeyring
     end
 
     private_class_method def self.hide_input # rubocop:disable Metrics/MethodLength
+      require 'io/console'
       password = +''
       loop do
         character = $stdin.getch
         break unless character
 
-        if ["\n", "\r"].include? character
+        case character
+        when "\n", "\r"
           puts ''
           break
-        elsif ["\b", "\u007f"].include? character
+        when "\b", "\u007f"
           password.chop!
           print "\b\e[P"
-        elsif character == "\u0003"
+        when "\u0003"
           exit 1
         else
           print '*'
