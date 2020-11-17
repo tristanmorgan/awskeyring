@@ -26,9 +26,9 @@ The commands are as follows:
 
     Adds a ROLE to the keyring
 
-* console ACCOUNT:
+* console ACCOUNT [--browser BROWSER]:
 
-    Open the AWS Console for the ACCOUNT
+    Open the AWS Console for the ACCOUNT in BROWSER or the default browser if BROWSER not specified
 
 * env ACCOUNT:
 
