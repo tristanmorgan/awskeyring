@@ -418,11 +418,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     if options['no-open']
       puts login_url
     else
-      if browser != nil
-        pid = Process.spawn("open -a \"#{browser}\" \"#{login_url}\"")
-      else
-        pid = Process.spawn("open \"#{login_url}\"")
-      end
+      spawn_cmd = browser.nil? ? "open \"#{login_url}\"" : "open -a \"#{browser}\" \"#{login_url}\""
+      pid = Process.spawn(spawn_cmd)
       Process.wait pid
     end
   end
