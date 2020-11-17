@@ -387,6 +387,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   desc 'console ACCOUNT', I18n.t('console.desc')
   method_option :path, type: :string, aliases: '-p', desc: I18n.t('method_option.path')
+  method_option :browser, type: :string, aliases: '-b', desc: I18n.t('method_option.browser')
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   method_option 'no-open', type: :boolean, aliases: '-o', desc: I18n.t('method_option.noopen'), default: false
   # Open the AWS Console
@@ -417,7 +418,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     if options['no-open']
       puts login_url
     else
-      pid = Process.spawn("open \"#{login_url}\"")
+      spawn_cmd = options[:browser] ? "open -a \"#{options[:browser]}\" \"#{login_url}\"" : "open \"#{login_url}\""
+      pid = Process.spawn(spawn_cmd)
       Process.wait pid
     end
   end
