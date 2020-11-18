@@ -68,6 +68,7 @@ describe Awskeyring do
     end
 
     let(:default_console) { %w[cloudformation ec2/v2 iam rds route53 s3 sns sqs vpc] }
+    let(:default_browsers) { %w[Brave FireFox Opera Safari Vivaldi] }
 
     it 'loads preferences from a file' do
       expect(awskeyring.prefs).to eq('awskeyring' => 'test', 'keyage' => 90)
@@ -75,6 +76,10 @@ describe Awskeyring do
 
     it 'provides a default list of console paths' do
       expect(awskeyring.list_console_path).to eq(default_console)
+    end
+
+    it 'provides a default list of browsers' do
+      expect(awskeyring.list_browsers).to eq(default_browsers)
     end
   end
 

@@ -16,27 +16,47 @@ The commands are as follows:
 
 * --version, -v:
 
-    Prints the version
+    Prints the version<br>
+
+    -r, --no-remote: Do not validate with remote api.
 
 * add ACCOUNT:
 
-    Adds an ACCOUNT to the keyring
+    Adds an ACCOUNT to the keyring<br>
+
+    -k, --key=KEY: AWS account key id.<br>
+    -s, --secret=SECRET: AWS account secret.<br>
+    -m, --mfa=MFA: AWS virtual mfa arn.<br>
+    -r, --no-remote: Do not validate with remote api.
 
 * add-role ROLE:
 
-    Adds a ROLE to the keyring
+    Adds a ROLE to the keyring<br>
+    
+    -a, --arn=ARN: AWS role arn.
 
-* console ACCOUNT [--browser BROWSER]:
+* awskeyring console ACCOUNT:
 
-    Open the AWS Console for the ACCOUNT in BROWSER or the default browser if BROWSER not specified
+    Open the AWS Console for the ACCOUNT<br>
+
+    -p, --path=PATH: The service PATH to open.<br>
+    -b, --browser=BROWSER: Specify an alternative browser.<br>
+    -n, --no-token: Do not use saved token.<br>
+    -o, --no-open: Do not open the url.
 
 * env ACCOUNT:
 
-    Outputs bourne shell environment exports for an ACCOUNT
+    Outputs bourne shell environment exports for an ACCOUNT<br>
+
+    -n, --no-token: Do not use saved token.<br>
+    -u, --unset, --no-unset: Unset environment variables.
 
 * exec ACCOUNT command...:
 
-    Execute a COMMAND with the environment set for an ACCOUNT
+    Execute a COMMAND with the environment set for an ACCOUNT<br>
+
+    -n, --no-token: Do not use saved token.<br>
+    -b, --no-bundle: Unset Bundler environment variables.
 
 * help [COMMAND]:
 
@@ -44,15 +64,21 @@ The commands are as follows:
 
 * import:
 
-    Import an ACCOUNT to the keyring from ~/.aws/credentials
+    Import an ACCOUNT to the keyring from ~/.aws/credentials<br>
+
+    -r, --no-remote: Do not validate with remote api.
 
 * initialise:
 
-    Initialises a new KEYCHAIN
+    Initialises a new KEYCHAIN<br>
+
+    -n, --keychain=KEYCHAIN: Name of KEYCHAIN to initialise.
 
 * json ACCOUNT:
 
-    Outputs AWS CLI compatible JSON for an ACCOUNT
+    Outputs AWS CLI compatible JSON for an ACCOUNT<br>
+
+    -n, --no-token: Do not use saved token.
 
 * list:
 
@@ -60,7 +86,9 @@ The commands are as follows:
 
 * list-role:
 
-    Prints a list of roles in the keyring
+    Prints a list of roles in the keyring<br>
+
+    -d, --detail, --no-detail: Show more detail.
 
 * remove ACCOUNT:
 
@@ -80,11 +108,19 @@ The commands are as follows:
 
 * token ACCOUNT [ROLE] [MFA]:
 
-    Create an STS Token from a ROLE or an MFA code
+    Create an STS Token from a ROLE or an MFA code<br>
+
+    -r, --role=ROLE: The ROLE to assume.<br>
+    -c, --code=CODE: Virtual mfa CODE.<br>
+    -d, --duration=DURATION: Session DURATION in seconds.
 
 * update ACCOUNT:
 
-    Updates an ACCOUNT in the keyring
+    Updates an ACCOUNT in the keyring<br>
+
+    -k, --key=KEY: AWS account key id.<br>
+    -s, --secret=SECRET: AWS account secret.<br>
+    -r, --no-remote: Do not validate with remote api.
 
 ## ENVIRONMENT
 
@@ -132,6 +168,7 @@ Tristan Morgan <tristan.morgan@servian.com> is the maintainer of Awskeyring.
 
 * Tristan [tristanmorgan](https://github.com/tristanmorgan)
 * Adam Sir [AzySir](https://github.com/AzySir)
+* Vito Giarrusso [thtliife](https://github.com/thtliife)
 
 ## LICENSE
 

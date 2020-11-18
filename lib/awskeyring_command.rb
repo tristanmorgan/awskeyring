@@ -462,9 +462,11 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     when 'remove-role', '-r', 'rmr'
       comp_len = 2
     when '--path', '-p'
-      comp_len = 4
+      comp_len = 40
     when 'remove-token', 'rmt'
-      comp_len = 5
+      comp_len = 50
+    when '--browser', '-b'
+      comp_len = 60
     end
 
     [curr, comp_len, sub_cmd]
@@ -489,12 +491,14 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       list = Awskeyring.list_account_names
     when 2
       list = Awskeyring.list_role_names
-    when 3
+    when 3..10
       list = list_arguments(command: sub_cmd)
-    when 4
+    when 40
       list = Awskeyring.list_console_path
-    when 5
+    when 50
       list = Awskeyring.list_token_names
+    when 60
+      list = Awskeyring.list_browsers
     else
       exit 1
     end

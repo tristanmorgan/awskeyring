@@ -85,6 +85,7 @@ describe AwskeyringCommand do
       allow(Awskeyring).to receive(:list_role_names_plus)
         .and_return(%W[admin\tarn1 minion\tarn2 readonly\tarn3])
       allow(Awskeyring).to receive(:list_console_path).and_return(%w[iam cloudformation vpc])
+      allow(Awskeyring).to receive(:list_browsers).and_return(%w[FireFox Safari])
       allow(Awskeyring).to receive(:prefs).and_return('{"awskeyring": "awskeyringtest"}')
     end
 
@@ -142,6 +143,13 @@ describe AwskeyringCommand do
       ENV['COMP_LINE'] = 'awskeyring console servian --path cloud'
       expect { described_class.start(%w[awskeyring cloud --path]) }
         .to output("cloudformation\n").to_stdout
+      ENV['COMP_LINE'] = nil
+    end
+
+    it 'lists common browsers with autocomplete' do
+      ENV['COMP_LINE'] = 'awskeyring console servian --browser Sa'
+      expect { described_class.start(%w[awskeyring Sa --browser]) }
+        .to output("Safari\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 

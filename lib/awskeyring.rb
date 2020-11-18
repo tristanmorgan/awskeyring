@@ -27,6 +27,8 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   DEFAULT_KEY_AGE = 90
   # Default Console Paths
   DEFAULT_CONSOLE_LIST = %w[cloudformation ec2/v2 iam rds route53 s3 sns sqs vpc].freeze
+  # Default Browsers
+  DEFAULT_BROWSER_LIST = %w[Brave FireFox Opera Safari Vivaldi].freeze
 
   # Retrieve the preferences
   #
@@ -199,6 +201,11 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   # Return a list of console paths
   def self.list_console_path
     prefs.key?('console') ? prefs['console'] : DEFAULT_CONSOLE_LIST
+  end
+
+  # Return a list of browserss
+  def self.list_browsers
+    prefs.key?('browser') ? prefs['browser'] : DEFAULT_BROWSER_LIST
   end
 
   # Return Key age warning number
