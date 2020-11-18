@@ -15,6 +15,7 @@ describe AwskeyringCommand do
         updated: Time.parse('2011-08-01T22:20:01Z')
       )
       allow(Awskeyring::Awsapi).to receive(:get_login_url).and_return('login-url')
+      allow(Process).to receive(:spawn).exactly(1).with('open -a "Safari" "login-url"').and_return(9999)
       allow(Process).to receive(:spawn).exactly(1).with('open "login-url"').and_return(9999)
       allow(Process).to receive(:wait).exactly(1).with(9999)
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
@@ -34,6 +35,13 @@ describe AwskeyringCommand do
         user: ENV['USER']
       )
       expect(Process).to have_received(:spawn).exactly(1).with('open "login-url"')
+    end
+
+    it 'opens the AWS Console with a specified Browser' do
+      described_class.start(%w[console test --browser Safari])
+      expect(Awskeyring).to have_received(:account_exists).with('test')
+      expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: false)
+      expect(Process).to have_received(:spawn).exactly(1).with('open -a "Safari" "login-url"')
     end
 
     it 'prints the AWS Console URL' do

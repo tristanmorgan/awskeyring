@@ -113,6 +113,7 @@ the [Contributor Covenant](https://contributor-covenant.org) code of conduct.
 
 * Tristan [tristanmorgan](https://github.com/tristanmorgan)
 * Adam Sir [AzySir](https://github.com/AzySir)
+* Vito Giarrusso [thtliife](https://github.com/thtliife)
 
 ## License
 
