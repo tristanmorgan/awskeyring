@@ -1,5 +1,14 @@
 # Changelog
 
+## [v1.7.0](https://github.com/servian/awskeyring/tree/v1.7.0) (2020-11-18)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.6.0...v1.7.0)
+
+**Implemented enhancements:**
+
+- Allow specifying a browser other than the default [\#71](https://github.com/servian/awskeyring/issues/71)
+- Autocomplete for Browsers [\#73](https://github.com/servian/awskeyring/pull/73) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.6.0](https://github.com/servian/awskeyring/tree/v1.6.0) (2020-08-11)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.5.0...v1.6.0)
@@ -9,6 +18,10 @@
 - Warn about missing accounts/roles [\#69](https://github.com/servian/awskeyring/pull/69) ([tristanmorgan](https://github.com/tristanmorgan))
 - RuboCop and Spec update [\#68](https://github.com/servian/awskeyring/pull/68) ([tristanmorgan](https://github.com/tristanmorgan))
 - Add SimpleCov reports. [\#67](https://github.com/servian/awskeyring/pull/67) ([tristanmorgan](https://github.com/tristanmorgan))
+
+**Merged pull requests:**
+
+- Updates for added RuboCop checks. [\#70](https://github.com/servian/awskeyring/pull/70) ([tristanmorgan](https://github.com/tristanmorgan))
 
 ## [v1.5.0](https://github.com/servian/awskeyring/tree/v1.5.0) (2020-07-08)
 
