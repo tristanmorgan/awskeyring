@@ -207,6 +207,7 @@ export AWS_ACCESS_KEY_ID="AKIATESTTEST"
 export AWS_ACCESS_KEY="AKIATESTTEST"
 export AWS_SECRET_ACCESS_KEY="biglongbase64"
 export AWS_SECRET_KEY="biglongbase64"
+unset AWS_CREDENTIAL_EXPIRATION
 unset AWS_SECURITY_TOKEN
 unset AWS_SESSION_TOKEN
 )).to_stdout
@@ -219,6 +220,7 @@ unset AWS_SESSION_TOKEN
 unset AWS_ACCOUNT_NAME
 unset AWS_ACCESS_KEY_ID
 unset AWS_ACCESS_KEY
+unset AWS_CREDENTIAL_EXPIRATION
 unset AWS_SECRET_ACCESS_KEY
 unset AWS_SECRET_KEY
 unset AWS_SECURITY_TOKEN
@@ -234,6 +236,7 @@ unset AWS_SESSION_TOKEN
         'AWS_ACCOUNT_NAME' => 'test',
         'AWS_ACCESS_KEY_ID' => 'ASIATESTTEST',
         'AWS_ACCESS_KEY' => 'ASIATESTTEST',
+        'AWS_CREDENTIAL_EXPIRATION' => Time.at(1_310_414_129).iso8601,
         'AWS_SECRET_ACCESS_KEY' => 'bigerlongbase64',
         'AWS_SECRET_KEY' => 'bigerlongbase64',
         'AWS_SECURITY_TOKEN' => 'evenlongerbase64token',
@@ -289,6 +292,7 @@ export AWS_SECRET_ACCESS_KEY="bigerlongbase64"
 export AWS_SECRET_KEY="bigerlongbase64"
 export AWS_SECURITY_TOKEN="evenlongerbase64token"
 export AWS_SESSION_TOKEN="evenlongerbase64token"
+export AWS_CREDENTIAL_EXPIRATION="#{Time.at(1_310_414_129).iso8601}"
 )).to_stdout
       expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: false)
     end
@@ -301,6 +305,7 @@ export AWS_ACCESS_KEY_ID="AKIATESTTEST"
 export AWS_ACCESS_KEY="AKIATESTTEST"
 export AWS_SECRET_ACCESS_KEY="biglongbase64"
 export AWS_SECRET_KEY="biglongbase64"
+unset AWS_CREDENTIAL_EXPIRATION
 unset AWS_SECURITY_TOKEN
 unset AWS_SESSION_TOKEN
 )).to_stdout

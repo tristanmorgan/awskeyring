@@ -27,6 +27,7 @@ module Awskeyring
       AWS_ACCOUNT_NAME
       AWS_ACCESS_KEY_ID
       AWS_ACCESS_KEY
+      AWS_CREDENTIAL_EXPIRATION
       AWS_SECRET_ACCESS_KEY
       AWS_SECRET_KEY
       AWS_SECURITY_TOKEN
@@ -125,6 +126,8 @@ module Awskeyring
     def self.get_env_array(params = {})
       env_var = {}
       env_var['AWS_DEFAULT_REGION'] = 'us-east-1' unless region
+
+      params[:expiration] = Time.at(params[:expiry]).iso8601 unless params[:expiry].nil?
 
       params.each_key do |param_name|
         AWS_ENV_VARS.each do |var_name|
