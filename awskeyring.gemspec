@@ -24,7 +24,7 @@ Gem::Specification.new do |spec|
 
   spec.metadata = {
     'bug_tracker_uri' => "#{Awskeyring::HOMEPAGE}/issues",
-    'changelog_uri' => "#{Awskeyring::HOMEPAGE}/blob/master/CHANGELOG.md",
+    'changelog_uri' => "#{Awskeyring::HOMEPAGE}/blob/main/CHANGELOG.md",
     'documentation_uri' => "https://rubydoc.info/gems/#{spec.name}/#{Awskeyring::VERSION}",
     'source_code_uri' => "#{Awskeyring::HOMEPAGE}/tree/v#{Awskeyring::VERSION}",
     'wiki_uri' => "#{Awskeyring::HOMEPAGE}/wiki"

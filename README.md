@@ -1,8 +1,8 @@
 # Awskeyring
 
-![Awskeyring](https://raw.githubusercontent.com/servian/awskeyring/master/awskeyring-144.png)
+![Awskeyring](https://raw.githubusercontent.com/servian/awskeyring/main/awskeyring-144.png)
 
-* [![Build Status](https://travis-ci.org/servian/awskeyring.svg?branch=master)](https://travis-ci.org/servian/awskeyring)
+* [![Build Status](https://travis-ci.org/servian/awskeyring.svg?branch=main)](https://travis-ci.org/servian/awskeyring)
 * [![Gem Version](https://badge.fury.io/rb/awskeyring.svg)](https://badge.fury.io/rb/awskeyring)
 * [![license MIT](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 * [![All Downloads](https://ruby-gem-downloads-badge.herokuapp.com/awskeyring?type=total)](https://rubygems.org/gems/awskeyring)
