@@ -27,6 +27,10 @@ Install it with:
 
     $ gem install awskeyring --user-install
 
+or via [homebrew gem](https://github.com/sportngin/brew-gem):
+
+    $ brew gem install awskeyring
+
 ## Wiki
 
 Please see the [Wiki](https://github.com/servian/awskeyring/wiki) for full usage instructions and tips.
