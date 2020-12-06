@@ -356,6 +356,7 @@ describe Awskeyring::Awsapi do
     it 'returns an array of env vars for the Credential' do
       expect(awsapi.get_env_array(
                account: 'test',
+               expiry: 1_489_305_329,
                key: 'ASIAIOSFODNN7EXAMPLE',
                secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
                token: role_token
@@ -363,6 +364,7 @@ describe Awskeyring::Awsapi do
                'AWS_ACCESS_KEY' => 'ASIAIOSFODNN7EXAMPLE',
                'AWS_ACCESS_KEY_ID' => 'ASIAIOSFODNN7EXAMPLE',
                'AWS_ACCOUNT_NAME' => 'test',
+               'AWS_CREDENTIAL_EXPIRATION' => Time.at(1_489_305_329).iso8601,
                'AWS_DEFAULT_REGION' => 'us-east-1',
                'AWS_SECRET_ACCESS_KEY' => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
                'AWS_SECRET_KEY' => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',

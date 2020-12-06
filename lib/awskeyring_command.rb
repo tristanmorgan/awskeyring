@@ -88,7 +88,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       warn I18n.t('message.missing_role', bin: File.basename($PROGRAM_NAME))
       exit 1
     end
-    if options['detail']
+    if options[:detail]
       puts Awskeyring.list_role_names_plus.join("\n")
     else
       puts Awskeyring.list_role_names.join("\n")
@@ -100,7 +100,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option 'unset', type: :boolean, aliases: '-u', desc: I18n.t('method_option.unset'), default: false
   # Print Env vars
   def env(account = nil)
-    if options['unset']
+    if options[:unset]
       put_env_string(account: nil, key: nil, secret: nil, token: nil)
     else
       account = ask_check(
