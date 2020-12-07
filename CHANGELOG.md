@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.8.0](https://github.com/servian/awskeyring/tree/v1.8.0) (2020-12-07)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.7.0...v1.8.0)
+
+**Implemented enhancements:**
+
+- Include expiry time export, AWS\_CREDENTIAL\_EXPIRATION [\#74](https://github.com/servian/awskeyring/pull/74) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.7.0](https://github.com/servian/awskeyring/tree/v1.7.0) (2020-11-18)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.6.0...v1.7.0)
@@ -8,6 +16,10 @@
 
 - Allow specifying a browser other than the default [\#71](https://github.com/servian/awskeyring/issues/71)
 - Autocomplete for Browsers [\#73](https://github.com/servian/awskeyring/pull/73) ([tristanmorgan](https://github.com/tristanmorgan))
+
+**Merged pull requests:**
+
+- Updates for added RuboCop checks. [\#70](https://github.com/servian/awskeyring/pull/70) ([tristanmorgan](https://github.com/tristanmorgan))
 
 ## [v1.6.0](https://github.com/servian/awskeyring/tree/v1.6.0) (2020-08-11)
 
@@ -18,10 +30,6 @@
 - Warn about missing accounts/roles [\#69](https://github.com/servian/awskeyring/pull/69) ([tristanmorgan](https://github.com/tristanmorgan))
 - RuboCop and Spec update [\#68](https://github.com/servian/awskeyring/pull/68) ([tristanmorgan](https://github.com/tristanmorgan))
 - Add SimpleCov reports. [\#67](https://github.com/servian/awskeyring/pull/67) ([tristanmorgan](https://github.com/tristanmorgan))
-
-**Merged pull requests:**
-
-- Updates for added RuboCop checks. [\#70](https://github.com/servian/awskeyring/pull/70) ([tristanmorgan](https://github.com/tristanmorgan))
 
 ## [v1.5.0](https://github.com/servian/awskeyring/tree/v1.5.0) (2020-07-08)
 
