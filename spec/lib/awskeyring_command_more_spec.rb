@@ -286,6 +286,7 @@ describe AwskeyringCommand do
         described_class.start(['add', 'test', '-k', access_key, '-s', secret_access_key])
       end.to output("# Added account test\n").to_stdout
       expect(Awskeyring::Awsapi).to have_received(:verify_cred)
+        .with(key: access_key, secret: secret_access_key)
       expect(Awskeyring).not_to have_received(:update_account)
       expect(Awskeyring).to have_received(:add_account)
     end
@@ -295,6 +296,7 @@ describe AwskeyringCommand do
         described_class.start(['update', 'tested', '-k', access_key, '-s', secret_access_key])
       end.to output("# Updated account tested\n").to_stdout
       expect(Awskeyring::Awsapi).to have_received(:verify_cred)
+        .with(key: access_key, secret: secret_access_key)
       expect(Awskeyring).to have_received(:update_account)
       expect(Awskeyring).not_to have_received(:add_account)
     end

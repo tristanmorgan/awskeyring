@@ -226,6 +226,7 @@ describe Awskeyring::Awsapi do
   context 'when credentials are verified' do
     let(:key) { 'AKIA1234567890ABCDEF' }
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
+    let(:token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
 
     let(:sts_client) { instance_double(Aws::STS::Client) }
 
@@ -240,7 +241,11 @@ describe Awskeyring::Awsapi do
     end
 
     it 'calls get_caller_identity' do
-      expect(awsapi.verify_cred(key: key, secret: secret, token: nil)).to be(true)
+      expect(awsapi.verify_cred(key: key, secret: secret)).to be(true)
+    end
+
+    it 'calls get_caller_identity with a token' do
+      expect(awsapi.verify_cred(key: key, secret: secret, token: token)).to be(true)
     end
   end
 
