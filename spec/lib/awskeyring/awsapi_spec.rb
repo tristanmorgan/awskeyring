@@ -281,7 +281,14 @@ describe Awskeyring::Awsapi do
           user_name: 'Bob'
         }
       )
-      allow(iam_client).to receive(:delete_access_key).and_return({})
+      allow(awsapi).to receive(:sleep) # rubocop:disable RSpec/SubjectStub
+      call_count = 0
+      allow(iam_client).to receive(:delete_access_key) do
+        call_count += 1
+        raise(Aws::IAM::Errors::InvalidClientTokenId.new(nil, 'test message')) if call_count < 3
+
+        {}
+      end
     end
 
     it 'rotates a secret access key' do
@@ -290,6 +297,7 @@ describe Awskeyring::Awsapi do
         key: new_key,
         secret: new_secret
       )
+      expect(awsapi).to have_received(:sleep).twice # rubocop:disable RSpec/SubjectStub
     end
   end
 
