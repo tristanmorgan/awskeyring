@@ -118,7 +118,10 @@ describe Awskeyring do
       allow(all_list).to receive(:where).and_return([nil])
       allow(all_list).to receive(:where).with(label: 'account test').and_return([item])
       allow(all_list).to receive(:where).with(label: 'role test').and_return([role])
+      allow(all_list).to receive(:create)
       allow(item).to receive(:delete)
+      allow(item).to receive(:password=)
+      allow(item).to receive(:save!)
       allow(role).to receive(:delete)
       allow(Keychain).to receive(:open).and_return(keychain)
     end
@@ -140,6 +143,54 @@ describe Awskeyring do
         awskeyring.delete_account(account: 'test', message: 'test delete message')
       end.to output(/test delete message/).to_stdout
       expect(item).to have_received(:delete)
+    end
+
+    it 'tries to add an account' do
+      awskeyring.add_account(account: 'test', key: 'AKIA012345678901', secret: 'biglongbase64string',
+                             mfa: 'arn:iam:and:on:and:on')
+      expect(all_list).to have_received(:create).with(
+        label: 'account test',
+        account: 'AKIA012345678901',
+        password: 'biglongbase64string',
+        comment: 'arn:iam:and:on:and:on'
+      )
+    end
+
+    it 'tries to update an account' do
+      awskeyring.update_account(account: 'test', key: 'AKIA012345678901', secret: 'biglongbase64string')
+      expect(item.attributes[:account]).to be('AKIA012345678901')
+      expect(item).to have_received(:password=).with('biglongbase64string')
+      expect(item).to have_received(:save!)
+    end
+
+    it 'tries to add a role' do
+      awskeyring.add_role(role: 'test', arn: 'arn:iam:and:on:and:on:role')
+      expect(all_list).to have_received(:create).with(
+        label: 'role test',
+        account: 'arn:iam:and:on:and:on:role',
+        password: '',
+        comment: ''
+      )
+    end
+
+    it 'tries to add a token' do
+      awskeyring.add_token(
+        account: 'test', key: 'ASIA012345678901', secret: 'biglongbase64string',
+        token: 'evenLongerbiglongbase64string', role: 'testrole',
+        expiry: Time.parse('2016-12-20T22:20:01Z').to_i.to_s
+      )
+      expect(all_list).to have_received(:create).with(
+        label: 'session-key test',
+        account: 'ASIA012345678901',
+        password: 'biglongbase64string',
+        comment: 'role testrole'
+      )
+      expect(all_list).to have_received(:create).with(
+        label: 'session-token test',
+        account: Time.parse('2016-12-20T22:20:01Z').to_i.to_s,
+        password: 'evenLongerbiglongbase64string',
+        comment: 'testrole'
+      )
     end
 
     it 'returns a hash with the role' do

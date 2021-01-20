@@ -145,7 +145,7 @@ module Awskeyring
     # @param [String] key The aws_access_key_id
     # @param [String] secret The aws_secret_access_key
     # @param [String] token The aws_session_token
-    def self.verify_cred(key:, secret:, token:)
+    def self.verify_cred(key:, secret:, token: nil)
       begin
         ENV['AWS_DEFAULT_REGION'] = 'us-east-1' unless region
         sts = Aws::STS::Client.new(access_key_id: key, secret_access_key: secret, session_token: token)

@@ -209,7 +209,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       existing: options[:mfa], message: I18n.t('message.mfa'),
       flags: 'optional', validator: Awskeyring::Validate.method(:mfa_arn)
     )
-    Awskeyring::Awsapi.verify_cred(key: key, secret: secret, token: nil) unless options['no-remote']
+    Awskeyring::Awsapi.verify_cred(key: key, secret: secret) unless options['no-remote']
     Awskeyring.add_account(
       account: account,
       key: key,
