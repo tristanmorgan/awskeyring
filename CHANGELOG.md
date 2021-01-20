@@ -1,5 +1,17 @@
 # Changelog
 
+## [v1.8.1](https://github.com/servian/awskeyring/tree/v1.8.1) (2021-01-20)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.8.0...v1.8.1)
+
+**Fixed bugs:**
+
+- Update command failed. [\#75](https://github.com/servian/awskeyring/issues/75)
+
+**Merged pull requests:**
+
+- Default nil token \(fix \#75\) [\#76](https://github.com/servian/awskeyring/pull/76) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.8.0](https://github.com/servian/awskeyring/tree/v1.8.0) (2020-12-07)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.7.0...v1.8.0)
