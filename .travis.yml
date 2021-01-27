@@ -1,5 +1,6 @@
 ---
 language: ruby
+cache: bundler
 os: osx
 osx_image: xcode12
 rvm:
