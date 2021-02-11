@@ -59,4 +59,5 @@ YARD::Rake::YardocTask.new do |t|
   t.stats_options = ['--list-undoc']
 end
 
+desc 'Run Linting, Tests and Documetation tasks'
 task default: %i[filemode rubocop spec ronn yard]
