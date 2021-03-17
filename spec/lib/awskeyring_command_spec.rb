@@ -39,7 +39,7 @@ describe AwskeyringCommand do
     end
 
     it 'prints autocomplete help text' do
-      expect { described_class.start(%w[awskeyring one two]) }.to raise_error
+      expect { described_class.start(%w[autocomplete one two]) }.to raise_error
         .and output(%r{enable autocomplete with 'complete -C /.+/\w+ \w+'}).to_stderr
     end
 
@@ -106,56 +106,56 @@ describe AwskeyringCommand do
 
     it 'lists accounts with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring token ser'
-      expect { described_class.start(%w[awskeyring ser token]) }
+      expect { described_class.start(%w[autocomplete ser token]) }
         .to output("servian\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists roles with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring remove-role min'
-      expect { described_class.start(%w[awskeyring min remove-role]) }
+      expect { described_class.start(%w[autocomplete min remove-role]) }
         .to output("minion\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists commands with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring '
-      expect { described_class.start(['awskeyring', '', 'awskeyring']) }
+      expect { described_class.start(['autocomplete', '', 'awskeyring']) }
         .to output(/--version\nadd\nadd-role\nconsole\nenv\nexec\nhelp/).to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists commands with autocomplete for help' do
       ENV['COMP_LINE'] = 'awskeyring help con'
-      expect { described_class.start(%w[awskeyring con help]) }
+      expect { described_class.start(%w[autocomplete con help]) }
         .to output("console\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists flags with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring token servian minion --dura'
-      expect { described_class.start(%w[awskeyring --dura minion]) }
+      expect { described_class.start(%w[autocomplete --dura minion]) }
         .to output("--duration\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists console paths with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring console servian --path cloud'
-      expect { described_class.start(%w[awskeyring cloud --path]) }
+      expect { described_class.start(%w[autocomplete cloud --path]) }
         .to output("cloudformation\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists common browsers with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring console servian --browser Sa'
-      expect { described_class.start(%w[awskeyring Sa --browser]) }
+      expect { described_class.start(%w[autocomplete Sa --browser]) }
         .to output("Safari\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists token names with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring remove-token ser'
-      expect { described_class.start(%w[awskeyring ser remove-token]) }
+      expect { described_class.start(%w[autocomplete ser remove-token]) }
         .to output("servian\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
