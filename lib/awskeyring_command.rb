@@ -16,17 +16,17 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   map %w[--version -v] => :__version
   map %w[--help -h] => :help
-  map ['init'] => :initialise
-  map ['adr'] => :add_role
-  map ['con'] => :console
-  map ['ls'] => :list
-  map ['lsr'] => :list_role
-  map ['rm'] => :remove
-  map ['rmr'] => :remove_role
-  map ['rmt'] => :remove_token
-  map ['rot'] => :rotate
-  map ['tok'] => :token
-  map ['up'] => :update
+  map 'init' => :initialise
+  map 'adr' => :add_role
+  map 'con' => :console
+  map 'ls' => :list
+  map 'lsr' => :list_role
+  map 'rm' => :remove
+  map 'rmr' => :remove_role
+  map 'rmt' => :remove_token
+  map 'rot' => :rotate
+  map 'tok' => :token
+  map 'up' => :update
 
   # default to returning an error on failure.
   def self.exit_on_failure?
@@ -425,8 +425,9 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   desc 'awskeyring CURR PREV', I18n.t('awskeyring.desc'), hide: true
+  map File.basename($PROGRAM_NAME) => :autocomplete
   # autocomplete
-  def awskeyring(curr, prev)
+  def autocomplete(curr, prev)
     comp_line = ENV['COMP_LINE']
     unless comp_line
       exec_name = File.basename($PROGRAM_NAME)
@@ -506,7 +507,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   def list_commands
-    self.class.all_commands.keys.map { |elem| elem.tr('_', '-') }.reject! { |elem| elem == 'awskeyring' }
+    self.class.all_commands.keys.map { |elem| elem.tr('_', '-') }.reject! { |elem| elem == 'autocomplete' }
   end
 
   def list_arguments(command:)
