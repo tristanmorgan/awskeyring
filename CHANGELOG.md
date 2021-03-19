@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.8.2](https://github.com/servian/awskeyring/tree/v1.8.2) (2021-03-19)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.8.1...v1.8.2)
+
+**Implemented enhancements:**
+
+- Make autocomplete accept dynamic exec\_name [\#77](https://github.com/servian/awskeyring/pull/77) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.8.1](https://github.com/servian/awskeyring/tree/v1.8.1) (2021-01-20)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.8.0...v1.8.1)
