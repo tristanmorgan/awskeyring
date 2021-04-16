@@ -11,6 +11,7 @@ require 'awskeyring/version'
 
 # AWSkeyring command line interface.
 class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
+  package_name 'Awskeyring'
   I18n.load_path = Dir.glob(File.join(File.realpath(__dir__), '..', 'i18n', '*.{yml,yaml}'))
   I18n.backend.load_translations
 

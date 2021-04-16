@@ -24,7 +24,7 @@ describe AwskeyringCommand do
       expect { described_class.start([]) }
         .to output(/^  \w+ --version, -v\s+# Prints the version/).to_stdout
       expect { described_class.start(%w[help]) }
-        .to output(/Commands:/).to_stdout
+        .to output(/Awskeyring commands:/).to_stdout
     end
 
     it 'returns the version number' do

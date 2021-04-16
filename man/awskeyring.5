@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "AWSKEYRING" "5" "March 2021" "" ""
+.TH "AWSKEYRING" "5" "April 2021" "" ""
 .
 .SH "NAME"
 \fBAwskeyring\fR \- is a small tool to manage AWS account keys in the macOS Keychain
@@ -267,8 +267,34 @@ awskeyring env personal\-aws
 .
 .IP "" 0
 .
+.P
+To open the AWS Console (web page) with your default browser simply run\.\.\.
+.
+.IP "" 4
+.
+.nf
+
+awskeyring console personal\-aws
+.
+.fi
+.
+.IP "" 0
+.
+.P
+Autocomplete is enabled in your current shell with the following command\.\.\.
+.
+.IP "" 4
+.
+.nf
+
+complete \-C /usr/local/bin/awskeyring awskeyring
+.
+.fi
+.
+.IP "" 0
+.
 .SH "HISTORY"
-The motivation of this application is to provide a local secure store of AWS credentials using specifically in the macOS Keychain, to have them easily accessed from the Terminal, and to provide useful functions like assuming roles and opening the AWS Console from the cli\. For Enterprise environments there are better suited tools to use like HashiCorp Vault \fIhttps://vaultproject\.io/\fR\.
+The motivation of this application is to provide a local secure store of AWS credentials using specifically in the macOS Keychain, to have them easily accessed from the Terminal, and to provide useful functions like assuming roles and opening the AWS Console from the cli\. It then expanded to include autocomplete and a desire to have an almost complete test coverage to prevent regressions in its functionality\. For Enterprise environments there are better suited tools to use like HashiCorp Vault \fIhttps://vaultproject\.io/\fR\.
 .
 .SH "SECURITY"
 If you believe you have found a security issue in Awskeyring, please responsibly disclose by contacting me at \fItristan\.morgan@servian\.com\fR\. Awskeyring is a Ruby script and as such Ruby is whitelisted to access your "awskeyring" keychain\. Use a strong password and keep the unlock time short\.
