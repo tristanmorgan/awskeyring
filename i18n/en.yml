@@ -1,41 +1,24 @@
 ---
 en:
-  __version:
-    desc: Prints the version
-  add:
-    desc: Adds an ACCOUNT to the keyring
-  add_role:
-    desc: Adds a ROLE to the keyring
-  awskeyring:
-    desc: Autocompletion for bourne shells
-  console:
-    desc: Open the AWS Console for the ACCOUNT
-  env:
-    desc: Outputs bourne shell environment exports for an ACCOUNT
-  exec:
-    desc: Execute a COMMAND with the environment set for an ACCOUNT
-  import:
-    desc: Import an ACCOUNT to the keyring from ~/.aws/credentials
-  initialise:
-    desc: Initialises a new KEYCHAIN
-  json:
-    desc: Outputs AWS CLI compatible JSON for an ACCOUNT
-  list:
-    desc: Prints a list of accounts in the keyring
-  list_role:
-    desc: Prints a list of roles in the keyring
-  remove:
-    desc: Removes an ACCOUNT from the keyring
-  remove_role:
-    desc: Removes a ROLE from the keyring
-  remove_token:
-    desc: Removes a token for ACCOUNT from the keyring
-  rotate:
-    desc: Rotate access keys for an ACCOUNT
-  token:
-    desc: Create an STS Token from a ROLE or an MFA code
-  update:
-    desc: Updates an ACCOUNT in the keyring
+  __version_desc: Prints the version
+  add_desc: Adds an ACCOUNT to the keyring
+  add_role_desc: Adds a ROLE to the keyring
+  awskeyring_desc: Autocompletion for bourne shells
+  console_desc: Open the AWS Console for the ACCOUNT
+  default_desc: Run default help or initialise if needed.
+  env_desc: Outputs bourne shell environment exports for an ACCOUNT
+  exec_desc: Execute a COMMAND with the environment set for an ACCOUNT
+  import_desc: Import an ACCOUNT to the keyring from ~/.aws/credentials
+  initialise_desc: Initialises a new KEYCHAIN
+  json_desc: Outputs AWS CLI compatible JSON for an ACCOUNT
+  list_desc: Prints a list of accounts in the keyring
+  list_role_desc: Prints a list of roles in the keyring
+  remove_desc: Removes an ACCOUNT from the keyring
+  remove_role_desc: Removes a ROLE from the keyring
+  remove_token_desc: Removes a token for ACCOUNT from the keyring
+  rotate_desc: Rotate access keys for an ACCOUNT
+  token_desc: Create an STS Token from a ROLE or an MFA code
+  update_desc: Updates an ACCOUNT in the keyring
   method_option:
     arn: 'AWS role arn.'
     code: 'Virtual mfa CODE.'
