@@ -145,12 +145,21 @@ Now your keys are stored safely in the macOS keychain. To print environment vari
 
     awskeyring env personal-aws
 
+To open the AWS Console (web page) with your default browser simply run...
+
+    awskeyring console personal-aws
+
+Autocomplete is enabled in your current shell with the following command... 
+
+    complete -C /usr/local/bin/awskeyring awskeyring
+
 ## HISTORY
 
 The motivation of this application is to provide a local secure store of AWS
 credentials using specifically in the macOS Keychain, to have them easily accessed
 from the Terminal, and to provide useful functions like assuming roles and opening
-the AWS Console from the cli.
+the AWS Console from the cli. It then expanded to include autocomplete and a desire
+to have an almost complete test coverage to prevent regressions in its functionality.
 For Enterprise environments there are better suited tools to use
 like [HashiCorp Vault](https://vaultproject.io/).
 

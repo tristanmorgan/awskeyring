@@ -11,6 +11,7 @@ require 'awskeyring/version'
 
 # AWSkeyring command line interface.
 class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
+  package_name 'Awskeyring'
   I18n.load_path = Dir.glob(File.join(File.realpath(__dir__), '..', 'i18n', '*.{yml,yaml}'))
   I18n.backend.load_translations
 
@@ -27,13 +28,24 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   map 'rot' => :rotate
   map 'tok' => :token
   map 'up' => :update
+  default_command :default
 
   # default to returning an error on failure.
   def self.exit_on_failure?
     true
   end
 
-  desc '--version, -v', I18n.t('__version.desc')
+  desc 'default', I18n.t('default_desc'), hide: true
+  # default command to run
+  def default
+    if Awskeyring.prefs.empty?
+      invoke :initialise
+    else
+      invoke :help
+    end
+  end
+
+  desc '--version, -v', I18n.t('__version_desc')
   method_option 'no-remote', type: :boolean, aliases: '-r', desc: I18n.t('method_option.noremote'), default: false
   # print the version number
   def __version
@@ -44,7 +56,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     puts "Homepage #{Awskeyring::HOMEPAGE}"
   end
 
-  desc 'initialise', I18n.t('initialise.desc')
+  desc 'initialise', I18n.t('initialise_desc')
   method_option :keychain, type: :string, aliases: '-n', desc: I18n.t('method_option.keychain')
   # initialise the keychain
   def initialise
@@ -69,7 +81,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     puts I18n.t('message.addkeychain', keychain: keychain, exec_name: exec_name)
   end
 
-  desc 'list', I18n.t('list.desc')
+  desc 'list', I18n.t('list_desc')
   # list the accounts
   def list
     if Awskeyring.list_account_names.empty?
@@ -80,7 +92,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   map 'list-role' => :list_role
-  desc 'list-role', I18n.t('list_role.desc')
+  desc 'list-role', I18n.t('list_role_desc')
   method_option 'detail', type: :boolean, aliases: '-d', desc: I18n.t('method_option.detail'), default: false
   # List roles
   def list_role
@@ -95,7 +107,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     end
   end
 
-  desc 'env ACCOUNT', I18n.t('env.desc')
+  desc 'env ACCOUNT', I18n.t('env_desc')
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   method_option 'unset', type: :boolean, aliases: '-u', desc: I18n.t('method_option.unset'), default: false
   # Print Env vars
@@ -113,7 +125,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     end
   end
 
-  desc 'json ACCOUNT', I18n.t('json.desc')
+  desc 'json ACCOUNT', I18n.t('json_desc')
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   # Print JSON for use with credential_process
   def json(account)
@@ -130,7 +142,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     )
   end
 
-  desc 'import ACCOUNT', I18n.t('import.desc')
+  desc 'import ACCOUNT', I18n.t('import_desc')
   method_option 'no-remote', type: :boolean, aliases: '-r', desc: I18n.t('method_option.noremote'), default: false
   # Import an Account
   def import(account = nil) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
@@ -166,7 +178,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     end
   end
 
-  desc 'exec ACCOUNT command...', I18n.t('exec.desc')
+  desc 'exec ACCOUNT command...', I18n.t('exec_desc')
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   method_option 'no-bundle', type: :boolean, aliases: '-b', desc: I18n.t('method_option.nobundle'), default: false
   # execute an external command with env set
@@ -188,7 +200,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     end
   end
 
-  desc 'add ACCOUNT', I18n.t('add.desc')
+  desc 'add ACCOUNT', I18n.t('add_desc')
   method_option :key, type: :string, aliases: '-k', desc: I18n.t('method_option.key')
   method_option :secret, type: :string, aliases: '-s', desc: I18n.t('method_option.secret')
   method_option :mfa, type: :string, aliases: '-m', desc: I18n.t('method_option.mfa')
@@ -219,7 +231,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     puts I18n.t('message.addaccount', account: account)
   end
 
-  desc 'update ACCOUNT', I18n.t('update.desc')
+  desc 'update ACCOUNT', I18n.t('update_desc')
   method_option :key, type: :string, aliases: '-k', desc: I18n.t('method_option.key')
   method_option :secret, type: :string, aliases: '-s', desc: I18n.t('method_option.secret')
   method_option 'no-remote', type: :boolean, aliases: '-r', desc: I18n.t('method_option.noremote'), default: false
@@ -247,7 +259,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   map 'add-role' => :add_role
-  desc 'add-role ROLE', I18n.t('add_role.desc')
+  desc 'add-role ROLE', I18n.t('add_role_desc')
   method_option :arn, type: :string, aliases: '-a', desc: I18n.t('method_option.arn')
   # Add a role
   def add_role(role = nil)
@@ -267,7 +279,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     puts I18n.t('message.addrole', role: role)
   end
 
-  desc 'remove ACCOUNT', I18n.t('remove.desc')
+  desc 'remove ACCOUNT', I18n.t('remove_desc')
   # Remove an account
   def remove(account = nil)
     account = ask_check(
@@ -277,7 +289,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     Awskeyring.delete_account(account: account, message: I18n.t('message.delaccount', account: account))
   end
 
-  desc 'remove-token ACCOUNT', I18n.t('remove_token.desc')
+  desc 'remove-token ACCOUNT', I18n.t('remove_token_desc')
   # remove a session token
   def remove_token(account = nil)
     account = ask_check(
@@ -288,7 +300,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   map 'remove-role' => :remove_role
-  desc 'remove-role ROLE', I18n.t('remove_role.desc')
+  desc 'remove-role ROLE', I18n.t('remove_role_desc')
   # remove a role
   def remove_role(role = nil)
     role = ask_check(
@@ -298,7 +310,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     Awskeyring.delete_role(role_name: role, message: I18n.t('message.delrole', role: role))
   end
 
-  desc 'rotate ACCOUNT', I18n.t('rotate.desc')
+  desc 'rotate ACCOUNT', I18n.t('rotate_desc')
   # rotate Account keys
   def rotate(account = nil) # rubocop:disable Metrics/MethodLength
     account = ask_check(
@@ -330,7 +342,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     puts I18n.t('message.upaccount', account: account)
   end
 
-  desc 'token ACCOUNT [ROLE] [MFA]', I18n.t('token.desc')
+  desc 'token ACCOUNT [ROLE] [MFA]', I18n.t('token_desc')
   method_option :role, type: :string, aliases: '-r', desc: I18n.t('method_option.role')
   method_option :code, type: :string, aliases: '-c', desc: I18n.t('method_option.code')
   method_option :duration, type: :string, aliases: '-d', desc: I18n.t('method_option.duration')
@@ -385,7 +397,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     puts I18n.t('message.addtoken', account: account, time: Time.at(new_creds[:expiry].to_i))
   end
 
-  desc 'console ACCOUNT', I18n.t('console.desc')
+  desc 'console ACCOUNT', I18n.t('console_desc')
   method_option :path, type: :string, aliases: '-p', desc: I18n.t('method_option.path')
   method_option :browser, type: :string, aliases: '-b', desc: I18n.t('method_option.browser')
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
@@ -424,7 +436,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     end
   end
 
-  desc 'awskeyring CURR PREV', I18n.t('awskeyring.desc'), hide: true
+  desc "#{File.basename($PROGRAM_NAME)} CURR PREV", I18n.t('awskeyring_desc'), hide: true
   map File.basename($PROGRAM_NAME) => :autocomplete
   # autocomplete
   def autocomplete(curr, prev)
@@ -507,7 +519,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   def list_commands
-    self.class.all_commands.keys.map { |elem| elem.tr('_', '-') }.reject! { |elem| elem == 'autocomplete' }
+    commands = self.class.all_commands.keys.map { |elem| elem.tr('_', '-') }
+    commands.reject! { |elem| %w[autocomplete default].include?(elem) }
   end
 
   def list_arguments(command:)

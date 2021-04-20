@@ -61,7 +61,7 @@ more details on this config option.
 
 The CLI is using [Thor](http://whatisthor.com) with help provided interactively.
 
-    Commands:
+    Awskeyring commands:
       awskeyring --version, -v               # Prints the version
       awskeyring add ACCOUNT                 # Adds an ACCOUNT to the keyring
       awskeyring add-role ROLE               # Adds a ROLE to the keyring

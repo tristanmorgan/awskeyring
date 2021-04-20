@@ -21,10 +21,8 @@ describe AwskeyringCommand do
     end
 
     it 'outputs help text' do
-      expect { described_class.start([]) }
-        .to output(/^  \w+ --version, -v\s+# Prints the version/).to_stdout
       expect { described_class.start(%w[help]) }
-        .to output(/Commands:/).to_stdout
+        .to output(/Awskeyring commands:/).to_stdout
     end
 
     it 'returns the version number' do
@@ -57,6 +55,11 @@ describe AwskeyringCommand do
       expect { described_class.start(%w[initialise]) }
         .to output(/Add accounts to your test keychain with:/).to_stdout
     end
+
+    it 'initialises the keychain by default' do
+      expect { described_class.start([]) }
+        .to output(/Add accounts to your test keychain with:/).to_stdout
+    end
   end
 
   context 'when no accounts or roles are set' do
@@ -64,6 +67,11 @@ describe AwskeyringCommand do
       allow(Awskeyring).to receive(:list_account_names).and_return([])
       allow(Awskeyring).to receive(:list_role_names).and_return([])
       allow(Awskeyring).to receive(:prefs).and_return('{"awskeyring": "awskeyringtest"}')
+    end
+
+    it 'outputs help text by default' do
+      expect { described_class.start([]) }
+        .to output(/^  \w+ --version, -v\s+# Prints the version/).to_stdout
     end
 
     it 'tells you that you must add accounts' do
