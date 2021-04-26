@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.8.3](https://github.com/servian/awskeyring/tree/v1.8.3) (2021-04-26)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.8.2...v1.8.3)
+
+**Implemented enhancements:**
+
+- Package name and default action [\#78](https://github.com/servian/awskeyring/pull/78) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.8.2](https://github.com/servian/awskeyring/tree/v1.8.2) (2021-03-19)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.8.1...v1.8.2)
