@@ -55,7 +55,7 @@ task :ronn do
 end
 
 YARD::Rake::YardocTask.new do |t|
-  t.options = ['--fail-on-warning', '--no-progress']
+  t.options = ['--fail-on-warning', '--no-progress', '--files', '*.md']
   t.stats_options = ['--list-undoc']
 end
 
