@@ -143,7 +143,7 @@ describe AwskeyringCommand do
 
     it 'tries to receive a new token' do
       expect do
-        described_class.start(%w[token test -r role])
+        described_class.start(%w[token test role])
       end.to output(
         "# Token saved for account test\n# Authentication valid until #{Time.at(1_422_992_424)}\n"
       ).to_stdout
@@ -199,7 +199,7 @@ describe AwskeyringCommand do
 
     it 'tries to receive a new token with an MFA and role' do
       expect do
-        described_class.start(%w[token test -r role -c 987654])
+        described_class.start(%w[token test role -c 987654])
       end.to output(
         "# Token saved for account test\n# Authentication valid until #{Time.at(1_422_992_424)}\n"
       ).to_stdout

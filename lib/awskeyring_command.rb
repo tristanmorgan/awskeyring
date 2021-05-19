@@ -17,17 +17,13 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   map %w[--version -v] => :__version
   map %w[--help -h] => :help
-  map 'init' => :initialise
   map 'adr' => :add_role
-  map 'con' => :console
+  map 'assume-role' => :token
   map 'ls' => :list
   map 'lsr' => :list_role
   map 'rm' => :remove
   map 'rmr' => :remove_role
   map 'rmt' => :remove_token
-  map 'rot' => :rotate
-  map 'tok' => :token
-  map 'up' => :update
   default_command :default
 
   # default to returning an error on failure.
@@ -91,9 +87,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     puts Awskeyring.list_account_names.join("\n")
   end
 
-  map 'list-role' => :list_role
   desc 'list-role', I18n.t('list_role_desc')
-  method_option 'detail', type: :boolean, aliases: '-d', desc: I18n.t('method_option.detail'), default: false
+  method_option :detail, type: :boolean, aliases: '-d', desc: I18n.t('method_option.detail'), default: false
   # List roles
   def list_role
     if Awskeyring.list_role_names.empty?
@@ -109,7 +104,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   desc 'env ACCOUNT', I18n.t('env_desc')
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
-  method_option 'unset', type: :boolean, aliases: '-u', desc: I18n.t('method_option.unset'), default: false
+  method_option :unset, type: :boolean, aliases: '-u', desc: I18n.t('method_option.unset'), default: false
   # Print Env vars
   def env(account = nil)
     if options[:unset]
@@ -258,7 +253,6 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     puts I18n.t('message.upaccount', account: account)
   end
 
-  map 'add-role' => :add_role
   desc 'add-role ROLE', I18n.t('add_role_desc')
   method_option :arn, type: :string, aliases: '-a', desc: I18n.t('method_option.arn')
   # Add a role
@@ -299,7 +293,6 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     Awskeyring.delete_token(account: account, message: I18n.t('message.deltoken', account: account))
   end
 
-  map 'remove-role' => :remove_role
   desc 'remove-role ROLE', I18n.t('remove_role_desc')
   # remove a role
   def remove_role(role = nil)
@@ -343,7 +336,6 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   desc 'token ACCOUNT [ROLE] [MFA]', I18n.t('token_desc')
-  method_option :role, type: :string, aliases: '-r', desc: I18n.t('method_option.role')
   method_option :code, type: :string, aliases: '-c', desc: I18n.t('method_option.code')
   method_option :duration, type: :string, aliases: '-d', desc: I18n.t('method_option.duration')
   # generate a sessiopn token
@@ -354,7 +346,6 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       validator: Awskeyring.method(:account_exists),
       limited_to: Awskeyring.list_account_names
     )
-    role ||= options[:role]
     if role
       role = ask_check(
         existing: role, message: I18n.t('message.role'), validator: Awskeyring.method(:role_exists),
@@ -472,7 +463,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     case prev
     when 'help', File.basename($PROGRAM_NAME)
       comp_len = 0
-    when 'remove-role', '-r', 'rmr'
+    when 'remove-role', 'rmr'
       comp_len = 2
     when '--path', '-p'
       comp_len = 40

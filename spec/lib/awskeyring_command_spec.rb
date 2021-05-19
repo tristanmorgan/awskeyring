@@ -88,7 +88,7 @@ describe AwskeyringCommand do
   context 'when accounts and roles are set' do
     before do
       allow(Awskeyring).to receive(:list_account_names).and_return(%w[company personal servian])
-      allow(Awskeyring).to receive(:list_token_names).and_return(%w[personal servian])
+      allow(Awskeyring).to receive(:list_token_names).and_return(%w[personal sersaml])
       allow(Awskeyring).to receive(:list_role_names).and_return(%w[admin minion readonly])
       allow(Awskeyring).to receive(:list_role_names_plus)
         .and_return(%W[admin\tarn1 minion\tarn2 readonly\tarn3])
@@ -114,6 +114,7 @@ describe AwskeyringCommand do
 
     it 'lists accounts with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring token ser'
+      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
       expect { described_class.start(%w[autocomplete ser token]) }
         .to output("servian\n").to_stdout
       ENV['COMP_LINE'] = nil
@@ -121,50 +122,65 @@ describe AwskeyringCommand do
 
     it 'lists roles with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring remove-role min'
+      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
       expect { described_class.start(%w[autocomplete min remove-role]) }
         .to output("minion\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
-    it 'lists commands with autocomplete' do
+    it 'lists all commands with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring '
+      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
       expect { described_class.start(['autocomplete', '', 'awskeyring']) }
         .to output(/--version\nadd\nadd-role\nconsole\nenv\nexec\nhelp/).to_stdout
       ENV['COMP_LINE'] = nil
     end
 
-    it 'lists commands with autocomplete for help' do
-      ENV['COMP_LINE'] = 'awskeyring help con'
-      expect { described_class.start(%w[autocomplete con help]) }
+    it 'lists commands with autocomplete' do
+      ENV['COMP_LINE'] = 'awskeyring con'
+      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
+      expect { described_class.start(%w[autocomplete con awskeyring]) }
         .to output("console\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
+    it 'lists commands with autocomplete for help' do
+      ENV['COMP_LINE'] = 'awskeyring help list'
+      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
+      expect { described_class.start(%w[autocomplete list help]) }
+        .to output("list\nlist-role\n").to_stdout
+      ENV['COMP_LINE'] = nil
+    end
+
     it 'lists flags with autocomplete' do
-      ENV['COMP_LINE'] = 'awskeyring token servian minion --dura'
-      expect { described_class.start(%w[autocomplete --dura minion]) }
+      ENV['COMP_LINE'] = 'awskeyring token servian minion 123456 --dura'
+      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
+      expect { described_class.start(%w[autocomplete --dura 123456]) }
         .to output("--duration\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists console paths with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring console servian --path cloud'
+      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
       expect { described_class.start(%w[autocomplete cloud --path]) }
         .to output("cloudformation\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists common browsers with autocomplete' do
-      ENV['COMP_LINE'] = 'awskeyring console servian --browser Sa'
+      ENV['COMP_LINE'] = 'awskeyring con servian --browser Sa'
+      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
       expect { described_class.start(%w[autocomplete Sa --browser]) }
         .to output("Safari\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
     it 'lists token names with autocomplete' do
-      ENV['COMP_LINE'] = 'awskeyring remove-token ser'
-      expect { described_class.start(%w[autocomplete ser remove-token]) }
-        .to output("servian\n").to_stdout
+      ENV['COMP_LINE'] = 'awskeyring rmt ser'
+      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
+      expect { described_class.start(%w[autocomplete ser rmt]) }
+        .to output("sersaml\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 
