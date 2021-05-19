@@ -160,6 +160,14 @@ describe AwskeyringCommand do
       ENV['COMP_LINE'] = nil
     end
 
+    it 'lists flags with autocomplete for partial commands' do
+      ENV['COMP_LINE'] = 'awskeyring con servian --p'
+      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
+      expect { described_class.start(%w[autocomplete --p servian]) }
+        .to output("--path\n").to_stdout
+      ENV['COMP_LINE'] = nil
+    end
+
     it 'lists console paths with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring console servian --path cloud'
       ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s

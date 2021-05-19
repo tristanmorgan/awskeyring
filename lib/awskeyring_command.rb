@@ -285,12 +285,12 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   desc 'remove-token ACCOUNT', I18n.t('remove_token_desc')
   # remove a session token
-  def remove_token(account = nil)
-    account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:token_exists),
+  def remove_token(token = nil)
+    token = ask_check(
+      existing: token, message: I18n.t('message.account'), validator: Awskeyring.method(:token_exists),
       limited_to: Awskeyring.list_token_names
     )
-    Awskeyring.delete_token(account: account, message: I18n.t('message.deltoken', account: account))
+    Awskeyring.delete_token(account: token, message: I18n.t('message.deltoken', account: token))
   end
 
   desc 'remove-role ROLE', I18n.t('remove_role_desc')
@@ -432,14 +432,18 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # autocomplete
   def autocomplete(curr, prev)
     comp_line = ENV['COMP_LINE']
-    unless comp_line
+    comp_point_str = ENV['COMP_POINT']
+    unless comp_line && comp_point_str
       exec_name = File.basename($PROGRAM_NAME)
       warn I18n.t('message.awskeyring', path: $PROGRAM_NAME, bin: exec_name)
       exit 1
     end
 
-    curr, comp_len, sub_cmd = comp_type(comp_line: comp_line, curr: curr, prev: prev)
-    print_auto_resp(curr, comp_len, sub_cmd)
+    comp_lines = comp_line[0..(comp_point_str.to_i)].split
+
+    comp_type, sub_cmd = comp_type(comp_lines: comp_lines, prev: prev)
+    list = fetch_auto_resp(comp_type, sub_cmd)
+    puts list.select { |elem| elem.start_with?(curr) }.sort!.join("\n")
   end
 
   private
@@ -454,59 +458,63 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     cred
   end
 
-  def comp_type(comp_line:, curr:, prev:)
-    comp_len = comp_line.split.index(prev)
-    sub_cmd = sub_command(comp_line.split)
-
-    comp_len = 3 if curr.start_with?('-')
+  def comp_type(comp_lines:, prev:)
+    sub_cmd = sub_command(comp_lines)
+    comp_idx = comp_lines.rindex(prev)
 
     case prev
-    when 'help', File.basename($PROGRAM_NAME)
-      comp_len = 0
-    when 'remove-role', 'rmr'
-      comp_len = 2
     when '--path', '-p'
-      comp_len = 40
-    when 'remove-token', 'rmt'
-      comp_len = 50
+      comp_type = :path_type
     when '--browser', '-b'
-      comp_len = 60
+      comp_type = :browser_type
+    else
+      comp_type = :command
+      comp_type = param_type(comp_idx, sub_cmd) unless sub_cmd.empty?
     end
 
-    [curr, comp_len, sub_cmd]
+    [comp_type, sub_cmd]
+  end
+
+  def param_type(comp_idx, sub_cmd)
+    param_list = method(sub_cmd).parameters
+    if comp_idx.zero?
+      :command
+    elsif comp_idx > param_list.length
+      :flag
+    else
+      param_list[comp_idx - 1][1]
+    end
   end
 
   def sub_command(comp_lines)
-    return nil if comp_lines.nil? || comp_lines.length < 2
+    return '' if comp_lines.nil? || comp_lines.length < 2
 
-    sub_cmd = comp_lines[1]
+    sub_cmd = comp_lines[1].tr('-', '_')
 
-    return sub_cmd if self.class.all_commands.keys.index(sub_cmd)
+    sub_cmds = self.class.all_commands.keys.select { |elem| elem.start_with?(sub_cmd) }
+
+    return sub_cmds.first if sub_cmds.length == 1
 
     self.class.map[sub_cmd].to_s
   end
 
-  def print_auto_resp(curr, len, sub_cmd) # rubocop:disable Metrics/MethodLength, Metrics/CyclomaticComplexity
-    list = []
-    case len
-    when 0
-      list = list_commands
-    when 1
-      list = Awskeyring.list_account_names
-    when 2
-      list = Awskeyring.list_role_names
-    when 3..10
-      list = list_arguments(command: sub_cmd)
-    when 40
-      list = Awskeyring.list_console_path
-    when 50
-      list = Awskeyring.list_token_names
-    when 60
-      list = Awskeyring.list_browsers
+  def fetch_auto_resp(comp_type, sub_cmd)
+    case comp_type
+    when :command
+      list_commands
+    when :account
+      Awskeyring.list_account_names
+    when :role
+      Awskeyring.list_role_names
+    when :path_type
+      Awskeyring.list_console_path
+    when :token
+      Awskeyring.list_token_names
+    when :browser_type
+      Awskeyring.list_browsers
     else
-      exit 1
+      list_arguments(command: sub_cmd)
     end
-    puts list.select { |elem| elem.start_with?(curr) }.sort!.join("\n")
   end
 
   def list_commands
@@ -515,9 +523,11 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   def list_arguments(command:)
-    exit 1 if command.empty?
-    self.class.all_commands[command].options.values.map(&:aliases).flatten! +
-      self.class.all_commands[command].options.values.map(&:switch_name)
+    options = self.class.all_commands[command].options.values
+    exit 1 if options.empty?
+
+    options.map(&:aliases).flatten! +
+      options.map(&:switch_name)
   end
 
   def put_env_string(cred)
