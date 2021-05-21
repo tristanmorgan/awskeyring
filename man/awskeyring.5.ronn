@@ -110,7 +110,6 @@ The commands are as follows:
 
     Create an STS Token from a ROLE or an MFA code<br>
 
-    -r, --role=ROLE: The ROLE to assume.<br>
     -c, --code=CODE: Virtual mfa CODE.<br>
     -d, --duration=DURATION: Session DURATION in seconds.
 

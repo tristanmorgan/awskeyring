@@ -91,7 +91,7 @@ There are also short forms of most commands if you prefer:
 
 To set your environment easily the following bash function helps:
 
-    awsenv() { eval "$(awskeyring env $@)"; }
+    awsenv() { eval "$(awskeyring env ${@:-$AWS_ACCOUNT_NAME})"; }
 
 ## Development
 
