@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.8.4](https://github.com/servian/awskeyring/tree/v1.8.4) (2021-05-24)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.8.3...v1.8.4)
+
+**Merged pull requests:**
+
+- \(Auto\)Complete rewrite [\#79](https://github.com/servian/awskeyring/pull/79) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.8.3](https://github.com/servian/awskeyring/tree/v1.8.3) (2021-04-26)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.8.2...v1.8.3)
