@@ -97,6 +97,23 @@ describe AwskeyringCommand do
       allow(Awskeyring).to receive(:prefs).and_return('{"awskeyring": "awskeyringtest"}')
     end
 
+    test_cases = [
+      ['awskeyring con', %w[con awskeyring], "console\n", 'commands'],
+      ['awskeyring list', %w[list awskeyring], "list\nlist-role\n", 'similar commands'],
+      ['awskeyring help list',   %w[list help],  "list\nlist-role\n", 'commands for help'],
+      ['awskeyring token ser',   %w[ser token],  "servian\n", 'account names'],
+      ['awskeyring exec ser', %w[ser exec], "servian\n", 'accounts for exec'],
+      ['awskeyring remove-role min', %w[min remove-role], "minion\n", 'roles'],
+      ['awskeyring rmr min',  %w[min rmr], "minion\n", 'roles for short commands'],
+      ['awskeyring rmt ser',  %w[ser rmt], "sersaml\n", 'tokens'],
+      ['awskeyring token servian minion 123456 --dura', %w[--dura 123456], "--duration\n", 'flags'],
+      ['awskeyring token servian minion --dura', %w[--dura minion], "--duration\n", 'flags'],
+      ['awskeyring con servian --p', %w[--p servian], "--path\n", 'flags'],
+      ['awskeyring exec servian --no', %w[--no servian], "--no-bundle\n--no-token\n", 'flags for exec'],
+      ['awskeyring console servian --path cloud', %w[cloud --path], "cloudformation\n", 'console paths'],
+      ['awskeyring con servian --browser Sa',  %w[Sa --browser], "Safari\n", 'browsers']
+    ]
+
     it 'list keychain items' do
       expect { described_class.start(%w[list]) }
         .to output("company\npersonal\nservian\n").to_stdout
@@ -112,20 +129,14 @@ describe AwskeyringCommand do
         .to output("admin\tarn1\nminion\tarn2\nreadonly\tarn3\n").to_stdout
     end
 
-    it 'lists accounts with autocomplete' do
-      ENV['COMP_LINE'] = 'awskeyring token ser'
-      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
-      expect { described_class.start(%w[autocomplete ser token]) }
-        .to output("servian\n").to_stdout
-      ENV['COMP_LINE'] = nil
-    end
-
-    it 'lists roles with autocomplete' do
-      ENV['COMP_LINE'] = 'awskeyring remove-role min'
-      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
-      expect { described_class.start(%w[autocomplete min remove-role]) }
-        .to output("minion\n").to_stdout
-      ENV['COMP_LINE'] = nil
+    test_cases.shuffle.each do |testcase|
+      it "lists #{testcase[3]} with autocomplete" do
+        ENV['COMP_LINE'] = testcase[0]
+        ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
+        expect { described_class.start(testcase[1].unshift('autocomplete')) }
+          .to output(testcase[2]).to_stdout
+        ENV['COMP_LINE'] = nil
+      end
     end
 
     it 'lists all commands with autocomplete' do
@@ -133,62 +144,6 @@ describe AwskeyringCommand do
       ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
       expect { described_class.start(['autocomplete', '', 'awskeyring']) }
         .to output(/--version\nadd\nadd-role\nconsole\nenv\nexec\nhelp/).to_stdout
-      ENV['COMP_LINE'] = nil
-    end
-
-    it 'lists commands with autocomplete' do
-      ENV['COMP_LINE'] = 'awskeyring con'
-      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
-      expect { described_class.start(%w[autocomplete con awskeyring]) }
-        .to output("console\n").to_stdout
-      ENV['COMP_LINE'] = nil
-    end
-
-    it 'lists commands with autocomplete for help' do
-      ENV['COMP_LINE'] = 'awskeyring help list'
-      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
-      expect { described_class.start(%w[autocomplete list help]) }
-        .to output("list\nlist-role\n").to_stdout
-      ENV['COMP_LINE'] = nil
-    end
-
-    it 'lists flags with autocomplete' do
-      ENV['COMP_LINE'] = 'awskeyring token servian minion 123456 --dura'
-      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
-      expect { described_class.start(%w[autocomplete --dura 123456]) }
-        .to output("--duration\n").to_stdout
-      ENV['COMP_LINE'] = nil
-    end
-
-    it 'lists flags with autocomplete for partial commands' do
-      ENV['COMP_LINE'] = 'awskeyring con servian --p'
-      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
-      expect { described_class.start(%w[autocomplete --p servian]) }
-        .to output("--path\n").to_stdout
-      ENV['COMP_LINE'] = nil
-    end
-
-    it 'lists console paths with autocomplete' do
-      ENV['COMP_LINE'] = 'awskeyring console servian --path cloud'
-      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
-      expect { described_class.start(%w[autocomplete cloud --path]) }
-        .to output("cloudformation\n").to_stdout
-      ENV['COMP_LINE'] = nil
-    end
-
-    it 'lists common browsers with autocomplete' do
-      ENV['COMP_LINE'] = 'awskeyring con servian --browser Sa'
-      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
-      expect { described_class.start(%w[autocomplete Sa --browser]) }
-        .to output("Safari\n").to_stdout
-      ENV['COMP_LINE'] = nil
-    end
-
-    it 'lists token names with autocomplete' do
-      ENV['COMP_LINE'] = 'awskeyring rmt ser'
-      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
-      expect { described_class.start(%w[autocomplete ser rmt]) }
-        .to output("sersaml\n").to_stdout
       ENV['COMP_LINE'] = nil
     end
 

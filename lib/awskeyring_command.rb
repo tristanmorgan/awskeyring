@@ -476,7 +476,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   def param_type(comp_idx, sub_cmd)
-    param_list = method(sub_cmd).parameters
+    types = %i[opt req]
+    param_list = method(sub_cmd).parameters.select { |elem| types.include? elem[0] }
     if comp_idx.zero?
       :command
     elsif comp_idx > param_list.length
