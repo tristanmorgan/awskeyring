@@ -430,7 +430,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   desc "#{File.basename($PROGRAM_NAME)} CURR PREV", I18n.t('awskeyring_desc'), hide: true
   map File.basename($PROGRAM_NAME) => :autocomplete
   # autocomplete
-  def autocomplete(curr, prev)
+  def autocomplete(curr, prev = nil)
+    curr, prev = fix_args(curr, prev)
     comp_line = ENV['COMP_LINE']
     comp_point_str = ENV['COMP_POINT']
     unless comp_line && comp_point_str
@@ -448,16 +449,16 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   private
 
-  def age_check_and_get(account:, no_token:)
-    cred = Awskeyring.get_valid_creds(account: account, no_token: no_token)
-
-    maxage = Awskeyring.key_age
-    age = (Time.new - cred[:updated]).div Awskeyring::Awsapi::ONE_DAY
-    warn I18n.t('message.age_check', account: account, age: age) unless age < maxage
-
-    cred
+  # when a double dash is parsed it is dropped from the args but we need it
+  def fix_args(curr, prev)
+    if prev.nil?
+      [ARGV[1], ARGV[2]]
+    else
+      [curr, prev]
+    end
   end
 
+  # determine the type of completion needed
   def comp_type(comp_lines:, prev:)
     sub_cmd = sub_command(comp_lines)
     comp_idx = comp_lines.rindex(prev)
@@ -475,6 +476,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     [comp_type, sub_cmd]
   end
 
+  # check params for named params or fall back to flags
   def param_type(comp_idx, sub_cmd)
     types = %i[opt req]
     param_list = method(sub_cmd).parameters.select { |elem| types.include? elem[0] }
@@ -487,6 +489,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     end
   end
 
+  # catch the command from prefixes and aliases
   def sub_command(comp_lines)
     return '' if comp_lines.nil? || comp_lines.length < 2
 
@@ -499,6 +502,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     self.class.map[sub_cmd].to_s
   end
 
+  # given a type return the right list for completions
   def fetch_auto_resp(comp_type, sub_cmd)
     case comp_type
     when :command
@@ -518,11 +522,13 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     end
   end
 
+  # list command names
   def list_commands
     commands = self.class.all_commands.keys.map { |elem| elem.tr('_', '-') }
     commands.reject! { |elem| %w[autocomplete default].include?(elem) }
   end
 
+  # list flags for a command
   def list_arguments(command:)
     options = self.class.all_commands[command].options.values
     exit 1 if options.empty?
@@ -531,18 +537,32 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       options.map(&:switch_name)
   end
 
+  # add warning about old keys
+  def age_check_and_get(account:, no_token:)
+    cred = Awskeyring.get_valid_creds(account: account, no_token: no_token)
+
+    maxage = Awskeyring.key_age
+    age = (Time.new - cred[:updated]).div Awskeyring::Awsapi::ONE_DAY
+    warn I18n.t('message.age_check', account: account, age: age) unless age < maxage
+
+    cred
+  end
+
+  # print exports from map
   def put_env_string(cred)
     env_var = Awskeyring::Awsapi.get_env_array(cred)
     env_var.each { |var, value| puts "export #{var}=\"#{value}\"" }
     Awskeyring::Awsapi::AWS_ENV_VARS.each { |key| puts "unset #{key}" unless env_var.key?(key) }
   end
 
+  # select duration for sts token types
   def default_duration(duration, role, code)
     duration ||= Awskeyring::Awsapi::ONE_HOUR.to_s if role
     duration ||= Awskeyring::Awsapi::TWELVE_HOUR.to_s if code
     duration || Awskeyring::Awsapi::ONE_HOUR.to_s
   end
 
+  # ask and validate input values.
   def ask_check(existing:, message:, flags: nil, validator: nil, limited_to: nil) # rubocop:disable Metrics/MethodLength
     retries ||= 3
     begin
@@ -563,10 +583,12 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     value
   end
 
+  # ask for somthinng if its missing.
   def ask_missing(existing:, message:, secure: false, optional: false, limited_to: nil)
     existing || ask(message: message, secure: secure, optional: optional, limited_to: limited_to).strip
   end
 
+  # ask in different ways
   def ask(message:, secure: false, optional: false, limited_to: nil)
     if secure
       Awskeyring::Input.read_secret("#{message.rjust(20)}: ")
@@ -579,6 +601,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     end
   end
 
+  # undo Bundler env vars
   def unbundle
     to_delete = ENV.keys.select { |elem| elem.start_with?('BUNDLER_ORIG_') }
     bundled_env = to_delete.map { |elem| elem[('BUNDLER_ORIG_'.length)..] }
