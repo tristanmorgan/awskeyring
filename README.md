@@ -62,24 +62,24 @@ more details on this config option.
 The CLI is using [Thor](http://whatisthor.com) with help provided interactively.
 
     Awskeyring commands:
-      awskeyring --version, -v               # Prints the version
-      awskeyring add ACCOUNT                 # Adds an ACCOUNT to the keyring
-      awskeyring add-role ROLE               # Adds a ROLE to the keyring
-      awskeyring console ACCOUNT             # Open the AWS Console for the ACCOUNT
-      awskeyring env ACCOUNT                 # Outputs bourne shell environment exports for an ACCOUNT
-      awskeyring exec ACCOUNT command...     # Execute a COMMAND with the environment set for an ACCOUNT
-      awskeyring help [COMMAND]              # Describe available commands or one specific command
-      awskeyring import ACCOUNT              # Import an ACCOUNT to the keyring from ~/.aws/credentials
-      awskeyring initialise                  # Initialises a new KEYCHAIN
-      awskeyring json ACCOUNT                # Outputs AWS CLI compatible JSON for an ACCOUNT
-      awskeyring list                        # Prints a list of accounts in the keyring
-      awskeyring list-role                   # Prints a list of roles in the keyring
-      awskeyring remove ACCOUNT              # Removes an ACCOUNT from the keyring
-      awskeyring remove-role ROLE            # Removes a ROLE from the keyring
-      awskeyring remove-token ACCOUNT        # Removes a token for ACCOUNT from the keyring
-      awskeyring rotate ACCOUNT              # Rotate access keys for an ACCOUNT
-      awskeyring token ACCOUNT [ROLE] [MFA]  # Create an STS Token from a ROLE or an MFA code
-      awskeyring update ACCOUNT              # Updates an ACCOUNT in the keyring
+      awskeyring --version, -v                # Prints the version
+      awskeyring add ACCOUNT                  # Adds an ACCOUNT to the keyring
+      awskeyring add-role ROLE                # Adds a ROLE to the keyring
+      awskeyring console ACCOUNT              # Open the AWS Console for the ACCOUNT
+      awskeyring env ACCOUNT                  # Outputs bourne shell environment exports for an ACCOUNT
+      awskeyring exec ACCOUNT command...      # Execute a COMMAND with the environment set for an ACCOUNT
+      awskeyring help [COMMAND]               # Describe available commands or one specific command
+      awskeyring import ACCOUNT               # Import an ACCOUNT to the keyring from ~/.aws/credentials
+      awskeyring initialise                   # Initialises a new KEYCHAIN
+      awskeyring json ACCOUNT                 # Outputs AWS CLI compatible JSON for an ACCOUNT
+      awskeyring list                         # Prints a list of accounts in the keyring
+      awskeyring list-role                    # Prints a list of roles in the keyring
+      awskeyring remove ACCOUNT               # Removes an ACCOUNT from the keyring
+      awskeyring remove-role ROLE             # Removes a ROLE from the keyring
+      awskeyring remove-token ACCOUNT         # Removes a token for ACCOUNT from the keyring
+      awskeyring rotate ACCOUNT               # Rotate access keys for an ACCOUNT
+      awskeyring token ACCOUNT [ROLE] [CODE]  # Create an STS Token from a ROLE or an mfa CODE
+      awskeyring update ACCOUNT               # Updates an ACCOUNT in the keyring
 
 and autocomplete that can be installed with:
 

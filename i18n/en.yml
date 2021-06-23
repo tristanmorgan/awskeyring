@@ -17,7 +17,7 @@ en:
   remove_role_desc: Removes a ROLE from the keyring
   remove_token_desc: Removes a token for ACCOUNT from the keyring
   rotate_desc: Rotate access keys for an ACCOUNT
-  token_desc: Create an STS Token from a ROLE or an MFA code
+  token_desc: Create an STS Token from a ROLE or an mfa CODE
   update_desc: Updates an ACCOUNT in the keyring
   method_option:
     arn: 'AWS role arn.'

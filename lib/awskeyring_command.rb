@@ -335,7 +335,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     puts I18n.t('message.upaccount', account: account)
   end
 
-  desc 'token ACCOUNT [ROLE] [MFA]', I18n.t('token_desc')
+  desc 'token ACCOUNT [ROLE] [CODE]', I18n.t('token_desc')
   method_option :code, type: :string, aliases: '-c', desc: I18n.t('method_option.code')
   method_option :duration, type: :string, aliases: '-d', desc: I18n.t('method_option.duration')
   # generate a sessiopn token
