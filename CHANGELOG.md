@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.8.5](https://github.com/servian/awskeyring/tree/v1.8.5) (2021-06-29)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.8.4...v1.8.5)
+
+**Merged pull requests:**
+
+- Autocomplete for exec and long flags [\#80](https://github.com/servian/awskeyring/pull/80) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.8.4](https://github.com/servian/awskeyring/tree/v1.8.4) (2021-05-24)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.8.3...v1.8.4)
