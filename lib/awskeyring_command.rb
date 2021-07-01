@@ -499,7 +499,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
     return sub_cmds.first if sub_cmds.length == 1
 
-    self.class.map[sub_cmd].to_s
+    self.class.map[comp_lines[1]].to_s
   end
 
   # given a type return the right list for completions
