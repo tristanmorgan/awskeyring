@@ -103,7 +103,14 @@ describe Awskeyring do
         password: ''
       )
     end
-    let(:all_list) { [item, role] }
+    let(:roleee) do
+      instance_double(
+        'HashMap',
+        attributes: { label: 'role testee', account: 'arn:aws:iam::012345678901:role/testee' },
+        password: ''
+      )
+    end
+    let(:all_list) { [item, role, roleee] }
     let(:keychain) { instance_double('Keychain::Keychain', generic_passwords: all_list, lock_interval: 300) }
 
     before do
@@ -115,6 +122,7 @@ describe Awskeyring do
       allow(File).to receive(:read)
         .with(/\.awskeyring/)
         .and_return('{ "awskeyring": "test", "keyage": 90 }')
+      allow(all_list).to receive(:all).and_return(all_list)
       allow(all_list).to receive(:where).and_return([nil])
       allow(all_list).to receive(:where).with(label: 'account test').and_return([item])
       allow(all_list).to receive(:where).with(label: 'role test').and_return([role])
@@ -197,6 +205,10 @@ describe Awskeyring do
       expect(awskeyring.get_role_arn(role_name: 'test')).to eq(
         'arn:aws:iam::012345678901:role/test'
       )
+    end
+
+    it 'validates a single role name' do
+      expect { awskeyring.role_exists('test') }.not_to raise_error
     end
 
     it 'tries to delete a role by name' do
@@ -316,12 +328,20 @@ describe Awskeyring do
       expect { awskeyring.account_exists('test') }.not_to raise_error
     end
 
+    it 'validates an partial account name' do
+      expect { awskeyring.account_exists('te') }.not_to raise_error
+    end
+
     it 'invalidates an account name' do
       expect { awskeyring.account_not_exists('test') }.to raise_error('Account already exists')
     end
 
     it 'validates an token name' do
       expect { awskeyring.token_exists('test') }.not_to raise_error
+    end
+
+    it 'validates an parial token name' do
+      expect { awskeyring.token_exists('te') }.not_to raise_error
     end
 
     it 'invalidates an access key' do
@@ -346,6 +366,10 @@ describe Awskeyring do
 
     it 'validates a role name' do
       expect { awskeyring.role_exists('role') }.not_to raise_error
+    end
+
+    it 'validates a partial role name' do
+      expect { awskeyring.role_exists('ro') }.not_to raise_error
     end
 
     it 'invalidates a role name' do
