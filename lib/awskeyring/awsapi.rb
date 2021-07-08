@@ -209,7 +209,7 @@ module Awskeyring
     # Get the signin token param
     private_class_method def self.token_param(session_json:)
       get_signin_token_url = AWS_SIGNIN_URL + '?Action=getSigninToken' \
-                             '&Session=' + CGI.escape(session_json)
+                                              '&Session=' + CGI.escape(session_json)
 
       uri       = URI(get_signin_token_url)
       request   = Net::HTTP.new(uri.host, uri.port)
