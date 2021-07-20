@@ -109,6 +109,7 @@ describe AwskeyringCommand do
       ['awskeyring token servian minion 123456 --dura', %w[--dura 123456], "--duration\n", 'flags'],
       ['awskeyring token servian minion --dura', %w[--dura minion], "--duration\n", 'flags'],
       ['awskeyring con servian --p', %w[--p servian], "--path\n", 'flags'],
+      ['awskeyring add sarveun --n', %w[--n sarveun], "--no-remote\n", 'flags for add'],
       ['awskeyring -v --n', %w[--n -v], "--no-remote\n", 'flags for --version'],
       ['awskeyring exec servian --no', %w[--no servian], "--no-bundle\n--no-token\n", 'flags for exec'],
       ['awskeyring console servian --path cloud', %w[cloud --path], "cloudformation\n", 'console paths'],

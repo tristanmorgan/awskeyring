@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'bundler/gem_tasks'
-require 'rspec/core/rake_task'
 require 'rubocop/rake_task'
 require 'ronn'
 require 'github_changelog_generator/task'
@@ -49,8 +48,9 @@ end
 desc 'generate manpage'
 task :ronn do
   puts 'Running Ronn...'
-  roff_text = Ronn::Document.new('man/awskeyring.5.ronn').to_roff
-  File.write('man/awskeyring.5', roff_text)
+  doc = Ronn::Document.new('man/awskeyring.5.ronn')
+  doc.date = Time.parse(`git show -s --format=%ad --date=short`)
+  File.write('man/awskeyring.5', doc.to_roff)
   puts "done\n\n"
 end
 

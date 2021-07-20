@@ -16,7 +16,6 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   I18n.backend.load_translations
 
   map %w[--version -v] => :__version
-  map %w[--help -h] => :help
   map 'adr' => :add_role
   map 'assume-role' => :token
   map 'ls' => :list
@@ -491,15 +490,13 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   # catch the command from prefixes and aliases
   def sub_command(comp_lines)
-    return '' if comp_lines.nil? || comp_lines.length < 2
+    return '' if comp_lines.length < 2
 
-    sub_cmd = comp_lines[1].tr('-', '_')
+    sub_cmd = comp_lines[1]
 
-    sub_cmds = self.class.all_commands.keys.select { |elem| elem.start_with?(sub_cmd) }
+    return self.class.map[sub_cmd].to_s if self.class.map.key? sub_cmd
 
-    return sub_cmds.first if sub_cmds.length == 1
-
-    self.class.map[comp_lines[1]].to_s
+    (Awskeyring.solo_select(list_commands, sub_cmd) || '').tr('-', '_')
   end
 
   # given a type return the right list for completions

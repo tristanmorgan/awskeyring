@@ -97,6 +97,17 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     all_items.where(account: account).first
   end
 
+  # return item that matches a prefix if only one.
+  def self.solo_select(list, prefix)
+    return prefix if list.include?(prefix)
+
+    list.select! { |elem| elem.start_with?(prefix) }
+
+    return list.first if list.length == 1
+
+    nil
+  end
+
   # Add an account item
   #
   # @param [String] account The account name to create
@@ -317,7 +328,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   # @param [String] account_name the associated account name.
   def self.account_exists(account_name)
     Awskeyring::Validate.account_name(account_name)
-    raise 'Account does not exist' unless list_account_names.include?(account_name)
+    raise 'Account does not exist' unless (account_name = solo_select(list_account_names, account_name))
 
     account_name
   end
@@ -347,7 +358,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   # @param [String] role_name the associated role name.
   def self.role_exists(role_name)
     Awskeyring::Validate.role_name(role_name)
-    raise 'Role does not exist' unless list_role_names.include?(role_name)
+    raise 'Role does not exist' unless (role_name = solo_select(list_role_names, role_name))
 
     role_name
   end
@@ -367,7 +378,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
   # @param [String] token_name the associated account name.
   def self.token_exists(token_name)
     Awskeyring::Validate.account_name(token_name)
-    raise 'Token does not exist' unless list_token_names.include?(token_name)
+    raise 'Token does not exist' unless (token_name = solo_select(list_token_names, token_name))
 
     token_name
   end
