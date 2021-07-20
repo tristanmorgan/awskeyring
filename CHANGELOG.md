@@ -1,5 +1,17 @@
 # Changelog
 
+## [v1.9.0](https://github.com/servian/awskeyring/tree/v1.9.0) (2021-07-20)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.8.5...v1.9.0)
+
+**Implemented enhancements:**
+
+- Partial name match for validation. [\#82](https://github.com/servian/awskeyring/pull/82) ([tristanmorgan](https://github.com/tristanmorgan))
+
+**Fixed bugs:**
+
+- Complete flags for -v command [\#81](https://github.com/servian/awskeyring/pull/81) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.8.5](https://github.com/servian/awskeyring/tree/v1.8.5) (2021-06-29)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.8.4...v1.8.5)
