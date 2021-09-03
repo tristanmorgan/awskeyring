@@ -1,5 +1,14 @@
 # Changelog
 
+## [v1.9.1](https://github.com/servian/awskeyring/tree/v1.9.1) (2021-09-03)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.9.0...v1.9.1)
+
+**Fixed bugs:**
+
+- Install on an M1 Mac \(ARM64\) [\#83](https://github.com/servian/awskeyring/issues/83)
+- Add account validadtion to exec command. [\#84](https://github.com/servian/awskeyring/pull/84) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.9.0](https://github.com/servian/awskeyring/tree/v1.9.0) (2021-07-20)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.8.5...v1.9.0)
