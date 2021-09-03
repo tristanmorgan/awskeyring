@@ -322,6 +322,7 @@ unset AWS_SESSION_TOKEN
         env_vars,
         'test-exec with params'
       )
+      expect(Awskeyring).to have_received(:account_exists).with('test')
       expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: false)
       expect(ENV['BUNDLER_ORIG_TEST_ENV']).to eq('BUNDLER_ENVIRONMENT_PRESERVER_INTENTIONALLY_NIL')
       expect(ENV['TEST_ENV']).to eq('CHANGED')
