@@ -124,7 +124,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # Print JSON for use with credential_process
   def json(account)
     account = ask_check(
-      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists)
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists),
+      limited_to: Awskeyring.list_account_names
     )
     cred = age_check_and_get(account: account, no_token: options['no-token'])
     expiry = Time.at(cred[:expiry]) unless cred[:expiry].nil?
@@ -176,11 +177,15 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   method_option 'no-bundle', type: :boolean, aliases: '-b', desc: I18n.t('method_option.nobundle'), default: false
   # execute an external command with env set
-  def exec(account, *command)
+  def exec(account, *command) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
     if command.empty?
       warn I18n.t('message.exec')
       exit 1
     end
+    account = ask_check(
+      existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists),
+      limited_to: Awskeyring.list_account_names
+    )
     cred = age_check_and_get(account: account, no_token: options['no-token'])
     env_vars = Awskeyring::Awsapi.get_env_array(cred)
     unbundle if options['no-bundle']
