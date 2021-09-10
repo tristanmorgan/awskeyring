@@ -52,6 +52,7 @@ describe Awskeyring do
 
     it 'creates a new file' do
       expect(awskeyring.init_keychain(awskeyring: 'awskeyringtest')).to eq(write_success)
+      expect(prefs_file).to have_received(:write).with(/browser/)
     end
   end
 
