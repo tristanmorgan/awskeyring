@@ -52,6 +52,7 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     prefs = {
       awskeyring: awskeyring,
       keyage: DEFAULT_KEY_AGE,
+      browser: DEFAULT_BROWSER_LIST,
       console: DEFAULT_CONSOLE_LIST
     }
     File.new(Awskeyring::PREFS_FILE, 'w').write JSON.dump(prefs)
