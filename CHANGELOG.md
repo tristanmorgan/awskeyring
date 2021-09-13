@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.9.2](https://github.com/servian/awskeyring/tree/v1.9.2) (2021-09-13)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.9.1...v1.9.2)
+
+**Implemented enhancements:**
+
+- Add CredentialProvider class for library use. [\#85](https://github.com/servian/awskeyring/pull/85) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.9.1](https://github.com/servian/awskeyring/tree/v1.9.1) (2021-09-03)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.9.0...v1.9.1)
