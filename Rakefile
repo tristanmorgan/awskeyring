@@ -39,7 +39,7 @@ task :filemode do
   files.merge(dirs).each do |file|
     mode = File.stat(file).mode
     print '.'
-    failure << file if (mode & 0x7) != (mode >> 3 & 0x7)
+    failure << file if (mode & 0x7) != ((mode >> 3) & 0x7)
   end
   abort "\nError: Incorrect file mode found\n#{failure.join("\n")}" unless failure.empty?
   print "\n"
