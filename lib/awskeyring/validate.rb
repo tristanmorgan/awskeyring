@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'base64'
+
 # Awskeyring Module,
 # gives you an interface to access keychains and items.
 module Awskeyring
@@ -27,7 +29,11 @@ module Awskeyring
     #
     # @param [String] aws_secret_access_key The aws_secret_access_key
     def self.secret_access_key(aws_secret_access_key)
-      raise 'Secret Access Key is not 40 chars' if aws_secret_access_key.length != 40
+      begin
+        raise 'Invalid Secret Access Key' unless Base64.strict_decode64(aws_secret_access_key).length == 30
+      rescue ArgumentError
+        raise 'Invalid Secret Access Key'
+      end
 
       aws_secret_access_key
     end
