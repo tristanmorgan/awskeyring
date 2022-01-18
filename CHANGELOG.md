@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.9.3](https://github.com/servian/awskeyring/tree/v1.9.3) (2022-01-18)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.9.2...v1.9.3)
+
+**Implemented enhancements:**
+
+- Stricter aws\_secret validation. [\#86](https://github.com/servian/awskeyring/pull/86) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.9.2](https://github.com/servian/awskeyring/tree/v1.9.2) (2021-09-13)
 
 [Full Changelog](https://github.com/servian/awskeyring/compare/v1.9.1...v1.9.2)
