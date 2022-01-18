@@ -12,8 +12,8 @@ describe Awskeyring::Validate do
 
     let(:test_broken_mfa_code) { 'mfa_code' }
     let(:test_mfa_code) { '321654' }
-    let(:test_broken_secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FE' }
-    let(:test_secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
+    let(:test_broken_secret) { 'hI7XqAiaR_XJxKgCqG0Wo79jm2+GcRYP' }
+    let(:test_secret) { 'vbkEXAMPLEa3TlCP2Fvmcbdp83LSaeDHtx13xc+M' }
     let(:test_broken_key) { 'AKIA1234567890' }
     let(:test_key) { 'AKIA1234567890ABCDEF' }
 
@@ -38,7 +38,7 @@ describe Awskeyring::Validate do
     end
 
     it 'invalidates an secret access key' do
-      expect { validate.secret_access_key(test_broken_secret) }.to raise_error('Secret Access Key is not 40 chars')
+      expect { validate.secret_access_key(test_broken_secret) }.to raise_error('Invalid Secret Access Key')
     end
 
     it 'validates an mfa code' do

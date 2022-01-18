@@ -338,7 +338,7 @@ describe AwskeyringCommand do
     it 'tries to add an invalid secret' do
       expect do
         described_class.start(['add', 'test', '-k', access_key, '-s', bad_secret_access_key, '-m', mfa_arn])
-      end.to raise_error.and output(/Secret Access Key is not 40 chars/).to_stderr
+      end.to raise_error.and output(/Invalid Secret Access Key/).to_stderr
     end
   end
 
