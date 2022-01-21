@@ -377,6 +377,10 @@ describe Awskeyring do
       expect { awskeyring.role_not_exists('role') }.to raise_error('Role already exists')
     end
 
+    it 'validates a role name not existing' do
+      expect { awskeyring.role_not_exists('roly') }.not_to raise_error
+    end
+
     it 'invalidates a role arn' do
       expect { awskeyring.role_arn_not_exists('role') }.to raise_error('Invalid Role ARN')
     end
@@ -395,6 +399,91 @@ describe Awskeyring do
       expect(awskeyring.list_role_names_plus).to eq(
         ["role\tarn:aws:iam::012345678901:role/test"]
       )
+    end
+  end
+
+  context 'when there is an expired token' do
+    let(:access_key) { 'AKIA1234567890ABCDEF' }
+    let(:item) do
+      instance_double(
+        'HashMap',
+        attributes: {
+          label: 'account test',
+          account: access_key,
+          comment: 'arn:aws:iam::012345678901:mfa/ec2-user',
+          updated_at: Time.parse('2016-12-01T22:20:01Z')
+        },
+        password: 'biglongbase64'
+      )
+    end
+    let(:session_key) do
+      instance_double(
+        'HashMap',
+        attributes: {
+          label: 'session-key test',
+          account: 'ASIATESTTEST',
+          comment: 'role role',
+          updated_at: Time.parse('2016-12-01T22:20:01Z')
+        },
+        password: 'bigerlongbase64'
+      )
+    end
+    let(:session_token) do
+      instance_double(
+        'HashMap',
+        attributes: {
+          label: 'session-token test',
+          account: Time.parse(
+            '2016-12-01T22:10:02Z'
+          ).to_i.to_s,
+          comment: 'role'
+        },
+        password: 'evenlongerbase64token'
+      )
+    end
+    let(:all_list) { [item, session_key, session_token] }
+    let(:keychain) { instance_double('Keychain::Keychain', generic_passwords: all_list, lock_interval: 300) }
+
+    before do
+      allow(File).to receive(:exist?).and_call_original
+      allow(File).to receive(:exist?)
+        .with(/\.awskeyring/)
+        .and_return(true)
+      allow(File).to receive(:read).and_call_original
+      allow(File).to receive(:read)
+        .with(/\.awskeyring/)
+        .and_return('{ "awskeyring": "test", "keyage": 90 }')
+      allow(Keychain).to receive(:open).and_return(keychain)
+      allow(all_list).to receive(:all).and_return(all_list)
+      allow(all_list).to receive(:where).and_return([nil])
+      allow(all_list).to receive(:where).with(label: 'account test').and_return([item])
+      allow(all_list).to receive(:where).with(label: 'session-key test').and_return([session_key])
+      allow(all_list).to receive(:where).with(label: 'session-token test').and_return([session_token])
+      allow(session_key).to receive(:delete)
+      allow(session_token).to receive(:delete)
+      allow(Time).to receive(:new).and_return(Time.parse('2016-12-01T22:20:02Z'))
+    end
+
+    it 'deletes an expired token.' do
+      test_hash = nil
+      expect do
+        test_hash = awskeyring.get_valid_creds(account: 'test', no_token: false)
+      end.to output(/# Removing expired session credentials/).to_stdout
+      expect(test_hash).to eq(
+        account: 'test',
+        key: 'AKIA1234567890ABCDEF',
+        secret: 'biglongbase64',
+        token: nil,
+        expiry: nil,
+        mfa: nil,
+        updated: Time.parse('2016-12-01T22:20:01Z')
+      )
+    end
+
+    it 'doesnt returns a hash' do
+      expect do
+        awskeyring.get_valid_creds(account: 'tasty', no_token: true)
+      end.to raise_error.and output(/# Credential not found with name/).to_stderr
     end
   end
 
