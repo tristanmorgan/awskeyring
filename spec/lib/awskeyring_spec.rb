@@ -38,10 +38,6 @@ describe Awskeyring do
       allow(test_keychain).to receive(:lock_on_sleep=)
     end
 
-    it 'has a version number' do
-      expect(Awskeyring::VERSION).not_to be nil
-    end
-
     it 'has a default preferences file' do
       expect(Awskeyring::PREFS_FILE).not_to be nil
     end
@@ -484,26 +480,6 @@ describe Awskeyring do
       expect do
         awskeyring.get_valid_creds(account: 'tasty', no_token: true)
       end.to raise_error.and output(/# Credential not found with name/).to_stderr
-    end
-  end
-
-  context 'when we try to find the latest version' do
-    let(:net_http) { instance_double(Net::HTTP) }
-
-    before do
-      allow(Net::HTTP).to receive(:new).and_return(net_http)
-      allow(net_http).to receive(:get)
-        .and_return(
-          instance_double(
-            'HashMap',
-            body: '{"version":"1.2.3"}'
-          )
-        )
-      allow(net_http).to receive(:use_ssl=)
-    end
-
-    it 'return the version number' do
-      expect(awskeyring.latest_version).to eq('1.2.3')
     end
   end
 end
