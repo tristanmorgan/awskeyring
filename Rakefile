@@ -6,11 +6,13 @@ require 'ronn'
 require 'github_changelog_generator/task'
 require 'yard'
 
+spec = Gem::Specification.load('awskeyring.gemspec')
+
 GitHubChangelogGenerator::RakeTask.new :changelog do |config|
   config.user = 'servian'
-  config.project = 'awskeyring'
-  config.future_release = "v#{Awskeyring::VERSION}"
-  config.since_tag = 'v0.10.0'
+  config.project = spec.name
+  config.future_release = spec.version
+  config.since_tag = 'v1.5.0'
 end
 
 RuboCop::RakeTask.new do |rubocop|
@@ -33,7 +35,7 @@ end
 desc 'Check filemode bits'
 task :filemode do
   puts 'Running FileMode...'
-  files = Set.new(`git ls-files -z`.split("\x0"))
+  files = Set.new(spec.files)
   dirs = Set.new(files.map { |file| File.dirname(file) })
   failure = []
   files.merge(dirs).each do |file|

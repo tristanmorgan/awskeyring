@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.homepage      = Awskeyring::HOMEPAGE
   spec.licenses      = ['MIT']
 
-  spec.files         = `git ls-files -z`.split("\x0").reject { |f| f.match(%r{^spec/|^\..*|C.*\.md|.*\.ronn|.*\.png}) }
+  spec.files         = %w[awskeyring.gemspec README.md LICENSE.txt] + Dir['exe/*', 'lib/**/*.rb', 'man/*.5', 'i18n/*']
   spec.bindir        = 'exe'
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ['lib']
