@@ -337,7 +337,7 @@ unset AWS_SESSION_TOKEN
         'test-exec with params'
       )
       expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: false)
-      expect(ENV['TEST_ENV']).to eq(nil)
+      expect(ENV['TEST_ENV']).to be_nil
     end
 
     it 'warns about a missing external command' do

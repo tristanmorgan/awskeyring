@@ -39,7 +39,7 @@ describe Awskeyring do
     end
 
     it 'has a default preferences file' do
-      expect(Awskeyring::PREFS_FILE).not_to be nil
+      expect(Awskeyring::PREFS_FILE).not_to be_nil
     end
 
     it 'can not load preferences' do

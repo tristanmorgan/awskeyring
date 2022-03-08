@@ -363,7 +363,7 @@ describe Awskeyring::Awsapi do
     end
 
     it 'can not retrieve the current region' do
-      expect(awsapi.region).to be nil
+      expect(awsapi.region).to be_nil
     end
 
     it 'returns an array of env vars for the Credential' do

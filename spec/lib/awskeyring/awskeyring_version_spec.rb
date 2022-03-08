@@ -27,15 +27,15 @@ describe Awskeyring do
     end
 
     it 'has a version number' do
-      expect(Awskeyring::VERSION).not_to be nil
+      expect(Awskeyring::VERSION).not_to be_nil
     end
 
     it 'has a homepage url' do
-      expect(Awskeyring::HOMEPAGE).not_to be nil
+      expect(Awskeyring::HOMEPAGE).not_to be_nil
     end
 
     it 'has a version_number url' do
-      expect(Awskeyring::GEM_VERSION_URL).not_to be nil
+      expect(Awskeyring::GEM_VERSION_URL).not_to be_nil
     end
 
     it 'fetches the latest version number' do
