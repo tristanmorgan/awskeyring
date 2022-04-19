@@ -8,17 +8,15 @@ describe Awskeyring do
   context 'when there is no config file' do
     let(:write_success) { 'great success' }
     let(:prefs_file) do
-      instance_double(
-        'HashMap',
+      class_double(
+        File,
         name: '.awskeyring',
         write: ''
       )
     end
     let(:test_keychain) do
       instance_double(
-        'HashMap',
-        lock_interval: 0,
-        lock_on_sleep: false
+        Keychain::Keychain
       )
     end
 
@@ -83,7 +81,7 @@ describe Awskeyring do
   context 'when there is accounts and roles' do
     let(:item) do
       instance_double(
-        'HashMap',
+        Keychain::Item,
         attributes: {
           label: 'account test',
           account: 'AKIATESTTEST',
@@ -95,20 +93,20 @@ describe Awskeyring do
     end
     let(:role) do
       instance_double(
-        'HashMap',
+        Keychain::Item,
         attributes: { label: 'role test', account: 'arn:aws:iam::012345678901:role/test' },
         password: ''
       )
     end
     let(:roleee) do
       instance_double(
-        'HashMap',
+        Keychain::Item,
         attributes: { label: 'role testee', account: 'arn:aws:iam::012345678901:role/testee' },
         password: ''
       )
     end
     let(:all_list) { [item, role, roleee] }
-    let(:keychain) { instance_double('Keychain::Keychain', generic_passwords: all_list, lock_interval: 300) }
+    let(:keychain) { instance_double(Keychain::Keychain, generic_passwords: all_list, lock_interval: 300) }
 
     before do
       allow(File).to receive(:exist?).and_call_original
@@ -221,7 +219,7 @@ describe Awskeyring do
     let(:role_arn) { 'arn:aws:iam::012345678901:role/test' }
     let(:item) do
       instance_double(
-        'HashMap',
+        Keychain::Item,
         attributes: {
           label: 'account test',
           account: access_key,
@@ -233,14 +231,14 @@ describe Awskeyring do
     end
     let(:role) do
       instance_double(
-        'HashMap',
+        Keychain::Item,
         attributes: { label: 'role role', account: role_arn },
         password: ''
       )
     end
     let(:session_key) do
       instance_double(
-        'HashMap',
+        Keychain::Item,
         attributes: {
           label: 'session-key test',
           account: 'ASIATESTTEST',
@@ -252,7 +250,7 @@ describe Awskeyring do
     end
     let(:session_token) do
       instance_double(
-        'HashMap',
+        Keychain::Item,
         attributes: {
           label: 'session-token test',
           account: Time.parse('2016-12-20T22:20:01Z').to_i.to_s,
@@ -262,7 +260,7 @@ describe Awskeyring do
       )
     end
     let(:all_list) { [item, role, session_key, session_token] }
-    let(:keychain) { instance_double('Keychain::Keychain', generic_passwords: all_list, lock_interval: 300) }
+    let(:keychain) { instance_double(Keychain::Keychain, generic_passwords: all_list, lock_interval: 300) }
 
     before do
       allow(File).to receive(:exist?).and_call_original
@@ -402,7 +400,7 @@ describe Awskeyring do
     let(:access_key) { 'AKIA1234567890ABCDEF' }
     let(:item) do
       instance_double(
-        'HashMap',
+        Keychain::Item,
         attributes: {
           label: 'account test',
           account: access_key,
@@ -414,7 +412,7 @@ describe Awskeyring do
     end
     let(:session_key) do
       instance_double(
-        'HashMap',
+        Keychain::Item,
         attributes: {
           label: 'session-key test',
           account: 'ASIATESTTEST',
@@ -426,7 +424,7 @@ describe Awskeyring do
     end
     let(:session_token) do
       instance_double(
-        'HashMap',
+        Keychain::Item,
         attributes: {
           label: 'session-token test',
           account: Time.parse(
@@ -438,7 +436,7 @@ describe Awskeyring do
       )
     end
     let(:all_list) { [item, session_key, session_token] }
-    let(:keychain) { instance_double('Keychain::Keychain', generic_passwords: all_list, lock_interval: 300) }
+    let(:keychain) { instance_double(Keychain::Keychain, generic_passwords: all_list, lock_interval: 300) }
 
     before do
       allow(File).to receive(:exist?).and_call_original

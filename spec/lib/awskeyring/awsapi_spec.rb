@@ -27,7 +27,7 @@ describe Awskeyring::Awsapi do
         token_code: nil
       ).and_return(
         instance_double(
-          'HashMap',
+          Aws::STS::Types::AssumeRoleResponse,
           assumed_role_user: {
             arn: 'arn:aws:sts::123456789012:assumed-role/demo/Bob',
             assumed_role_id: 'ARO123EXAMPLE123:Bob'
@@ -49,7 +49,7 @@ describe Awskeyring::Awsapi do
         token_code: '654321'
       ).and_return(
         instance_double(
-          'HashMap',
+          Aws::STS::Types::AssumeRoleResponse,
           assumed_role_user: {
             arn: 'arn:aws:sts::123456789012:assumed-role/demo/Bob',
             assumed_role_id: 'ARO123EXAMPLE123:Bob'
@@ -65,7 +65,7 @@ describe Awskeyring::Awsapi do
       )
       allow(sts_client).to receive(:get_session_token).and_return(
         instance_double(
-          'HashMap',
+          Aws::STS::Types::GetSessionTokenResponse,
           credentials: {
             access_key_id: 'ASIAIOSFODNN7EXAMPLE',
             expiration: Time.parse('2011-07-11T19:55:29.611Z'),
@@ -80,7 +80,7 @@ describe Awskeyring::Awsapi do
         duration_seconds: 3600
       ).and_return(
         instance_double(
-          'HashMap',
+          Aws::STS::Types::GetFederationTokenResponse,
           credentials: {
             access_key_id: 'ASIAIUGFODNN7EXAMPLE',
             expiration: Time.parse('2012-07-11T19:55:29.611Z'),
@@ -168,13 +168,6 @@ describe Awskeyring::Awsapi do
   end
 
   context 'when we try to access AWS Console' do
-    let(:item) do
-      instance_double(
-        'HashMap',
-        attributes: { label: 'account test', account: 'AKIATESTTEST' },
-        password: 'biglongbase64'
-      )
-    end
     let(:sts_client) { instance_double(Aws::STS::Client) }
     let(:net_http) { instance_double(Net::HTTP) }
 
@@ -184,7 +177,7 @@ describe Awskeyring::Awsapi do
       allow(sts_client).to receive(:get_federation_token)
         .and_return(
           instance_double(
-            'HashMap',
+            Aws::STS::Types::GetFederationTokenResponse,
             credentials: {
               access_key_id: 'ASIATESTETSTTETS',
               secret_access_key: 'verybiglonghexkey',
@@ -197,7 +190,7 @@ describe Awskeyring::Awsapi do
       allow(net_http).to receive(:get)
         .and_return(
           instance_double(
-            'HashMap',
+            Net::HTTPGenericRequest,
             body: '{"SigninToken":"*** the SigninToken string ***"}'
           )
         )
@@ -345,7 +338,7 @@ describe Awskeyring::Awsapi do
     let(:role_token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
     let(:sharedcfg) do
       instance_double(
-        'HashMap',
+        Aws::SharedConfig,
         region: nil
       )
     end
@@ -395,7 +388,7 @@ describe Awskeyring::Awsapi do
     let(:account_secret) { 'wJalrXUtnFEMI/K7MDENG/bPxRiCYzEXAMPLEKEY' }
     let(:sharedcfg) do
       instance_double(
-        'HashMap',
+        Aws::SharedConfig,
         credentials_path: "#{Dir.home}/.aws/credentials"
       )
     end
@@ -406,7 +399,7 @@ describe Awskeyring::Awsapi do
         .with(profile: 'testaccount')
         .and_return(
           instance_double(
-            'HashMap',
+            Aws::Credentials,
             access_key_id: account_key,
             secret_access_key: account_secret,
             session_token: nil
@@ -416,7 +409,7 @@ describe Awskeyring::Awsapi do
         .with(profile: 'testtoken')
         .and_return(
           instance_double(
-            'HashMap',
+            Aws::Credentials,
             access_key_id: key,
             secret_access_key: secret,
             session_token: token

@@ -19,7 +19,7 @@ describe Awskeyring do
       allow(net_http).to receive(:get)
         .and_return(
           instance_double(
-            'HashMap',
+            Net::HTTPGenericRequest,
             body: request_body
           )
         )
