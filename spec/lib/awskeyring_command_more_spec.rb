@@ -32,7 +32,7 @@ describe AwskeyringCommand do
         secret: 'bigerlongbase64',
         token: 'evenlongerbase64token',
         path: 'console',
-        user: ENV['USER']
+        user: ENV.fetch('USER', 'awskeyring')
       )
       expect(Process).to have_received(:spawn).exactly(1).with('open "login-url"')
     end
@@ -54,7 +54,7 @@ describe AwskeyringCommand do
         secret: 'bigerlongbase64',
         token: 'evenlongerbase64token',
         path: 'console',
-        user: ENV['USER']
+        user: ENV.fetch('USER', 'awskeyring')
       )
       expect(Process).not_to have_received(:spawn).with('open "login-url"')
     end
@@ -85,7 +85,7 @@ describe AwskeyringCommand do
         secret: 'biglongbase64',
         token: nil,
         path: 'test',
-        user: ENV['USER']
+        user: ENV.fetch('USER', 'awskeyring')
       )
       expect(Process).to have_received(:spawn).with('open "login-url"')
     end
@@ -166,7 +166,7 @@ describe AwskeyringCommand do
         mfa: 'arn:aws:iam::012345678901:mfa/ec2-user',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
-        user: ENV['USER']
+        user: ENV.fetch('USER', 'awskeyring')
       )
     end
 
@@ -193,7 +193,7 @@ describe AwskeyringCommand do
         mfa: 'arn:aws:iam::012345678901:mfa/ec2-user',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
-        user: ENV['USER']
+        user: ENV.fetch('USER', 'awskeyring')
       )
     end
 
@@ -220,7 +220,7 @@ describe AwskeyringCommand do
         mfa: 'arn:aws:iam::012345678901:mfa/ec2-user',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
-        user: ENV['USER']
+        user: ENV.fetch('USER', 'awskeyring')
       )
     end
 
@@ -238,7 +238,7 @@ describe AwskeyringCommand do
         mfa: 'arn:aws:iam::012345678901:mfa/ec2-user',
         key: 'AKIATESTTEST',
         secret: 'biglongbase64',
-        user: ENV['USER']
+        user: ENV.fetch('USER', 'awskeyring')
       )
     end
 
