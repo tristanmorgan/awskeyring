@@ -372,7 +372,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
         mfa: item_hash[:mfa],
         key: item_hash[:key],
         secret: item_hash[:secret],
-        user: ENV['USER']
+        user: ENV.fetch('USER', 'awskeyring')
       )
       Awskeyring.delete_token(account: account, message: '# Removing STS credentials')
     rescue Aws::Errors::ServiceError => e
@@ -415,7 +415,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
         secret: cred[:secret],
         token: cred[:token],
         path: path,
-        user: ENV['USER']
+        user: ENV.fetch('USER', 'awskeyring')
       )
     rescue Aws::Errors::ServiceError => e
       warn e.to_s
@@ -436,8 +436,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # autocomplete
   def autocomplete(curr, prev = nil)
     curr, prev = fix_args(curr, prev)
-    comp_line = ENV['COMP_LINE']
-    comp_point_str = ENV['COMP_POINT']
+    comp_line = ENV.fetch('COMP_LINE', nil)
+    comp_point_str = ENV.fetch('COMP_POINT', nil)
     unless comp_line && comp_point_str
       exec_name = File.basename($PROGRAM_NAME)
       warn I18n.t('message.awskeyring', path: $PROGRAM_NAME, bin: exec_name)
@@ -609,7 +609,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     bundled_env = to_delete.map { |elem| elem[('BUNDLER_ORIG_'.length)..] }
     to_delete << 'BUNDLE_GEMFILE'
     bundled_env.each do |env_name|
-      ENV[env_name] = ENV["BUNDLER_ORIG_#{env_name}"]
+      ENV[env_name] = ENV.fetch("BUNDLER_ORIG_#{env_name}", nil)
       to_delete << env_name if ENV["BUNDLER_ORIG_#{env_name}"].start_with? 'BUNDLER_'
     end
     to_delete.each do |env_name|
