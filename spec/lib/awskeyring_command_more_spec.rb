@@ -136,7 +136,7 @@ describe AwskeyringCommand do
     it 'tries to import a valid token without remote tests' do
       expect do
         described_class.start(['import', 'testaccount', '-r'])
-      end.to output("# Token saved for account testaccount\n"\
+      end.to output("# Token saved for account testaccount\n" \
                     "# Authentication valid until #{Time.at(1_489_305_329)}\n").to_stdout
       expect(Awskeyring::Awsapi).not_to have_received(:verify_cred)
     end
