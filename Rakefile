@@ -2,7 +2,6 @@
 
 require 'bundler/gem_tasks'
 require 'rubocop/rake_task'
-require 'ronn'
 require 'github_changelog_generator/task'
 require 'yard'
 
@@ -50,6 +49,7 @@ end
 desc 'generate manpage'
 task :ronn do
   puts 'Running Ronn...'
+  require 'ronn'
   doc = Ronn::Document.new('man/awskeyring.5.ronn')
   doc.date = Time.parse(`git show -s --format=%ad --date=short`)
   File.write('man/awskeyring.5', doc.to_roff)

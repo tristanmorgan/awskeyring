@@ -5,6 +5,7 @@ os: osx
 osx_image: xcode12
 rvm:
   - 2.6.3
+  - 2.6.10
   - ruby-head
 matrix:
   allow_failures:
