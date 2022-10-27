@@ -334,6 +334,51 @@ describe Awskeyring::Awsapi do
     end
   end
 
+  context 'when key rotation fails to delete' do
+    let(:account) { 'test' }
+    let(:key) { 'AKIA1234567890ABCDEF' }
+    let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
+    let(:new_key) { 'AKIAIOSFODNN7EXAMPLE' }
+    let(:new_secret) { 'wJalrXUtnFEMI/K7MDENG/bPxRiCYzEXAMPLEKEY' }
+    let(:key_message) { '# You have two access keys for account test' }
+
+    let(:iam_client) { instance_double(Aws::IAM::Client) }
+
+    before do
+      allow(described_class).to receive(:region).and_return(nil)
+      allow(Aws::IAM::Client).to receive(:new).and_return(iam_client)
+      allow(iam_client).to receive(:list_access_keys).and_return(
+        access_key_metadata: [
+          {
+            access_key_id: key,
+            create_date: Time.parse('2016-12-01T22:19:58Z'),
+            status: 'Active',
+            user_name: 'Alice'
+          }
+        ]
+      )
+      allow(iam_client).to receive(:create_access_key).and_return(
+        access_key: {
+          access_key_id: new_key,
+          create_date: Time.parse('2015-03-09T18:39:23.411Z'),
+          secret_access_key: new_secret,
+          status: 'Active',
+          user_name: 'Bob'
+        }
+      )
+      allow(awsapi).to receive(:sleep) # rubocop:disable RSpec/SubjectStub
+      allow(iam_client).to receive(:delete_access_key) do
+        raise(Aws::IAM::Errors::InvalidClientTokenId.new(nil, 'Cannot delete access key'))
+      end
+    end
+
+    it 'calls the rotate method and fails' do
+      expect do
+        awsapi.rotate(account: account, key: key, secret: secret, key_message: key_message)
+      end.to raise_error(SystemExit).and output(/Cannot delete access key/).to_stderr
+    end
+  end
+
   context 'when there is no region set' do
     let(:role_token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
     let(:sharedcfg) do
@@ -442,6 +487,47 @@ describe Awskeyring::Awsapi do
                expiry: Time.parse('2017-03-12T07:55:29Z'),
                role: nil
              )
+    end
+  end
+
+  context 'when credentials are invalid' do
+    let(:key) { 'AKIA1234567890ABCDEF' }
+    let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
+    let(:token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
+
+    let(:sts_client) { instance_double(Aws::STS::Client) }
+
+    # Aws::STS::Client
+    before do
+      allow(Aws::STS::Client).to receive(:new).and_return(sts_client)
+      allow(sts_client).to receive(:get_caller_identity) do
+        raise(Aws::Errors::ServiceError.new(nil, 'The security token included in the request is invalid'))
+      end
+      allow(sts_client).to receive(:assume_role) do
+        raise(Aws::STS::Errors::AccessDenied.new(
+                nil,
+                'The security token included in the request is invalid'
+              ))
+      end
+    end
+
+    it 'calls get_caller_identity with an expired/invalid token' do
+      expect do
+        awsapi.verify_cred(key: key, secret: secret, token: token)
+      end.to raise_error(SystemExit).and output(/The security token included in the request is invalid/).to_stderr
+    end
+
+    it 'calls get_token with an expired/invalid token' do
+      expect do
+        awsapi.get_token(
+          key: key,
+          secret: secret,
+          role_arn: 'blah',
+          code: nil, mfa: nil,
+          duration: 3600,
+          user: 'rspec-user'
+        )
+      end.to raise_error(SystemExit).and output(/The security token included in the request is invalid/).to_stderr
     end
   end
 end
