@@ -364,21 +364,16 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     end
     item_hash = age_check_and_get(account: account, no_token: true)
 
-    begin
-      new_creds = Awskeyring::Awsapi.get_token(
-        code: code,
-        role_arn: (Awskeyring.get_role_arn(role_name: role) if role),
-        duration: default_duration(options[:duration], role, code),
-        mfa: item_hash[:mfa],
-        key: item_hash[:key],
-        secret: item_hash[:secret],
-        user: ENV.fetch('USER', 'awskeyring')
-      )
-      Awskeyring.delete_token(account: account, message: '# Removing STS credentials')
-    rescue Aws::Errors::ServiceError => e
-      warn e.to_s
-      exit 1
-    end
+    new_creds = Awskeyring::Awsapi.get_token(
+      code: code,
+      role_arn: (Awskeyring.get_role_arn(role_name: role) if role),
+      duration: default_duration(options[:duration], role, code),
+      mfa: item_hash[:mfa],
+      key: item_hash[:key],
+      secret: item_hash[:secret],
+      user: ENV.fetch('USER', 'awskeyring')
+    )
+    Awskeyring.delete_token(account: account, message: '# Removing STS credentials')
 
     Awskeyring.add_token(
       account: account,
@@ -409,18 +404,13 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
     path = options[:path] || 'console'
 
-    begin
-      login_url = Awskeyring::Awsapi.get_login_url(
-        key: cred[:key],
-        secret: cred[:secret],
-        token: cred[:token],
-        path: path,
-        user: ENV.fetch('USER', 'awskeyring')
-      )
-    rescue Aws::Errors::ServiceError => e
-      warn e.to_s
-      exit 1
-    end
+    login_url = Awskeyring::Awsapi.get_login_url(
+      key: cred[:key],
+      secret: cred[:secret],
+      token: cred[:token],
+      path: path,
+      user: ENV.fetch('USER', 'awskeyring')
+    )
 
     if options['no-open']
       puts login_url
