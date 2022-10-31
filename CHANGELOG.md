@@ -1,8 +1,16 @@
 # Changelog
 
-## [1.9.4](https://github.com/servian/awskeyring/tree/1.9.4) (2022-04-21)
+## [1.9.5](https://github.com/servian/awskeyring/tree/1.9.5) (2022-10-31)
 
-[Full Changelog](https://github.com/servian/awskeyring/compare/v1.9.3...1.9.4)
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.9.4...1.9.5)
+
+**Implemented enhancements:**
+
+- Exception coverage. [\#88](https://github.com/servian/awskeyring/pull/88) ([tristanmorgan](https://github.com/tristanmorgan))
+
+## [v1.9.4](https://github.com/servian/awskeyring/tree/v1.9.4) (2022-04-22)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.9.3...v1.9.4)
 
 **Merged pull requests:**
 
