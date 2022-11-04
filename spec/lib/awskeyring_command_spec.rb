@@ -189,7 +189,7 @@ describe AwskeyringCommand do
     end
 
     it 'export an AWS Access key' do
-      expect { described_class.start(%w[env test]) }
+      expect { described_class.start(%w[env test --force]) }
         .to output(%(export AWS_DEFAULT_REGION="us-east-1"
 export AWS_ACCOUNT_NAME="test"
 export AWS_ACCESS_KEY_ID="AKIATESTTEST"

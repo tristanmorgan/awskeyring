@@ -1,7 +1,7 @@
 .\" generated with Ronn/v0.7.3
 .\" http://github.com/rtomayko/ronn/tree/0.7.3
 .
-.TH "AWSKEYRING" "5" "October 2022" "" ""
+.TH "AWSKEYRING" "5" "November 2022" "" ""
 .
 .SH "NAME"
 \fBAwskeyring\fR \- is a small tool to manage AWS account keys in the macOS Keychain
@@ -94,6 +94,9 @@ Outputs bourne shell environment exports for an ACCOUNT
 .br
 \-u, \-\-unset, \-\-no\-unset: Unset environment variables\.
 .
+.br
+\-f, \-\-force: Force output to a tty\.
+.
 .TP
 exec ACCOUNT command\.\.\.:
 .
@@ -146,6 +149,9 @@ Outputs AWS CLI compatible JSON for an ACCOUNT
 .
 .IP
 \-n, \-\-no\-token: Do not use saved token\.
+.
+.br
+\-f, \-\-force: Force output to a tty\.
 .
 .TP
 list:

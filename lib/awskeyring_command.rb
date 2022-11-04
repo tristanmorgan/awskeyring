@@ -104,11 +104,16 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   desc 'env ACCOUNT', I18n.t('env_desc')
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   method_option :unset, type: :boolean, aliases: '-u', desc: I18n.t('method_option.unset'), default: false
+  method_option :force, type: :boolean, aliases: '-f', desc: I18n.t('method_option.force'), default: false
   # Print Env vars
   def env(account = nil)
     if options[:unset]
       put_env_string(account: nil, key: nil, secret: nil, token: nil)
     else
+      if $stdout.isatty && !options[:force]
+        warn I18n.t('message.ttyblock')
+        exit 1
+      end
       account = ask_check(
         existing: account, message: I18n.t('message.account'),
         validator: Awskeyring.method(:account_exists),
@@ -121,8 +126,13 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   desc 'json ACCOUNT', I18n.t('json_desc')
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
+  method_option :force, type: :boolean, aliases: '-f', desc: I18n.t('method_option.force'), default: false
   # Print JSON for use with credential_process
-  def json(account)
+  def json(account) # rubocop:disable Metrics/AbcSize
+    if $stdout.isatty && !options[:force]
+      warn I18n.t('message.ttyblock')
+      exit 1
+    end
     account = ask_check(
       existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists),
       limited_to: Awskeyring.list_account_names
