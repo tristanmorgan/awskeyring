@@ -49,7 +49,8 @@ The commands are as follows:
     Outputs bourne shell environment exports for an ACCOUNT<br>
 
     -n, --no-token: Do not use saved token.<br>
-    -u, --unset, --no-unset: Unset environment variables.
+    -u, --unset, --no-unset: Unset environment variables.<br>
+    -f, --force: Force output to a tty.
 
 * exec ACCOUNT command...:
 
@@ -78,7 +79,8 @@ The commands are as follows:
 
     Outputs AWS CLI compatible JSON for an ACCOUNT<br>
 
-    -n, --no-token: Do not use saved token.
+    -n, --no-token: Do not use saved token.<br>
+    -f, --force:    Force output to a tty.
 
 * list:
 

@@ -8,6 +8,7 @@ describe AwskeyringCommand do
   context 'when everything raises an exception' do
     let(:iam_client) { instance_double(Aws::IAM::Client) }
     let(:sts_client) { instance_double(Aws::STS::Client) }
+    let(:test_tty) { instance_double(StringIO) }
 
     before do
       allow(Awskeyring).to receive(:get_valid_creds).and_return(
@@ -36,6 +37,8 @@ describe AwskeyringCommand do
                 'The security token included in the request is invalid'
               ))
       end
+      allow(test_tty).to receive(:isatty).and_return(true)
+      allow(test_tty).to receive(:write)
     end
 
     it 'fails to run an external command' do
@@ -60,6 +63,40 @@ describe AwskeyringCommand do
       expect do
         described_class.start(%w[console test])
       end.to raise_error(SystemExit).and output(/The security token included in the request is invalid/).to_stderr
+    end
+
+    it 'blocks showing JSON creds on console' do
+      old = $stdout
+      $stdout = test_tty # rubocop:disable RSpec/ExpectOutput
+      expect do
+        described_class.start(%w[json test])
+      end.to raise_error(SystemExit).and output(/Output suppressed to a tty, --force to override/).to_stderr
+      $stdout = old # rubocop:disable RSpec/ExpectOutput
+    end
+
+    it 'blocks showing creds on console' do
+      old = $stdout
+      $stdout = test_tty # rubocop:disable RSpec/ExpectOutput
+      expect do
+        described_class.start(%w[env test])
+      end.to raise_error(SystemExit).and output(/Output suppressed to a tty, --force to override/).to_stderr
+      $stdout = old # rubocop:disable RSpec/ExpectOutput
+    end
+
+    it 'allows showing creds on console' do
+      old = $stdout
+      $stdout = test_tty # rubocop:disable RSpec/ExpectOutput
+      expect { described_class.start(%w[env test --force]) }
+        .to output(%(export AWS_ACCOUNT_NAME="test"
+export AWS_ACCESS_KEY_ID="ASIATESTTEST"
+export AWS_ACCESS_KEY="ASIATESTTEST"
+export AWS_SECRET_ACCESS_KEY="bigerlongbase64"
+export AWS_SECRET_KEY="bigerlongbase64"
+unset AWS_CREDENTIAL_EXPIRATION
+unset AWS_SECURITY_TOKEN
+unset AWS_SESSION_TOKEN
+)).to_stdout
+      $stdout = old # rubocop:disable RSpec/ExpectOutput
     end
   end
 end
