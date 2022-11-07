@@ -25,9 +25,9 @@ The commands are as follows:
     Adds an ACCOUNT to the keyring<br>
 
     -k, --key=KEY: AWS account key id.<br>
-    -s, --secret=SECRET: AWS account secret.<br>
     -m, --mfa=MFA: AWS virtual mfa arn.<br>
-    -r, --no-remote: Do not validate with remote api.
+    -r, --no-remote: Do not validate with remote api.<br>
+    -s, --secret=SECRET: AWS account secret.
 
 * add-role ROLE:
 
@@ -39,25 +39,25 @@ The commands are as follows:
 
     Open the AWS Console for the ACCOUNT<br>
 
-    -p, --path=PATH: The service PATH to open.<br>
     -b, --browser=BROWSER: Specify an alternative browser.<br>
+    -o, --no-open: Do not open the url.<br>
     -n, --no-token: Do not use saved token.<br>
-    -o, --no-open: Do not open the url.
+    -p, --path=PATH: The service PATH to open.
 
 * env ACCOUNT:
 
     Outputs bourne shell environment exports for an ACCOUNT<br>
 
+    -f, --force: Force output to a tty.<br>
     -n, --no-token: Do not use saved token.<br>
-    -u, --unset, --no-unset: Unset environment variables.<br>
-    -f, --force: Force output to a tty.
+    -u, --unset, --no-unset: Unset environment variables.
 
 * exec ACCOUNT command...:
 
     Execute a COMMAND with the environment set for an ACCOUNT<br>
 
-    -n, --no-token: Do not use saved token.<br>
-    -b, --no-bundle: Unset Bundler environment variables.
+    -b, --no-bundle: Unset Bundler environment variables.<br>
+    -n, --no-token: Do not use saved token.
 
 * help [COMMAND]:
 
@@ -79,8 +79,8 @@ The commands are as follows:
 
     Outputs AWS CLI compatible JSON for an ACCOUNT<br>
 
-    -n, --no-token: Do not use saved token.<br>
-    -f, --force:    Force output to a tty.
+    -f, --force:    Force output to a tty.<br>
+    -n, --no-token: Do not use saved token.
 
 * list:
 
@@ -120,8 +120,8 @@ The commands are as follows:
     Updates an ACCOUNT in the keyring<br>
 
     -k, --key=KEY: AWS account key id.<br>
-    -s, --secret=SECRET: AWS account secret.<br>
-    -r, --no-remote: Do not validate with remote api.
+    -r, --no-remote: Do not validate with remote api.<br>
+    -s, --secret=SECRET: AWS account secret.
 
 ## ENVIRONMENT
 
@@ -153,6 +153,25 @@ To open the AWS Console (web page) with your default browser simply run...
 Autocomplete is enabled in your current shell with the following command... 
 
     complete -C /usr/local/bin/awskeyring awskeyring
+
+## CONFIGURATION
+
+A Configuration file is stored in the users home directory at `~/.awskeyring` as a JSON formatted file.
+Most of the fields have a default value except the awskeyring field.
+
+```json
+{
+  "awskeyring": "awskeyring",
+  "browser":    ["FireFox", "Google Chrome", "Safari"],
+  "console":    ["ec2/v2", "cloudwatch", "iam"],
+  "keyage":     90
+}
+```
+
+1. The first field is the Keychain that your keys will be saved in.<br>
+2. A list of your browsers to use the console command with.<br>
+3. The next is the list of AWS Console pages autocomplete will present.<br>
+4. The last field is the warning threshold for key age.
 
 ## HISTORY
 

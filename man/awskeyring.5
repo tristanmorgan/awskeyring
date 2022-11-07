@@ -41,13 +41,13 @@ Adds an ACCOUNT to the keyring
 \-k, \-\-key=KEY: AWS account key id\.
 .
 .br
-\-s, \-\-secret=SECRET: AWS account secret\.
-.
-.br
 \-m, \-\-mfa=MFA: AWS virtual mfa arn\.
 .
 .br
 \-r, \-\-no\-remote: Do not validate with remote api\.
+.
+.br
+\-s, \-\-secret=SECRET: AWS account secret\.
 .
 .TP
 add\-role ROLE:
@@ -69,16 +69,16 @@ Open the AWS Console for the ACCOUNT
 .br
 .
 .IP
-\-p, \-\-path=PATH: The service PATH to open\.
+\-b, \-\-browser=BROWSER: Specify an alternative browser\.
 .
 .br
-\-b, \-\-browser=BROWSER: Specify an alternative browser\.
+\-o, \-\-no\-open: Do not open the url\.
 .
 .br
 \-n, \-\-no\-token: Do not use saved token\.
 .
 .br
-\-o, \-\-no\-open: Do not open the url\.
+\-p, \-\-path=PATH: The service PATH to open\.
 .
 .TP
 env ACCOUNT:
@@ -89,13 +89,13 @@ Outputs bourne shell environment exports for an ACCOUNT
 .br
 .
 .IP
+\-f, \-\-force: Force output to a tty\.
+.
+.br
 \-n, \-\-no\-token: Do not use saved token\.
 .
 .br
 \-u, \-\-unset, \-\-no\-unset: Unset environment variables\.
-.
-.br
-\-f, \-\-force: Force output to a tty\.
 .
 .TP
 exec ACCOUNT command\.\.\.:
@@ -106,10 +106,10 @@ Execute a COMMAND with the environment set for an ACCOUNT
 .br
 .
 .IP
-\-n, \-\-no\-token: Do not use saved token\.
+\-b, \-\-no\-bundle: Unset Bundler environment variables\.
 .
 .br
-\-b, \-\-no\-bundle: Unset Bundler environment variables\.
+\-n, \-\-no\-token: Do not use saved token\.
 .
 .TP
 help [COMMAND]:
@@ -148,10 +148,10 @@ Outputs AWS CLI compatible JSON for an ACCOUNT
 .br
 .
 .IP
-\-n, \-\-no\-token: Do not use saved token\.
+\-f, \-\-force: Force output to a tty\.
 .
 .br
-\-f, \-\-force: Force output to a tty\.
+\-n, \-\-no\-token: Do not use saved token\.
 .
 .TP
 list:
@@ -220,10 +220,10 @@ Updates an ACCOUNT in the keyring
 \-k, \-\-key=KEY: AWS account key id\.
 .
 .br
-\-s, \-\-secret=SECRET: AWS account secret\.
+\-r, \-\-no\-remote: Do not validate with remote api\.
 .
 .br
-\-r, \-\-no\-remote: Do not validate with remote api\.
+\-s, \-\-secret=SECRET: AWS account secret\.
 .
 .SH "ENVIRONMENT"
 The AWS_DEFAULT_REGION environment variable will be used for AWS API calls where specified or fall back to us\-east\-1 when not\.
@@ -293,6 +293,47 @@ Autocomplete is enabled in your current shell with the following command\.\.\.
 complete \-C /usr/local/bin/awskeyring awskeyring
 .
 .fi
+.
+.IP "" 0
+.
+.SH "CONFIGURATION"
+A Configuration file is stored in the users home directory at \fB~/\.awskeyring\fR as a JSON formatted file\. Most of the fields have a default value except the awskeyring field\.
+.
+.IP "" 4
+.
+.nf
+
+{
+  "awskeyring": "awskeyring",
+  "browser":    ["FireFox", "Google Chrome", "Safari"],
+  "console":    ["ec2/v2", "cloudwatch", "iam"],
+  "keyage":     90
+}
+.
+.fi
+.
+.IP "" 0
+.
+.IP "1." 4
+The first field is the Keychain that your keys will be saved in\.
+.
+.br
+
+.
+.IP "2." 4
+A list of your browsers to use the console command with\.
+.
+.br
+
+.
+.IP "3." 4
+The next is the list of AWS Console pages autocomplete will present\.
+.
+.br
+
+.
+.IP "4." 4
+The last field is the warning threshold for key age\.
 .
 .IP "" 0
 .
