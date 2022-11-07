@@ -110,10 +110,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     if options[:unset]
       put_env_string(account: nil, key: nil, secret: nil, token: nil)
     else
-      if $stdout.isatty && !options[:force]
-        warn I18n.t('message.ttyblock')
-        exit 1
-      end
+      output_safe(options[:force])
       account = ask_check(
         existing: account, message: I18n.t('message.account'),
         validator: Awskeyring.method(:account_exists),
@@ -129,10 +126,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option :force, type: :boolean, aliases: '-f', desc: I18n.t('method_option.force'), default: false
   # Print JSON for use with credential_process
   def json(account) # rubocop:disable Metrics/AbcSize
-    if $stdout.isatty && !options[:force]
-      warn I18n.t('message.ttyblock')
-      exit 1
-    end
+    output_safe(options[:force])
     account = ask_check(
       existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists),
       limited_to: Awskeyring.list_account_names
@@ -548,6 +542,14 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     warn I18n.t('message.age_check', account: account, age: age) unless age < maxage
 
     cred
+  end
+
+  # warn if output is unsafe unless forced
+  def output_safe(force)
+    return if force || !$stdout.isatty
+
+    warn I18n.t('message.ttyblock')
+    exit 1
   end
 
   # print exports from map
