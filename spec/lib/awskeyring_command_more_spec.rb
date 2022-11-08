@@ -425,6 +425,7 @@ describe AwskeyringCommand do
         secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY'
       )
       allow(Time).to receive(:new).and_return(Time.parse('2017-03-11T19:55:29.611Z'))
+      allow(Thor::LineEditor).to receive(:readline).and_return('test')
       allow(Awskeyring).to receive(:account_exists).and_return('test')
     end
 
@@ -443,13 +444,15 @@ describe AwskeyringCommand do
 
     it 'warns about the age of the creds' do
       expect do
-        described_class.start(%w[env test])
+        described_class.start(%w[env])
       end.to output(
         /# Creds for account test are 99 days old./
       ).to_stderr
         .and output(
           /export AWS_ACCOUNT_NAME="test"/
         ).to_stdout
+      expect(Awskeyring).to have_received(:account_exists).with('test')
+      expect(Thor::LineEditor).to have_received(:readline).with('        account name: ', limited_to: ['test'])
     end
   end
 
