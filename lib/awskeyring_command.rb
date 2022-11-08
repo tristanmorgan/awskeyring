@@ -102,18 +102,15 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   desc 'env ACCOUNT', I18n.t('env_desc')
+  method_option :force, type: :boolean, aliases: '-f', desc: I18n.t('method_option.force'), default: false
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   method_option :unset, type: :boolean, aliases: '-u', desc: I18n.t('method_option.unset'), default: false
-  method_option :force, type: :boolean, aliases: '-f', desc: I18n.t('method_option.force'), default: false
   # Print Env vars
   def env(account = nil)
     if options[:unset]
       put_env_string(account: nil, key: nil, secret: nil, token: nil)
     else
-      if $stdout.isatty && !options[:force]
-        warn I18n.t('message.ttyblock')
-        exit 1
-      end
+      output_safe(options[:force])
       account = ask_check(
         existing: account, message: I18n.t('message.account'),
         validator: Awskeyring.method(:account_exists),
@@ -125,14 +122,11 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   desc 'json ACCOUNT', I18n.t('json_desc')
-  method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   method_option :force, type: :boolean, aliases: '-f', desc: I18n.t('method_option.force'), default: false
+  method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   # Print JSON for use with credential_process
   def json(account) # rubocop:disable Metrics/AbcSize
-    if $stdout.isatty && !options[:force]
-      warn I18n.t('message.ttyblock')
-      exit 1
-    end
+    output_safe(options[:force])
     account = ask_check(
       existing: account, message: I18n.t('message.account'), validator: Awskeyring.method(:account_exists),
       limited_to: Awskeyring.list_account_names
@@ -184,8 +178,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   desc 'exec ACCOUNT command...', I18n.t('exec_desc')
-  method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   method_option 'no-bundle', type: :boolean, aliases: '-b', desc: I18n.t('method_option.nobundle'), default: false
+  method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   # execute an external command with env set
   def exec(account, *command) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
     if command.empty?
@@ -211,9 +205,9 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   desc 'add ACCOUNT', I18n.t('add_desc')
   method_option :key, type: :string, aliases: '-k', desc: I18n.t('method_option.key')
-  method_option :secret, type: :string, aliases: '-s', desc: I18n.t('method_option.secret')
   method_option :mfa, type: :string, aliases: '-m', desc: I18n.t('method_option.mfa')
   method_option 'no-remote', type: :boolean, aliases: '-r', desc: I18n.t('method_option.noremote'), default: false
+  method_option :secret, type: :string, aliases: '-s', desc: I18n.t('method_option.secret')
   # Add an Account
   def add(account = nil) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
     account = ask_check(
@@ -242,8 +236,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
   desc 'update ACCOUNT', I18n.t('update_desc')
   method_option :key, type: :string, aliases: '-k', desc: I18n.t('method_option.key')
-  method_option :secret, type: :string, aliases: '-s', desc: I18n.t('method_option.secret')
   method_option 'no-remote', type: :boolean, aliases: '-r', desc: I18n.t('method_option.noremote'), default: false
+  method_option :secret, type: :string, aliases: '-s', desc: I18n.t('method_option.secret')
   # Update an Account
   def update(account = nil) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
     account = ask_check(
@@ -398,10 +392,10 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   desc 'console ACCOUNT', I18n.t('console_desc')
-  method_option :path, type: :string, aliases: '-p', desc: I18n.t('method_option.path')
   method_option :browser, type: :string, aliases: '-b', desc: I18n.t('method_option.browser')
-  method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   method_option 'no-open', type: :boolean, aliases: '-o', desc: I18n.t('method_option.noopen'), default: false
+  method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
+  method_option :path, type: :string, aliases: '-p', desc: I18n.t('method_option.path')
   # Open the AWS Console
   def console(account = nil) # rubocop:disable Metrics/AbcSize, Metrics/MethodLength
     account = ask_check(
@@ -548,6 +542,14 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     warn I18n.t('message.age_check', account: account, age: age) unless age < maxage
 
     cred
+  end
+
+  # warn if output is unsafe unless forced
+  def output_safe(force)
+    return if force || !$stdout.isatty
+
+    warn I18n.t('message.ttyblock')
+    exit 1
   end
 
   # print exports from map
