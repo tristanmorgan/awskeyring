@@ -149,6 +149,16 @@ describe AwskeyringCommand do
       ENV['COMP_LINE'] = nil
     end
 
+    it 'lists double dash flags with autocomplete' do
+      ENV['COMP_LINE'] = 'awskeyring env test --'
+      ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
+      test_args = ['awskeyring', '--', 'test'].freeze
+      ARGV = test_args # rubocop:disable RSpec/LeakyConstantDeclaration, Lint/ConstantDefinitionInBlock
+      expect { described_class.start(%w[autocomplete test]) }
+        .to output(/--force\n--no-token\n--unset/).to_stdout
+      ENV['COMP_LINE'] = nil
+    end
+
     it 'doesnt try to re-initialises the keychain' do
       expect do
         described_class.start(%w[initialise])
