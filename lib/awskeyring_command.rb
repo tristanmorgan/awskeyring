@@ -196,7 +196,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     begin
       pid = Process.spawn(env_vars, command.join(' '))
       Process.wait pid
-      $CHILD_STATUS
+      exit 1 if Process.last_status.exitstatus.positive?
     rescue Errno::ENOENT => e
       warn e.to_s
       exit 1
@@ -422,6 +422,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       spawn_cmd = options[:browser] ? "open -a \"#{options[:browser]}\" \"#{login_url}\"" : "open \"#{login_url}\""
       pid = Process.spawn(spawn_cmd)
       Process.wait pid
+      exit 1 if Process.last_status.exitstatus.positive?
     end
   end
 
@@ -450,7 +451,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # when a double dash is parsed it is dropped from the args but we need it
   def fix_args(curr, prev)
     if prev.nil?
-      [ARGV[1], ARGV[2]]
+      [ARGF.argv[1], ARGF.argv[2]]
     else
       [curr, prev]
     end

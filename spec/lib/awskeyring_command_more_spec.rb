@@ -6,6 +6,8 @@ require_relative '../../lib/awskeyring_command'
 
 describe AwskeyringCommand do
   context 'when we try to access AWS with a token' do
+    let(:good_exit) { instance_double(Process::Status) }
+
     before do
       allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false).and_return(
         account: 'test',
@@ -18,6 +20,8 @@ describe AwskeyringCommand do
       allow(Process).to receive(:spawn).exactly(1).with('open -a "Safari" "login-url"').and_return(9999)
       allow(Process).to receive(:spawn).exactly(1).with('open "login-url"').and_return(9999)
       allow(Process).to receive(:wait).exactly(1).with(9999)
+      allow(Process).to receive(:last_status).exactly(1).and_return(good_exit)
+      allow(good_exit).to receive(:exitstatus).and_return(0)
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
       allow(Awskeyring).to receive(:account_exists).and_return('test')
       allow(Awskeyring).to receive(:list_account_names).and_return(['test'])
@@ -61,6 +65,8 @@ describe AwskeyringCommand do
   end
 
   context 'when we try to access AWS without a token' do
+    let(:good_exit) { instance_double(Process::Status) }
+
     before do
       allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false).and_return(
         account: 'test',
@@ -72,6 +78,8 @@ describe AwskeyringCommand do
       allow(Awskeyring::Awsapi).to receive(:get_login_url).and_return('login-url')
       allow(Process).to receive(:spawn).exactly(1).with('open "login-url"').and_return(9999)
       allow(Process).to receive(:wait).exactly(1).with(9999)
+      allow(Process).to receive(:last_status).exactly(1).and_return(good_exit)
+      allow(good_exit).to receive(:exitstatus).and_return(0)
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
       allow(Awskeyring).to receive(:account_exists).and_return('test')
       allow(Awskeyring).to receive(:list_account_names).and_return(['test'])

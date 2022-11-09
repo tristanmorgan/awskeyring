@@ -152,8 +152,7 @@ describe AwskeyringCommand do
     it 'lists double dash flags with autocomplete' do
       ENV['COMP_LINE'] = 'awskeyring env test --'
       ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
-      test_args = ['awskeyring', '--', 'test'].freeze
-      ARGV = test_args # rubocop:disable RSpec/LeakyConstantDeclaration, Lint/ConstantDefinitionInBlock
+      allow(ARGF).to receive(:argv).and_return(['awskeyring', '--', 'test'])
       expect { described_class.start(%w[autocomplete test]) }
         .to output(/--force\n--no-token\n--unset/).to_stdout
       ENV['COMP_LINE'] = nil
@@ -241,6 +240,7 @@ unset AWS_SESSION_TOKEN
         'AWS_SECURITY_TOKEN' => 'evenlongerbase64token',
         'AWS_SESSION_TOKEN' => 'evenlongerbase64token' }
     end
+    let(:good_exit) { instance_double(Process::Status) }
 
     before do
       allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
@@ -267,6 +267,8 @@ unset AWS_SESSION_TOKEN
         'test-exec with params'
       ).and_return(8888)
       allow(Process).to receive(:wait).exactly(1).with(8888)
+      allow(Process).to receive(:last_status).exactly(1).and_return(good_exit)
+      allow(good_exit).to receive(:exitstatus).and_return(0)
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
       allow(Awskeyring).to receive(:account_exists).and_return('test')
       allow(Awskeyring).to receive(:token_exists).and_return('test')
