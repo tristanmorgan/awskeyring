@@ -11,6 +11,7 @@ describe AwskeyringCommand do
     let(:test_tty) { instance_double(IO) }
 
     before do
+      ENV['AWS_DEFAULT_REGION'] = nil
       allow(Awskeyring).to receive(:get_valid_creds).and_return(
         account: 'test',
         key: 'ASIATESTTEST',
@@ -86,7 +87,8 @@ describe AwskeyringCommand do
     it 'allows showing creds on console' do
       $stdout = test_tty # rubocop:disable RSpec/ExpectOutput
       expect { described_class.start(%w[env test --force]) }
-        .to output(%(export AWS_ACCOUNT_NAME="test"
+        .to output(%(export AWS_DEFAULT_REGION="us-east-1"
+export AWS_ACCOUNT_NAME="test"
 export AWS_ACCESS_KEY_ID="ASIATESTTEST"
 export AWS_ACCESS_KEY="ASIATESTTEST"
 export AWS_SECRET_ACCESS_KEY="bigerlongbase64"
