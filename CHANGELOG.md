@@ -1,8 +1,17 @@
 # Changelog
 
-## [1.9.5](https://github.com/servian/awskeyring/tree/1.9.5) (2022-10-31)
+## [1.10.0](https://github.com/servian/awskeyring/tree/1.10.0) (2022-11-12)
 
-[Full Changelog](https://github.com/servian/awskeyring/compare/v1.9.4...1.9.5)
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.9.5...1.10.0)
+
+**Implemented enhancements:**
+
+- Reorder flags [\#90](https://github.com/servian/awskeyring/pull/90) ([tristanmorgan](https://github.com/tristanmorgan))
+- Check for tty and allow force. [\#89](https://github.com/servian/awskeyring/pull/89) ([tristanmorgan](https://github.com/tristanmorgan))
+
+## [v1.9.5](https://github.com/servian/awskeyring/tree/v1.9.5) (2022-10-31)
+
+[Full Changelog](https://github.com/servian/awskeyring/compare/v1.9.4...v1.9.5)
 
 **Implemented enhancements:**
 
