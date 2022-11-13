@@ -12,6 +12,7 @@ describe AwskeyringCommand do
 
     before do
       ENV['AWS_DEFAULT_REGION'] = nil
+      ENV['AWS_REGION'] = nil
       allow(Awskeyring).to receive(:get_valid_creds).and_return(
         account: 'test',
         key: 'ASIATESTTEST',

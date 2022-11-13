@@ -169,6 +169,7 @@ describe AwskeyringCommand do
   context 'when there is an account and a role' do
     before do
       ENV['AWS_DEFAULT_REGION'] = nil
+      ENV['AWS_REGION'] = nil
       allow(Awskeyring).to receive(:delete_account)
       allow(Awskeyring).to receive(:delete_role)
       allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false).and_return(
