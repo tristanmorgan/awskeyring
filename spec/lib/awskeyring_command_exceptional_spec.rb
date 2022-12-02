@@ -11,8 +11,7 @@ describe AwskeyringCommand do
     let(:test_tty) { instance_double(IO) }
 
     before do
-      ENV['AWS_DEFAULT_REGION'] = nil
-      ENV['AWS_REGION'] = nil
+      allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
       allow(Awskeyring).to receive(:get_valid_creds).and_return(
         account: 'test',
         key: 'ASIATESTTEST',
