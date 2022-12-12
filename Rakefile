@@ -8,7 +8,7 @@ require 'yard'
 spec = Gem::Specification.load('awskeyring.gemspec')
 
 GitHubChangelogGenerator::RakeTask.new :changelog do |config|
-  config.user = 'servian'
+  config.user = 'tristanmorgan'
   config.project = spec.name
   config.future_release = spec.version
   config.since_tag = 'v1.5.0'

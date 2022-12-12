@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.name          = 'awskeyring'
   spec.version       = Awskeyring::VERSION
   spec.authors       = ['Tristan Morgan']
-  spec.email         = 'tristan.morgan@servian.com'
+  spec.email         = 'tristan.morgan@gmail.com'
 
   spec.summary       = 'Manages AWS credentials in the macOS keychain'
   spec.description   = 'Manages AWS credentials in the macOS keychain'

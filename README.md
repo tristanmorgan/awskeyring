@@ -1,8 +1,8 @@
 # Awskeyring
 
-![Awskeyring](https://raw.githubusercontent.com/servian/awskeyring/main/awskeyring-144.png)
+![Awskeyring](https://raw.githubusercontent.com/tristanmorgan/awskeyring/main/awskeyring-144.png)
 
-* [![Build Status](https://app.travis-ci.com/servian/awskeyring.svg?branch=main)](https://app.travis-ci.com/github/servian/awskeyring)
+* [![Build Status](https://app.travis-ci.com/tristanmorgan/awskeyring.svg?branch=main)](https://app.travis-ci.com/github/tristanmorgan/awskeyring)
 * [![Gem Version](https://badge.fury.io/rb/awskeyring.svg)](https://badge.fury.io/rb/awskeyring)
 * [![license MIT](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 * [![All Downloads](https://ruby-gem-downloads-badge.herokuapp.com/awskeyring?type=total)](https://rubygems.org/gems/awskeyring)
@@ -10,7 +10,7 @@
 * [![Documentation](https://img.shields.io/badge/yard-docs-brightgreen.svg)](https://www.rubydoc.info/gems/awskeyring)
 
 Awskeyring is a small tool to manage AWS account keys in the macOS Keychain. It has
-grown to incorporate a lot of [features](https://github.com/servian/awskeyring/wiki/Awskeyring-features).
+grown to incorporate a lot of [features](https://github.com/tristanmorgan/awskeyring/wiki/Awskeyring-features).
 
 ## Motivation
 
@@ -33,7 +33,7 @@ or via [homebrew gem](https://github.com/sportngin/brew-gem):
 
 ## Wiki
 
-Please see the [Wiki](https://github.com/servian/awskeyring/wiki) for full usage instructions and tips.
+Please see the [Wiki](https://github.com/tristanmorgan/awskeyring/wiki) for full usage instructions and tips.
 
 ## Quick start
 
@@ -104,12 +104,12 @@ To install this gem onto your local machine, run `bundle exec rake install`.
 ## Security
 
 If you believe you have found a security issue in Awskeyring, please responsibly disclose by contacting me at
-[tristan.morgan@servian.com](mailto:tristan.morgan@servian.com). Awskeyring is a Ruby script and as such Ruby is whitelisted
+[tristan.morgan@gmail.com](mailto:tristan.morgan@gmail.com). Awskeyring is a Ruby script and as such Ruby is whitelisted
 to access your "awskeyring" keychain. Use a strong password and keep the unlock time short.
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at [https://github.com/servian/awskeyring](https://github.com/servian/awskeyring).
+Bug reports and pull requests are welcome on GitHub at [https://github.com/tristanmorgan/awskeyring](https://github.com/tristanmorgan/awskeyring).
 This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to
 the [Contributor Covenant](https://contributor-covenant.org) code of conduct.
 

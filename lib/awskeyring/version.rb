@@ -6,9 +6,9 @@ require 'json'
 # Version const and query of latest.
 module Awskeyring
   # The Gem's version number
-  VERSION = '1.10.0'
+  VERSION = '1.10.1'
   # The Gem's homepage
-  HOMEPAGE = 'https://github.com/servian/awskeyring'
+  HOMEPAGE = 'https://github.com/tristanmorgan/awskeyring'
 
   # RubyGems Version url
   GEM_VERSION_URL = 'https://rubygems.org/api/v1/versions/awskeyring/latest.json'
