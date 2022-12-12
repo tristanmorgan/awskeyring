@@ -3,10 +3,10 @@
 ![Awskeyring](https://raw.githubusercontent.com/tristanmorgan/awskeyring/main/awskeyring-144.png)
 
 * [![Build Status](https://app.travis-ci.com/tristanmorgan/awskeyring.svg?branch=main)](https://app.travis-ci.com/github/tristanmorgan/awskeyring)
-* [![Gem Version](https://badge.fury.io/rb/awskeyring.svg)](https://badge.fury.io/rb/awskeyring)
+* [![Gem Version](https://img.shields.io/gem/v/awskeyring)](https://badge.fury.io/rb/awskeyring)
 * [![license MIT](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
-* [![All Downloads](https://ruby-gem-downloads-badge.herokuapp.com/awskeyring?type=total)](https://rubygems.org/gems/awskeyring)
-* [![Version Downloads](https://ruby-gem-downloads-badge.herokuapp.com/awskeyring?label=downloads-current-version)](https://rubygems.org/gems/awskeyring)
+* [![All Downloads](https://img.shields.io/gem/dt/awskeyring)](https://rubygems.org/gems/awskeyring)
+* [![Version Downloads](https://img.shields.io/gem/dtv/awskeyring)](https://rubygems.org/gems/awskeyring)
 * [![Documentation](https://img.shields.io/badge/yard-docs-brightgreen.svg)](https://www.rubydoc.info/gems/awskeyring)
 
 Awskeyring is a small tool to manage AWS account keys in the macOS Keychain. It has
