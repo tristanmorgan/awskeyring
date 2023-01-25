@@ -20,7 +20,7 @@ module Awskeyring
     #
     # @param [String] aws_access_key The aws_access_key_id
     def self.access_key(aws_access_key)
-      raise 'Invalid Access Key' unless /\AAKIA[A-Z0-9]{12,16}\z/.match?(aws_access_key)
+      raise 'Invalid Access Key' unless /\AAKIA[A-Z234567]{16}\z/.match?(aws_access_key)
 
       aws_access_key
     end

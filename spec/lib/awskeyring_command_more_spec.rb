@@ -258,7 +258,7 @@ describe AwskeyringCommand do
   end
 
   context 'when we try to add an AWS account' do
-    let(:access_key) { 'AKIA0123456789ABCDEF' }
+    let(:access_key) { 'AKIA234567ABCDEFGHIJ' }
     let(:secret_access_key) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     let(:mfa_arn) { 'arn:aws:iam::012345678901:mfa/readonly' }
     let(:bad_access_key) { 'akIA01_678F' }
@@ -351,7 +351,7 @@ describe AwskeyringCommand do
   end
 
   context 'when we try to add an AWS account and test an mfa' do
-    let(:access_key) { 'AKIA0123456789ABCDEF' }
+    let(:access_key) { 'AKIA234567ABCDEFGHIJ' }
     let(:secret_access_key) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     let(:mfa_arn) { 'arn:aws:iam::012345678901:mfa/readonly' }
     let(:bad_mfa_arn) { 'arn:azure:iamnot::ABCD45678901:Administrators' }
