@@ -15,7 +15,7 @@ describe Awskeyring::Validate do
     let(:test_broken_secret) { 'hI7XqAiaR_XJxKgCqG0Wo79jm2+GcRYP' }
     let(:test_secret) { 'vbkEXAMPLEa3TlCP2Fvmcbdp83LSaeDHtx13xc+M' }
     let(:test_broken_key) { 'AKIA1234567890' }
-    let(:test_key) { 'AKIA1234567890ABCDEF' }
+    let(:test_key) { 'AKIA234567ABCDEFGHIJ' }
 
     it 'validates an account name' do
       expect { validate.account_name(test_account) }.not_to raise_error

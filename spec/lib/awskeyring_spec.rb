@@ -215,7 +215,7 @@ describe Awskeyring do
   end
 
   context 'when there is accounts and roles and tokens' do
-    let(:access_key) { 'AKIA1234567890ABCDEF' }
+    let(:access_key) { 'AKIA234567ABCDEFGHIJ' }
     let(:role_arn) { 'arn:aws:iam::012345678901:role/test' }
     let(:item) do
       instance_double(
