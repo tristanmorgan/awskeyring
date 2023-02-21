@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.11.0](https://github.com/tristanmorgan/awskeyring/tree/1.11.0) (2023-02-21)
+
+[Full Changelog](https://github.com/tristanmorgan/awskeyring/compare/v1.10.1...1.11.0)
+
+**Implemented enhancements:**
+
+- AWS Access Key Validation tweak [\#91](https://github.com/tristanmorgan/awskeyring/pull/91) ([tristanmorgan](https://github.com/tristanmorgan))
+
+## [v1.10.1](https://github.com/tristanmorgan/awskeyring/tree/v1.10.1) (2022-12-12)
+
+[Full Changelog](https://github.com/tristanmorgan/awskeyring/compare/v1.10.0...v1.10.1)
+
 ## [v1.10.0](https://github.com/tristanmorgan/awskeyring/tree/v1.10.0) (2022-11-12)
 
 [Full Changelog](https://github.com/tristanmorgan/awskeyring/compare/v1.9.5...v1.10.0)
