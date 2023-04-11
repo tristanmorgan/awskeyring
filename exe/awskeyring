@@ -11,6 +11,6 @@ end
 begin
   AwskeyringCommand.start
 rescue Keychain::UserCancelledError => e
-  warn e.to_s
+  warn e
   exit 1
 end

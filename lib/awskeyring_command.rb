@@ -198,7 +198,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       Process.wait pid
       exit 1 if Process.last_status.exitstatus.positive?
     rescue Errno::ENOENT => e
-      warn e.to_s
+      warn e
       exit 1
     end
   end
@@ -330,7 +330,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
         key_message: I18n.t('message.rotate', account: account)
       )
     rescue Aws::Errors::ServiceError => e
-      warn e.to_s
+      warn e
       exit 1
     end
 

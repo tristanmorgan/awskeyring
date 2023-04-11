@@ -85,7 +85,7 @@ module Awskeyring
             )
           end
       rescue Aws::STS::Errors::AccessDenied => e
-        warn e.to_s
+        warn e
         exit 1
       end
 
@@ -151,7 +151,7 @@ module Awskeyring
         sts = Aws::STS::Client.new(access_key_id: key, secret_access_key: secret, session_token: token)
         sts.get_caller_identity
       rescue Aws::Errors::ServiceError => e
-        warn e.to_s
+        warn e
         exit 1
       end
       true
