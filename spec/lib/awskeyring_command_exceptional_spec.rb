@@ -12,19 +12,19 @@ describe AwskeyringCommand do
 
     before do
       allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
-      allow(Awskeyring).to receive(:get_valid_creds).and_return(
-        account: 'test',
-        key: 'ASIATESTTEST',
-        secret: 'bigerlongbase64',
-        token: nil,
-        updated: Time.parse('2011-08-01T22:20:01Z')
+      allow(Awskeyring).to receive_messages(
+        get_valid_creds: { account: 'test',
+                           key: 'ASIATESTTEST',
+                           secret: 'bigerlongbase64',
+                           token: nil,
+                           updated: Time.parse('2011-08-01T22:20:01Z') },
+        account_exists: 'test',
+        list_account_names: ['test']
       )
       allow(Process).to receive(:spawn) do
         raise Errno::ENOENT
       end
       allow(Process).to receive(:wait).exactly(1).with(9999)
-      allow(Awskeyring).to receive(:account_exists).and_return('test')
-      allow(Awskeyring).to receive(:list_account_names).and_return(['test'])
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
 
       allow(Aws::IAM::Client).to receive(:new).and_return(iam_client)

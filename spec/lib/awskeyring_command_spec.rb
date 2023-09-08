@@ -64,9 +64,11 @@ describe AwskeyringCommand do
 
   context 'when no accounts or roles are set' do
     before do
-      allow(Awskeyring).to receive(:list_account_names).and_return([])
-      allow(Awskeyring).to receive(:list_role_names).and_return([])
-      allow(Awskeyring).to receive(:prefs).and_return('{"awskeyring": "awskeyringtest"}')
+      allow(Awskeyring).to receive_messages(
+        list_account_names: [],
+        list_role_names: [],
+        prefs: '{"awskeyring": "awskeyringtest"}'
+      )
     end
 
     it 'outputs help text by default' do
@@ -87,14 +89,15 @@ describe AwskeyringCommand do
 
   context 'when accounts and roles are set' do
     before do
-      allow(Awskeyring).to receive(:list_account_names).and_return(%w[company personal servian])
-      allow(Awskeyring).to receive(:list_token_names).and_return(%w[personal sersaml])
-      allow(Awskeyring).to receive(:list_role_names).and_return(%w[admin minion readonly])
-      allow(Awskeyring).to receive(:list_role_names_plus)
-        .and_return(%W[admin\tarn1 minion\tarn2 readonly\tarn3])
-      allow(Awskeyring).to receive(:list_console_path).and_return(%w[iam cloudformation vpc])
-      allow(Awskeyring).to receive(:list_browsers).and_return(%w[FireFox Safari])
-      allow(Awskeyring).to receive(:prefs).and_return('{"awskeyring": "awskeyringtest"}')
+      allow(Awskeyring).to receive_messages(
+        list_account_names: %w[company personal servian],
+        list_token_names: %w[personal sersaml],
+        list_role_names: %w[admin minion readonly],
+        list_role_names_plus: %W[admin\tarn1 minion\tarn2 readonly\tarn3],
+        list_console_path: %w[iam cloudformation vpc],
+        list_browsers: %w[FireFox Safari],
+        prefs: '{"awskeyring": "awskeyringtest"}'
+      )
     end
 
     test_cases = [
@@ -180,10 +183,12 @@ describe AwskeyringCommand do
       )
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
       allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
-      allow(Awskeyring).to receive(:account_exists).and_return('test')
-      allow(Awskeyring).to receive(:role_exists).and_return('test')
-      allow(Awskeyring).to receive(:list_account_names).and_return(['test'])
-      allow(Awskeyring).to receive(:list_role_names).and_return(['test'])
+      allow(Awskeyring).to receive_messages(
+        account_exists: 'test',
+        role_exists: 'test',
+        list_account_names: ['test'],
+        list_role_names: ['test']
+      )
     end
 
     it 'removes an account' do
@@ -271,10 +276,12 @@ unset AWS_SESSION_TOKEN
       allow(Process).to receive(:last_status).exactly(1).and_return(good_exit)
       allow(good_exit).to receive(:exitstatus).and_return(0)
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
-      allow(Awskeyring).to receive(:account_exists).and_return('test')
-      allow(Awskeyring).to receive(:token_exists).and_return('test')
-      allow(Awskeyring).to receive(:list_account_names).and_return(['test'])
-      allow(Awskeyring).to receive(:list_token_names).and_return(['test'])
+      allow(Awskeyring).to receive_messages(
+        account_exists: 'test',
+        token_exists: 'test',
+        list_account_names: ['test'],
+        list_token_names: ['test']
+      )
     end
 
     it 'removes a token' do

@@ -17,8 +17,19 @@ describe Awskeyring::Awsapi do
     before do
       allow(described_class).to receive(:region).and_return(nil)
       allow(Aws::STS::Client).to receive(:new).and_return(sts_client)
-      allow(sts_client).to receive(:assume_role).and_return({})
-      allow(sts_client).to receive(:get_federation_token).and_return({})
+      allow(sts_client).to receive_messages(
+        assume_role: {},
+        get_federation_token: {},
+        get_session_token: instance_double(
+          Aws::STS::Types::GetSessionTokenResponse,
+          credentials: {
+            access_key_id: 'ASIAIOSFODNN7EXAMPLE',
+            expiration: Time.parse('2011-07-11T19:55:29.611Z'),
+            secret_access_key: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+            session_token: mfa_token
+          }
+        )
+      )
       allow(sts_client).to receive(:assume_role).with(
         duration_seconds: 3600,
         role_arn: 'blah',
@@ -61,17 +72,6 @@ describe Awskeyring::Awsapi do
             session_token: rofa_token
           },
           packed_policy_size: 6
-        )
-      )
-      allow(sts_client).to receive(:get_session_token).and_return(
-        instance_double(
-          Aws::STS::Types::GetSessionTokenResponse,
-          credentials: {
-            access_key_id: 'ASIAIOSFODNN7EXAMPLE',
-            expiration: Time.parse('2011-07-11T19:55:29.611Z'),
-            secret_access_key: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
-            session_token: mfa_token
-          }
         )
       )
       allow(sts_client).to receive(:get_federation_token).with(
@@ -255,24 +255,21 @@ describe Awskeyring::Awsapi do
     before do
       allow(described_class).to receive(:region).and_return(nil)
       allow(Aws::IAM::Client).to receive(:new).and_return(iam_client)
-      allow(iam_client).to receive(:list_access_keys).and_return(
-        access_key_metadata: [
+      allow(iam_client).to receive_messages(
+        list_access_keys: { access_key_metadata: [
           {
             access_key_id: 'AKIATESTTEST',
             create_date: Time.parse('2016-12-01T22:19:58Z'),
             status: 'Active',
             user_name: 'Alice'
           }
-        ]
-      )
-      allow(iam_client).to receive(:create_access_key).and_return(
-        access_key: {
+        ] }, create_access_key: { access_key: {
           access_key_id: new_key,
           create_date: Time.parse('2015-03-09T18:39:23.411Z'),
           secret_access_key: new_secret,
           status: 'Active',
           user_name: 'Bob'
-        }
+        } }
       )
       allow(awsapi).to receive(:sleep) # rubocop:disable RSpec/SubjectStub
       call_count = 0
@@ -347,24 +344,21 @@ describe Awskeyring::Awsapi do
     before do
       allow(described_class).to receive(:region).and_return(nil)
       allow(Aws::IAM::Client).to receive(:new).and_return(iam_client)
-      allow(iam_client).to receive(:list_access_keys).and_return(
-        access_key_metadata: [
+      allow(iam_client).to receive_messages(
+        list_access_keys: { access_key_metadata: [
           {
             access_key_id: key,
             create_date: Time.parse('2016-12-01T22:19:58Z'),
             status: 'Active',
             user_name: 'Alice'
           }
-        ]
-      )
-      allow(iam_client).to receive(:create_access_key).and_return(
-        access_key: {
+        ] }, create_access_key: { access_key: {
           access_key_id: new_key,
           create_date: Time.parse('2015-03-09T18:39:23.411Z'),
           secret_access_key: new_secret,
           status: 'Active',
           user_name: 'Bob'
-        }
+        } }
       )
       allow(awsapi).to receive(:sleep) # rubocop:disable RSpec/SubjectStub
       allow(iam_client).to receive(:delete_access_key) do

@@ -23,8 +23,7 @@ describe AwskeyringCommand do
       allow(Process).to receive(:last_status).exactly(1).and_return(good_exit)
       allow(good_exit).to receive(:exitstatus).and_return(0)
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
-      allow(Awskeyring).to receive(:account_exists).and_return('test')
-      allow(Awskeyring).to receive(:list_account_names).and_return(['test'])
+      allow(Awskeyring).to receive_messages(account_exists: 'test', list_account_names: ['test'])
     end
 
     it 'opens the AWS Console' do
@@ -81,8 +80,7 @@ describe AwskeyringCommand do
       allow(Process).to receive(:last_status).exactly(1).and_return(good_exit)
       allow(good_exit).to receive(:exitstatus).and_return(0)
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
-      allow(Awskeyring).to receive(:account_exists).and_return('test')
-      allow(Awskeyring).to receive(:list_account_names).and_return(['test'])
+      allow(Awskeyring).to receive_messages(account_exists: 'test', list_account_names: ['test'])
     end
 
     it 'opens the AWS Console' do
@@ -114,31 +112,29 @@ describe AwskeyringCommand do
       )
 
       allow(Awskeyring).to receive(:add_token)
-      allow(Awskeyring::Awsapi).to receive(:get_token)
-        .and_return(
+      allow(Awskeyring::Awsapi).to receive_messages(
+        get_token: { key: 'ASIAEXAMPLE',
+                     secret: 'bigishLongSecret',
+                     token: 'VeryveryVeryLongSecret',
+                     expiry: '1422992424',
+                     updated: Time.parse('2011-08-01T22:20:01Z') }, verify_cred: true,
+        get_credentials_from_file: {
+          account: 'testaccount',
           key: 'ASIAEXAMPLE',
           secret: 'bigishLongSecret',
           token: 'VeryveryVeryLongSecret',
-          expiry: '1422992424',
-          updated: Time.parse('2011-08-01T22:20:01Z')
-        )
+          expiry: Time.parse('2017-03-12T07:55:29Z'),
+          role: nil
+        }
+      )
       allow(Thor::LineEditor).to receive(:readline).and_return('invalid')
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
-      allow(Awskeyring).to receive(:account_exists).and_return('test')
-      allow(Awskeyring).to receive(:role_exists).and_return('role')
-      allow(Awskeyring).to receive(:list_account_names).and_return(['test'])
-      allow(Awskeyring).to receive(:list_role_names).and_return(['role'])
-      allow(Awskeyring::Awsapi).to receive(:verify_cred)
-        .and_return(true)
-      allow(Awskeyring::Awsapi).to receive(:get_credentials_from_file)
-        .and_return({
-                      account: 'testaccount',
-                      key: 'ASIAEXAMPLE',
-                      secret: 'bigishLongSecret',
-                      token: 'VeryveryVeryLongSecret',
-                      expiry: Time.parse('2017-03-12T07:55:29Z'),
-                      role: nil
-                    })
+      allow(Awskeyring).to receive_messages(
+        account_exists: 'test',
+        role_exists: 'role',
+        list_account_names: ['test'],
+        list_role_names: ['role']
+      )
     end
 
     it 'tries to import a valid token without remote tests' do
@@ -266,27 +262,27 @@ describe AwskeyringCommand do
     let(:bad_mfa_arn) { 'arn:azure:iamnot::ABCD45678901:Administrators' }
 
     before do
-      allow(Awskeyring).to receive(:add_account).and_return(nil)
-      allow(Awskeyring).to receive(:update_account).and_return(nil)
+      allow(Awskeyring).to receive_messages(
+        add_account: nil,
+        update_account: nil,
+        list_account_names: ['tested'],
+        item_by_account: nil, list_role_names: ['role']
+      )
       allow(Thor::LineEditor).to receive(:readline).and_return('')
-      allow(Awskeyring::Awsapi).to receive(:verify_cred)
-        .and_return(true)
+      allow(Awskeyring::Awsapi).to receive_messages(
+        verify_cred: true, get_credentials_from_file: {
+          account: 'testaccount',
+          key: access_key,
+          secret: secret_access_key,
+          token: nil,
+          expiry: Time.parse('2017-03-12T07:55:29Z'),
+          role: nil
+        }
+      )
       allow(Awskeyring).to receive(:account_not_exists).with('test').and_return('test')
       allow(Awskeyring).to receive(:account_not_exists).with('testaccount').and_return('testaccount')
       allow(Awskeyring).to receive(:account_exists).with('tested').and_return('tested')
-      allow(Awskeyring).to receive(:list_account_names).and_return(['tested'])
-      allow(Awskeyring).to receive(:item_by_account).and_return(nil)
       allow(Awskeyring::Input).to receive(:read_secret).and_return(bad_secret_access_key)
-      allow(Awskeyring).to receive(:list_role_names).and_return(['role'])
-      allow(Awskeyring::Awsapi).to receive(:get_credentials_from_file)
-        .and_return({
-                      account: 'testaccount',
-                      key: access_key,
-                      secret: secret_access_key,
-                      token: nil,
-                      expiry: Time.parse('2017-03-12T07:55:29Z'),
-                      role: nil
-                    })
     end
 
     it 'tries to add a valid account' do
@@ -358,8 +354,7 @@ describe AwskeyringCommand do
 
     before do
       allow(Awskeyring).to receive(:account_not_exists).with('test').and_return('test')
-      allow(Awskeyring).to receive(:item_by_account).and_return(nil)
-      allow(Awskeyring).to receive(:add_account).and_return(nil)
+      allow(Awskeyring).to receive_messages(item_by_account: nil, add_account: nil)
       allow(Awskeyring::Awsapi).to receive(:verify_cred)
         .and_return(true)
       allow(Awskeyring).to receive(:update_account)
@@ -389,9 +384,7 @@ describe AwskeyringCommand do
     let(:bad_role_arn) { 'arn:azure:iamnot::ABCD45678901:Administrators' }
 
     before do
-      allow(Awskeyring).to receive(:add_role).and_return(nil)
-      allow(Awskeyring).to receive(:item_by_account).and_return(nil)
-      allow(Awskeyring).to receive(:role_not_exists).and_return('readonly')
+      allow(Awskeyring).to receive_messages(add_role: nil, item_by_account: nil, role_not_exists: 'readonly')
     end
 
     it 'tries to add a valid role' do
@@ -410,17 +403,19 @@ describe AwskeyringCommand do
 
   context 'when we try to rotate keys' do
     before do
-      allow(Awskeyring).to receive(:get_valid_creds).and_return(
-        account: 'test',
-        key: 'AKIAIOSFODNN7EXAMPLE',
-        secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
-        token: nil,
-        updated: Time.parse('2016-12-01T22:20:01Z')
+      allow(Awskeyring).to receive_messages(
+        get_valid_creds: {
+          account: 'test',
+          key: 'AKIAIOSFODNN7EXAMPLE',
+          secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+          token: nil,
+          updated: Time.parse('2016-12-01T22:20:01Z')
+        },
+        update_account: true,
+        key_age: 90,
+        list_account_names: ['test'],
+        account_exists: 'test'
       )
-
-      allow(Awskeyring).to receive(:update_account).and_return(true)
-      allow(Awskeyring).to receive(:key_age).and_return(90)
-      allow(Awskeyring).to receive(:list_account_names).and_return(['test'])
 
       allow(Awskeyring::Awsapi).to receive(:rotate).with(
         account: 'test',
@@ -434,7 +429,6 @@ describe AwskeyringCommand do
       )
       allow(Time).to receive(:new).and_return(Time.parse('2017-03-11T19:55:29.611Z'))
       allow(Thor::LineEditor).to receive(:readline).and_return('test')
-      allow(Awskeyring).to receive(:account_exists).and_return('test')
     end
 
     it 'calls the rotate method' do
@@ -469,12 +463,13 @@ describe AwskeyringCommand do
 
     before do
       allow(Awskeyring).to receive(:update_account)
-      allow(Awskeyring).to receive(:get_valid_creds).and_return(
-        account: 'test',
-        key: 'AKIAIOSFODNN7EXAMPLE',
-        secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
-        token: nil,
-        updated: Time.parse('2016-12-01T22:20:01Z')
+      allow(Awskeyring).to receive_messages(
+        get_valid_creds: { account: 'test',
+                           key: 'AKIAIOSFODNN7EXAMPLE',
+                           secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+                           token: nil,
+                           updated: Time.parse('2016-12-01T22:20:01Z') },
+        account_exists: 'test', list_account_names: ['test']
       )
       allow(Aws::IAM::Client).to receive(:new).and_return(iam_client)
       allow(iam_client).to receive(:create_access_key)
@@ -495,8 +490,6 @@ describe AwskeyringCommand do
           }
         ]
       )
-      allow(Awskeyring).to receive(:account_exists).and_return('test')
-      allow(Awskeyring).to receive(:list_account_names).and_return(['test'])
       allow(Awskeyring).to receive(:update_account)
     end
 
