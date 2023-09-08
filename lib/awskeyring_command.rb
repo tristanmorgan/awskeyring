@@ -515,7 +515,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   # given a type return the right list for completions
-  def fetch_auto_resp(comp_type, sub_cmd)
+  def fetch_auto_resp(comp_type, sub_cmd) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/MethodLength
     case comp_type
     when :command
       list_commands
@@ -529,6 +529,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       Awskeyring.list_token_names
     when :browser_type
       Awskeyring.list_browsers
+    when :exec
+      list_exec
     else
       list_arguments(command: sub_cmd)
     end
@@ -538,6 +540,17 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   def list_commands
     commands = self.class.all_commands.keys.map { |elem| elem.tr('_', '-') }
     commands.reject! { |elem| %w[autocomplete default decode].include?(elem) }
+  end
+
+  # list executables
+  def list_exec
+    list = []
+    ENV['PATH'].split(File::PATH_SEPARATOR).each do |path|
+      list.concat(Dir.children(File.expand_path(path)))
+    rescue Errno::ENOENT
+      next
+    end
+    list.flatten
   end
 
   # list flags for a command

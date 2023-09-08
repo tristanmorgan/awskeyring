@@ -116,6 +116,7 @@ describe AwskeyringCommand do
       ['awskeyring add sarveun --n', %w[--n sarveun], "--no-remote\n", 'flags for add'],
       ['awskeyring -v --n', %w[--n -v], "--no-remote\n", 'flags for --version'],
       ['awskeyring exec sarviun --no', %w[--no sarviun], "--no-bundle\n--no-token\n", 'flags for exec'],
+      ['awskeyring exec sarviun base', %w[base sarviun], "base64\nbasename\n", 'flags for exec'],
       ['awskeyring console sarviun --path cloud', %w[cloud --path], "cloudformation\n", 'console paths'],
       ['awskeyring con sarviun --browser Sa',  %w[Sa --browser], "Safari\n", 'browsers']
     ]
