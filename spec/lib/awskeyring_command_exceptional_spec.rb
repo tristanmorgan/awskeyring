@@ -14,7 +14,7 @@ describe AwskeyringCommand do
       allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
       allow(Awskeyring).to receive_messages(
         get_valid_creds: { account: 'test',
-                           key: 'ASIATESTTEST',
+                           key: 'AKIA234567ABCDEFGHIJ',
                            secret: 'bigerlongbase64',
                            token: nil,
                            updated: Time.parse('2011-08-01T22:20:01Z') },
@@ -89,8 +89,9 @@ describe AwskeyringCommand do
       expect { described_class.start(%w[env test --force]) }
         .to output(%(export AWS_DEFAULT_REGION="us-east-1"
 export AWS_ACCOUNT_NAME="test"
-export AWS_ACCESS_KEY_ID="ASIATESTTEST"
-export AWS_ACCESS_KEY="ASIATESTTEST"
+export AWS_ACCOUNT_ID="747118721026"
+export AWS_ACCESS_KEY_ID="AKIA234567ABCDEFGHIJ"
+export AWS_ACCESS_KEY="AKIA234567ABCDEFGHIJ"
 export AWS_SECRET_ACCESS_KEY="bigerlongbase64"
 export AWS_SECRET_KEY="bigerlongbase64"
 unset AWS_CREDENTIAL_EXPIRATION

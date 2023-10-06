@@ -40,7 +40,7 @@ describe Awskeyring::Awsapi do
         instance_double(
           Aws::STS::Types::AssumeRoleResponse,
           assumed_role_user: {
-            arn: 'arn:aws:sts::123456789012:assumed-role/demo/Bob',
+            arn: 'arn:aws:sts::747118721026:assumed-role/demo/Bob',
             assumed_role_id: 'ARO123EXAMPLE123:Bob'
           },
           credentials: {
@@ -62,7 +62,7 @@ describe Awskeyring::Awsapi do
         instance_double(
           Aws::STS::Types::AssumeRoleResponse,
           assumed_role_user: {
-            arn: 'arn:aws:sts::123456789012:assumed-role/demo/Bob',
+            arn: 'arn:aws:sts::747118721026:assumed-role/demo/Bob',
             assumed_role_id: 'ARO123EXAMPLE123:Bob'
           },
           credentials: {
@@ -217,7 +217,7 @@ describe Awskeyring::Awsapi do
   end
 
   context 'when credentials are verified' do
-    let(:key) { 'AKIA1234567890ABCDEF' }
+    let(:key) { 'AKIA234567ABCDEFGHIJ' }
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     let(:token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
 
@@ -227,9 +227,9 @@ describe Awskeyring::Awsapi do
       allow(described_class).to receive(:region).and_return(nil)
       allow(Aws::STS::Client).to receive(:new).and_return(sts_client)
       allow(sts_client).to receive(:get_caller_identity).and_return(
-        account: '123456789012',
-        arn: 'arn:aws:iam::123456789012:user/Alice',
-        user_id: 'AKIAI44QH8DHBEXAMPLE'
+        account: '747118721026',
+        arn: 'arn:aws:iam::747118721026:user/Alice',
+        user_id: 'AKIA234567ABCDEFGHIJ'
       )
     end
 
@@ -240,11 +240,19 @@ describe Awskeyring::Awsapi do
     it 'calls get_caller_identity with a token' do
       expect(awsapi.verify_cred(key: key, secret: secret, token: token)).to be(true)
     end
+
+    it 'calls get_account_id with a valid token' do
+      expect(awsapi.get_account_id(key: key)).to eq('747118721026')
+    end
+
+    it 'calls get_account_id returning a short account number' do
+      expect(awsapi.get_account_id(key: 'AKIAQAAA67ABCDEFGHIJ')).to eq('000002029570')
+    end
   end
 
   context 'when keys are roated' do
     let(:account) { 'test' }
-    let(:key) { 'AKIA1234567890ABCDEF' }
+    let(:key) { 'AKIA234567ABCDEFGHIJ' }
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     let(:new_key) { 'AKIAIOSFODNN7EXAMPLE' }
     let(:new_secret) { 'wJalrXUtnFEMI/K7MDENG/bPxRiCYzEXAMPLEKEY' }
@@ -258,7 +266,7 @@ describe Awskeyring::Awsapi do
       allow(iam_client).to receive_messages(
         list_access_keys: { access_key_metadata: [
           {
-            access_key_id: 'AKIATESTTEST',
+            access_key_id: 'AKIA234567ABCDEFGHIJ',
             create_date: Time.parse('2016-12-01T22:19:58Z'),
             status: 'Active',
             user_name: 'Alice'
@@ -293,7 +301,7 @@ describe Awskeyring::Awsapi do
 
   context 'when key rotation fails' do
     let(:account) { 'test' }
-    let(:key) { 'AKIA1234567890ABCDEF' }
+    let(:key) { 'AKIA234567ABCDEFGHIJ' }
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     let(:key_message) { '# You have two access keys for account test' }
     let(:iam_client) { instance_double(Aws::IAM::Client) }
@@ -333,7 +341,7 @@ describe Awskeyring::Awsapi do
 
   context 'when key rotation fails to delete' do
     let(:account) { 'test' }
-    let(:key) { 'AKIA1234567890ABCDEF' }
+    let(:key) { 'AKIA234567ABCDEFGHIJ' }
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     let(:new_key) { 'AKIAIOSFODNN7EXAMPLE' }
     let(:new_secret) { 'wJalrXUtnFEMI/K7MDENG/bPxRiCYzEXAMPLEKEY' }
@@ -402,13 +410,14 @@ describe Awskeyring::Awsapi do
       expect(awsapi.get_env_array(
                account: 'test',
                expiry: 1_489_305_329,
-               key: 'ASIAIOSFODNN7EXAMPLE',
+               key: 'ASIA234567ABCDEFGHIJ',
                secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
                token: role_token
              )).to eq(
-               'AWS_ACCESS_KEY' => 'ASIAIOSFODNN7EXAMPLE',
-               'AWS_ACCESS_KEY_ID' => 'ASIAIOSFODNN7EXAMPLE',
+               'AWS_ACCESS_KEY' => 'ASIA234567ABCDEFGHIJ',
+               'AWS_ACCESS_KEY_ID' => 'ASIA234567ABCDEFGHIJ',
                'AWS_ACCOUNT_NAME' => 'test',
+               'AWS_ACCOUNT_ID' => '747118721026',
                'AWS_CREDENTIAL_EXPIRATION' => Time.at(1_489_305_329).iso8601,
                'AWS_DEFAULT_REGION' => 'us-east-1',
                'AWS_SECRET_ACCESS_KEY' => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
@@ -420,7 +429,7 @@ describe Awskeyring::Awsapi do
   end
 
   context 'when existing creds are loaded from a file' do
-    let(:key) { 'AKIA1234567890ABCDEF' }
+    let(:key) { 'AKIA234567ABCDEFGHIJ' }
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     let(:token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
     let(:account_key) { 'AKIAIOSFODNN7EXAMPLE' }
@@ -522,6 +531,10 @@ describe Awskeyring::Awsapi do
           user: 'rspec-user'
         )
       end.to raise_error(SystemExit).and output(/The security token included in the request is invalid/).to_stderr
+    end
+
+    it 'calls get_account_id with an invalid token' do
+      expect(awsapi.get_account_id(key: key)).to eq('000000000000')
     end
   end
 end

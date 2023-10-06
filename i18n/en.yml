@@ -5,6 +5,7 @@ en:
   add_role_desc: Adds a ROLE to the keyring
   awskeyring_desc: Autocompletion for bourne shells
   console_desc: Open the AWS Console for the ACCOUNT
+  decode_desc: Decode an account id from a KEY
   default_desc: Run default help or initialise if needed.
   env_desc: Outputs bourne shell environment exports for an ACCOUNT
   exec_desc: Execute a COMMAND with the environment set for an ACCOUNT
