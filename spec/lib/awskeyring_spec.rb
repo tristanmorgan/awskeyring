@@ -84,9 +84,9 @@ describe Awskeyring do
         Keychain::Item,
         attributes: {
           label: 'account test',
-          account: 'AKIATESTTEST',
+          account: 'AKIA234567ABCDEFGHIJ',
           updated_at: Time.parse('2016-12-01T22:20:01Z'),
-          comment: 'arn:aws:iam::012345678901:mfa/ec2-user'
+          comment: 'arn:aws:iam::747118721026:mfa/ec2-user'
         },
         password: 'biglongbase64'
       )
@@ -94,14 +94,14 @@ describe Awskeyring do
     let(:role) do
       instance_double(
         Keychain::Item,
-        attributes: { label: 'role test', account: 'arn:aws:iam::012345678901:role/test' },
+        attributes: { label: 'role test', account: 'arn:aws:iam::747118721026:role/test' },
         password: ''
       )
     end
     let(:roleee) do
       instance_double(
         Keychain::Item,
-        attributes: { label: 'role testee', account: 'arn:aws:iam::012345678901:role/testee' },
+        attributes: { label: 'role testee', account: 'arn:aws:iam::747118721026:role/testee' },
         password: ''
       )
     end
@@ -131,11 +131,11 @@ describe Awskeyring do
     it 'returns a hash with the creds' do
       expect(awskeyring.get_valid_creds(account: 'test', no_token: true)).to eq(
         account: 'test',
-        key: 'AKIATESTTEST',
+        key: 'AKIA234567ABCDEFGHIJ',
         secret: 'biglongbase64',
         token: nil,
         expiry: nil,
-        mfa: 'arn:aws:iam::012345678901:mfa/ec2-user',
+        mfa: 'arn:aws:iam::747118721026:mfa/ec2-user',
         updated: Time.parse('2016-12-01T22:20:01Z')
       )
     end
@@ -197,7 +197,7 @@ describe Awskeyring do
 
     it 'returns a hash with the role' do
       expect(awskeyring.get_role_arn(role_name: 'test')).to eq(
-        'arn:aws:iam::012345678901:role/test'
+        'arn:aws:iam::747118721026:role/test'
       )
     end
 
@@ -215,14 +215,14 @@ describe Awskeyring do
 
   context 'when there is accounts and roles and tokens' do
     let(:access_key) { 'AKIA234567ABCDEFGHIJ' }
-    let(:role_arn) { 'arn:aws:iam::012345678901:role/test' }
+    let(:role_arn) { 'arn:aws:iam::747118721026:role/test' }
     let(:item) do
       instance_double(
         Keychain::Item,
         attributes: {
           label: 'account test',
           account: access_key,
-          comment: 'arn:aws:iam::012345678901:mfa/ec2-user',
+          comment: 'arn:aws:iam::747118721026:mfa/ec2-user',
           updated_at: Time.parse('2016-12-01T22:20:01Z')
         },
         password: 'biglongbase64'
@@ -240,7 +240,7 @@ describe Awskeyring do
         Keychain::Item,
         attributes: {
           label: 'session-key test',
-          account: 'ASIATESTTEST',
+          account: 'ASIA234567ABCTESTHIJ',
           comment: 'role role',
           updated_at: Time.parse('2016-12-01T22:20:01Z')
         },
@@ -290,7 +290,7 @@ describe Awskeyring do
       end.to output(/# Using temporary session credentials/).to_stdout
       expect(test_hash).to eq(
         account: 'test',
-        key: 'ASIATESTTEST',
+        key: 'ASIA234567ABCTESTHIJ',
         secret: 'bigerlongbase64',
         token: 'evenlongerbase64token',
         expiry: Time.parse('2016-12-20T22:20:01Z').to_i,
@@ -306,14 +306,14 @@ describe Awskeyring do
         secret: 'biglongbase64',
         token: nil,
         expiry: nil,
-        mfa: 'arn:aws:iam::012345678901:mfa/ec2-user',
+        mfa: 'arn:aws:iam::747118721026:mfa/ec2-user',
         updated: Time.parse('2016-12-01T22:20:01Z')
       )
     end
 
     it 'returns a hash with the role' do
       expect(awskeyring.get_role_arn(role_name: 'role')).to eq(
-        'arn:aws:iam::012345678901:role/test'
+        'arn:aws:iam::747118721026:role/test'
       )
     end
 
@@ -348,6 +348,12 @@ describe Awskeyring do
     it 'lists all accounts' do
       expect(awskeyring.list_account_names).to eq(
         ['test']
+      )
+    end
+
+    it 'lists all accounts with detail' do
+      expect(awskeyring.list_account_names_plus).to eq(
+        ["test\t747118721026"]
       )
     end
 
@@ -389,20 +395,20 @@ describe Awskeyring do
 
     it 'lists all roles with detail' do
       expect(awskeyring.list_role_names_plus).to eq(
-        ["role\tarn:aws:iam::012345678901:role/test"]
+        ["role\tarn:aws:iam::747118721026:role/test"]
       )
     end
   end
 
   context 'when there is an expired token' do
-    let(:access_key) { 'AKIA1234567890ABCDEF' }
+    let(:access_key) { 'AKIA234567ABCDEFGHIJ' }
     let(:item) do
       instance_double(
         Keychain::Item,
         attributes: {
           label: 'account test',
           account: access_key,
-          comment: 'arn:aws:iam::012345678901:mfa/ec2-user',
+          comment: 'arn:aws:iam::747118721026:mfa/ec2-user',
           updated_at: Time.parse('2016-12-01T22:20:01Z')
         },
         password: 'biglongbase64'
@@ -413,7 +419,7 @@ describe Awskeyring do
         Keychain::Item,
         attributes: {
           label: 'session-key test',
-          account: 'ASIATESTTEST',
+          account: 'ASIA234567ABCTESTHIJ',
           comment: 'role role',
           updated_at: Time.parse('2016-12-01T22:20:01Z')
         },
@@ -462,7 +468,7 @@ describe Awskeyring do
       end.to output(/# Removing expired session credentials/).to_stdout
       expect(test_hash).to eq(
         account: 'test',
-        key: 'AKIA1234567890ABCDEF',
+        key: 'AKIA234567ABCDEFGHIJ',
         secret: 'biglongbase64',
         token: nil,
         expiry: nil,

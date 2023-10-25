@@ -4,6 +4,7 @@ require 'i18n'
 require 'json'
 require 'keychain'
 require 'awskeyring/validate'
+require 'awskeyring/awsapi'
 
 # Awskeyring Module,
 # gives you an interface to access keychains and items.
@@ -193,6 +194,19 @@ module Awskeyring # rubocop:disable Metrics/ModuleLength
     tokens = list_tokens.map { |elem| elem.attributes[:label][(SESSION_KEY_PREFIX.length)..] }
 
     (items + tokens).uniq.sort
+  end
+
+  # Return a list account item names plus account ids
+  def self.list_account_names_plus # rubocop:disable Metrics/AbcSize
+    list_items.concat(list_tokens).map do |elem|
+      account_id = Awskeyring::Awsapi.get_account_id(key: elem.attributes[:account])
+      account_name = if elem.attributes[:label].start_with?(ACCOUNT_PREFIX)
+                       elem.attributes[:label][(ACCOUNT_PREFIX.length)..]
+                     else
+                       elem.attributes[:label][(SESSION_KEY_PREFIX.length)..]
+                     end
+      "#{account_name}\t#{account_id}"
+    end.uniq.sort
   end
 
   # Return a list role item names

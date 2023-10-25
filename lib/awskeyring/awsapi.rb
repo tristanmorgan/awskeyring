@@ -25,6 +25,7 @@ module Awskeyring
     # AWS Env vars
     AWS_ENV_VARS = %w[
       AWS_ACCOUNT_NAME
+      AWS_ACCOUNT_ID
       AWS_ACCESS_KEY_ID
       AWS_ACCESS_KEY
       AWS_CREDENTIAL_EXPIRATION
@@ -123,14 +124,16 @@ module Awskeyring
     #    [String] secret The aws_secret_access_key
     #    [String] token The aws_session_token
     # @return [Hash] env_var hash
-    def self.get_env_array(params = {})
+    def self.get_env_array(params = {}) # rubocop:disable Metrics/CyclomaticComplexity, Metrics/AbcSize
       env_var = {}
       env_var['AWS_DEFAULT_REGION'] = 'us-east-1' unless region
 
       params[:expiration] = Time.at(params[:expiry]).iso8601 unless params[:expiry].nil?
+      params[:account_name] = params.delete(:account)
+      params[:account_id] = get_account_id(key: params[:key]) unless params[:key].nil?
 
-      params.each_key do |param_name|
-        AWS_ENV_VARS.each do |var_name|
+      AWS_ENV_VARS.each do |var_name|
+        params.each_key do |param_name|
           if var_name.include?(param_name.to_s.upcase) && !params[param_name].nil?
             env_var[var_name] = params[param_name]
           end
@@ -227,6 +230,30 @@ module Awskeyring
       keys = %w[AWS_REGION AMAZON_REGION AWS_DEFAULT_REGION]
       region = ENV.values_at(*keys).compact.first
       region || Aws.shared_config.region(profile: 'default')
+    end
+
+    # Get the account number from an access key
+    #
+    # @param [String] key The aws_access_key_id
+    # @return [String] Account number
+    def self.get_account_id(key:)
+      padded_no = key[3..12]
+      mask = (2 << 39) - 1
+      decimal = (decode(padded_no) >> 4) & mask
+      decimal.to_s.rjust(12, '0')
+    end
+
+    # base32 decode function
+    # returns 0 on failure
+    private_class_method def self.decode(str)
+      aws_table = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
+      bytes = str.bytes
+      bytes.inject do |m, o|
+        i = aws_table.index(o.chr)
+        return 0 if i.nil?
+
+        (m << 5) + i
+      end
     end
 
     # Rotates the AWS access keys

@@ -77,13 +77,18 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   desc 'list', I18n.t('list_desc')
+  method_option :detail, type: :boolean, aliases: '-d', desc: I18n.t('method_option.detail'), default: false
   # list the accounts
   def list
     if Awskeyring.list_account_names.empty?
       warn I18n.t('message.missing_account', bin: File.basename($PROGRAM_NAME))
       exit 1
     end
-    puts Awskeyring.list_account_names.join("\n")
+    if options[:detail]
+      puts Awskeyring.list_account_names_plus.join("\n")
+    else
+      puts Awskeyring.list_account_names.join("\n")
+    end
   end
 
   desc 'list-role', I18n.t('list_role_desc')
@@ -426,6 +431,16 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     end
   end
 
+  desc 'decode KEY', I18n.t('decode_desc'), hide: true
+  # decode account numbers
+  def decode(key = nil)
+    key = ask_check(
+      existing: key, message: I18n.t('message.key'), validator: Awskeyring::Validate.method(:access_key)
+    )
+
+    puts Awskeyring::Awsapi.get_account_id(key: key)
+  end
+
   desc "#{File.basename($PROGRAM_NAME)} CURR PREV", I18n.t('awskeyring_desc'), hide: true
   map File.basename($PROGRAM_NAME) => :autocomplete
   # autocomplete
@@ -522,7 +537,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   # list command names
   def list_commands
     commands = self.class.all_commands.keys.map { |elem| elem.tr('_', '-') }
-    commands.reject! { |elem| %w[autocomplete default].include?(elem) }
+    commands.reject! { |elem| %w[autocomplete default decode].include?(elem) }
   end
 
   # list flags for a command

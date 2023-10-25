@@ -90,8 +90,9 @@ describe AwskeyringCommand do
   context 'when accounts and roles are set' do
     before do
       allow(Awskeyring).to receive_messages(
-        list_account_names: %w[company personal servian],
-        list_token_names: %w[personal sersaml],
+        list_account_names: %w[company personal sarviun],
+        list_account_names_plus: %W[company\t123456 personal\t345678 sarviun\t432765],
+        list_token_names: %w[personal sarsaml],
         list_role_names: %w[admin minion readonly],
         list_role_names_plus: %W[admin\tarn1 minion\tarn2 readonly\tarn3],
         list_console_path: %w[iam cloudformation vpc],
@@ -104,24 +105,29 @@ describe AwskeyringCommand do
       ['awskeyring con', %w[con awskeyring], "console\n", 'commands'],
       ['awskeyring list', %w[list awskeyring], "list\nlist-role\n", 'similar commands'],
       ['awskeyring help list',   %w[list help],  "list\nlist-role\n", 'commands for help'],
-      ['awskeyring token ser',   %w[ser token],  "servian\n", 'account names'],
-      ['awskeyring exec ser', %w[ser exec], "servian\n", 'accounts for exec'],
+      ['awskeyring token sar',   %w[sar token],  "sarviun\n", 'account names'],
+      ['awskeyring exec sar', %w[sar exec], "sarviun\n", 'accounts for exec'],
       ['awskeyring remove-role min', %w[min remove-role], "minion\n", 'roles'],
       ['awskeyring rmr min',  %w[min rmr], "minion\n", 'roles for short commands'],
-      ['awskeyring rmt ser',  %w[ser rmt], "sersaml\n", 'tokens'],
-      ['awskeyring token servian minion 123456 --dura', %w[--dura 123456], "--duration\n", 'flags'],
-      ['awskeyring token servian minion --dura', %w[--dura minion], "--duration\n", 'flags'],
-      ['awskeyring con servian --p', %w[--p servian], "--path\n", 'flags'],
+      ['awskeyring rmt sar',  %w[sar rmt], "sarsaml\n", 'tokens'],
+      ['awskeyring token sarviun minion 123456 --dura', %w[--dura 123456], "--duration\n", 'flags'],
+      ['awskeyring token sarviun minion --dura', %w[--dura minion], "--duration\n", 'flags'],
+      ['awskeyring con sarviun --p', %w[--p sarviun], "--path\n", 'flags'],
       ['awskeyring add sarveun --n', %w[--n sarveun], "--no-remote\n", 'flags for add'],
       ['awskeyring -v --n', %w[--n -v], "--no-remote\n", 'flags for --version'],
-      ['awskeyring exec servian --no', %w[--no servian], "--no-bundle\n--no-token\n", 'flags for exec'],
-      ['awskeyring console servian --path cloud', %w[cloud --path], "cloudformation\n", 'console paths'],
-      ['awskeyring con servian --browser Sa',  %w[Sa --browser], "Safari\n", 'browsers']
+      ['awskeyring exec sarviun --no', %w[--no sarviun], "--no-bundle\n--no-token\n", 'flags for exec'],
+      ['awskeyring console sarviun --path cloud', %w[cloud --path], "cloudformation\n", 'console paths'],
+      ['awskeyring con sarviun --browser Sa',  %w[Sa --browser], "Safari\n", 'browsers']
     ]
 
     it 'list keychain items' do
       expect { described_class.start(%w[list]) }
-        .to output("company\npersonal\nservian\n").to_stdout
+        .to output("company\npersonal\nsarviun\n").to_stdout
+    end
+
+    it 'list keychain items with detail' do
+      expect { described_class.start(%w[list -d]) }
+        .to output("company\t123456\npersonal\t345678\nsarviun\t432765\n").to_stdout
     end
 
     it 'list keychain roles' do
@@ -132,6 +138,11 @@ describe AwskeyringCommand do
     it 'list keychain roles with detail' do
       expect { described_class.start(%w[list-role -d]) }
         .to output("admin\tarn1\nminion\tarn2\nreadonly\tarn3\n").to_stdout
+    end
+
+    it 'decodes an account number from a key' do
+      expect { described_class.start(%w[decode AKIA234567ABCDEFGHIJ]) }
+        .to output("747118721026\n").to_stdout
     end
 
     test_cases.shuffle.each do |testcase|
@@ -176,13 +187,12 @@ describe AwskeyringCommand do
       allow(Awskeyring).to receive(:delete_role)
       allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false).and_return(
         account: 'test',
-        key: 'AKIATESTTEST',
+        key: 'AKIA234567ABCDEFGHIJ',
         secret: 'biglongbase64',
         token: nil,
         updated: Time.parse('2011-08-11T22:20:01Z')
       )
       allow(Time).to receive(:new).and_return(Time.parse('2011-07-11T19:55:29.611Z'))
-      allow(Awskeyring::Awsapi).to receive(:region).and_return(nil)
       allow(Awskeyring).to receive_messages(
         account_exists: 'test',
         role_exists: 'test',
@@ -207,8 +217,9 @@ describe AwskeyringCommand do
       expect { described_class.start(%w[env test --force]) }
         .to output(%(export AWS_DEFAULT_REGION="us-east-1"
 export AWS_ACCOUNT_NAME="test"
-export AWS_ACCESS_KEY_ID="AKIATESTTEST"
-export AWS_ACCESS_KEY="AKIATESTTEST"
+export AWS_ACCOUNT_ID="747118721026"
+export AWS_ACCESS_KEY_ID="AKIA234567ABCDEFGHIJ"
+export AWS_ACCESS_KEY="AKIA234567ABCDEFGHIJ"
 export AWS_SECRET_ACCESS_KEY="biglongbase64"
 export AWS_SECRET_KEY="biglongbase64"
 unset AWS_CREDENTIAL_EXPIRATION
@@ -222,6 +233,7 @@ unset AWS_SESSION_TOKEN
       expect { described_class.start(%w[env --unset]) }
         .to output(%(export AWS_DEFAULT_REGION="us-east-1"
 unset AWS_ACCOUNT_NAME
+unset AWS_ACCOUNT_ID
 unset AWS_ACCESS_KEY_ID
 unset AWS_ACCESS_KEY
 unset AWS_CREDENTIAL_EXPIRATION
@@ -238,8 +250,9 @@ unset AWS_SESSION_TOKEN
     let(:env_vars) do
       { 'AWS_DEFAULT_REGION' => 'us-east-1',
         'AWS_ACCOUNT_NAME' => 'test',
-        'AWS_ACCESS_KEY_ID' => 'ASIATESTTEST',
-        'AWS_ACCESS_KEY' => 'ASIATESTTEST',
+        'AWS_ACCOUNT_ID' => '747118721026',
+        'AWS_ACCESS_KEY_ID' => 'ASIA234567ABCDEFGHIJ',
+        'AWS_ACCESS_KEY' => 'ASIA234567ABCDEFGHIJ',
         'AWS_CREDENTIAL_EXPIRATION' => Time.at(1_310_414_129).iso8601,
         'AWS_SECRET_ACCESS_KEY' => 'bigerlongbase64',
         'AWS_SECRET_KEY' => 'bigerlongbase64',
@@ -253,7 +266,7 @@ unset AWS_SESSION_TOKEN
       allow(Awskeyring).to receive(:delete_token)
       allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: false).and_return(
         account: 'test',
-        key: 'ASIATESTTEST',
+        key: 'ASIA234567ABCDEFGHIJ',
         secret: 'bigerlongbase64',
         token: 'evenlongerbase64token',
         role: 'role',
@@ -262,7 +275,7 @@ unset AWS_SESSION_TOKEN
       )
       allow(Awskeyring).to receive(:get_valid_creds).with(account: 'test', no_token: true).and_return(
         account: 'test',
-        key: 'AKIATESTTEST',
+        key: 'AKIA234567ABCDEFGHIJ',
         secret: 'biglongbase64',
         token: nil,
         expiry: nil,
@@ -295,13 +308,14 @@ unset AWS_SESSION_TOKEN
       expect { described_class.start(%w[env test]) }
         .to output(%(export AWS_DEFAULT_REGION="us-east-1"
 export AWS_ACCOUNT_NAME="test"
-export AWS_ACCESS_KEY_ID="ASIATESTTEST"
-export AWS_ACCESS_KEY="ASIATESTTEST"
+export AWS_ACCOUNT_ID="747118721026"
+export AWS_ACCESS_KEY_ID="ASIA234567ABCDEFGHIJ"
+export AWS_ACCESS_KEY="ASIA234567ABCDEFGHIJ"
+export AWS_CREDENTIAL_EXPIRATION="#{Time.at(1_310_414_129).iso8601}"
 export AWS_SECRET_ACCESS_KEY="bigerlongbase64"
 export AWS_SECRET_KEY="bigerlongbase64"
 export AWS_SECURITY_TOKEN="evenlongerbase64token"
 export AWS_SESSION_TOKEN="evenlongerbase64token"
-export AWS_CREDENTIAL_EXPIRATION="#{Time.at(1_310_414_129).iso8601}"
 )).to_stdout
       expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: false)
     end
@@ -310,8 +324,9 @@ export AWS_CREDENTIAL_EXPIRATION="#{Time.at(1_310_414_129).iso8601}"
       expect { described_class.start(%w[env test --no-token]) }
         .to output(%(export AWS_DEFAULT_REGION="us-east-1"
 export AWS_ACCOUNT_NAME="test"
-export AWS_ACCESS_KEY_ID="AKIATESTTEST"
-export AWS_ACCESS_KEY="AKIATESTTEST"
+export AWS_ACCOUNT_ID="747118721026"
+export AWS_ACCESS_KEY_ID="AKIA234567ABCDEFGHIJ"
+export AWS_ACCESS_KEY="AKIA234567ABCDEFGHIJ"
 export AWS_SECRET_ACCESS_KEY="biglongbase64"
 export AWS_SECRET_KEY="biglongbase64"
 unset AWS_CREDENTIAL_EXPIRATION
@@ -325,7 +340,7 @@ unset AWS_SESSION_TOKEN
       expect { described_class.start(%w[json test]) }
         .to output("#{JSON.pretty_generate(
           Version: 1,
-          AccessKeyId: 'ASIATESTTEST',
+          AccessKeyId: 'ASIA234567ABCDEFGHIJ',
           SecretAccessKey: 'bigerlongbase64',
           SessionToken: 'evenlongerbase64token',
           Expiration: Time.at(Time.parse('2011-07-11T19:55:29.611Z').to_i).iso8601
