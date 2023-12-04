@@ -1,8 +1,17 @@
 # Changelog
 
-## [1.11.0](https://github.com/tristanmorgan/awskeyring/tree/1.11.0) (2023-02-21)
+## [1.12.0](https://github.com/tristanmorgan/awskeyring/tree/1.12.0) (2023-12-04)
 
-[Full Changelog](https://github.com/tristanmorgan/awskeyring/compare/v1.10.1...1.11.0)
+[Full Changelog](https://github.com/tristanmorgan/awskeyring/compare/v1.11.0...1.12.0)
+
+**Merged pull requests:**
+
+- Decode Account IDs from access keys. [\#93](https://github.com/tristanmorgan/awskeyring/pull/93) ([tristanmorgan](https://github.com/tristanmorgan))
+- Migrate away from Travis CI to GitHub Actions [\#92](https://github.com/tristanmorgan/awskeyring/pull/92) ([tristanmorgan](https://github.com/tristanmorgan))
+
+## [v1.11.0](https://github.com/tristanmorgan/awskeyring/tree/v1.11.0) (2023-02-21)
+
+[Full Changelog](https://github.com/tristanmorgan/awskeyring/compare/v1.10.1...v1.11.0)
 
 **Implemented enhancements:**
 
