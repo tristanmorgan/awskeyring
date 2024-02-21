@@ -2,6 +2,7 @@
 
 ![Awskeyring](https://raw.githubusercontent.com/tristanmorgan/awskeyring/main/awskeyring-144.png)
 
+* ![Build Passing](https://github.com/tristanmorgan/awskeyring/actions/workflows/ruby.yml/badge.svg)
 * [![Gem Version](https://img.shields.io/gem/v/awskeyring)](https://badge.fury.io/rb/awskeyring)
 * [![license MIT](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://opensource.org/licenses/MIT)
 * [![All Downloads](https://img.shields.io/gem/dt/awskeyring)](https://rubygems.org/gems/awskeyring)

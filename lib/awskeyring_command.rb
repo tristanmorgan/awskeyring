@@ -186,8 +186,8 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   method_option 'no-bundle', type: :boolean, aliases: '-b', desc: I18n.t('method_option.nobundle'), default: false
   method_option 'no-token', type: :boolean, aliases: '-n', desc: I18n.t('method_option.notoken'), default: false
   # execute an external command with env set
-  def exec(account, *command) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
-    if command.empty?
+  def exec(account, *exec) # rubocop:disable Metrics/MethodLength, Metrics/AbcSize
+    if exec.empty?
       warn I18n.t('message.exec')
       exit 1
     end
@@ -199,7 +199,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
     env_vars = Awskeyring::Awsapi.get_env_array(cred)
     unbundle if options['no-bundle']
     begin
-      pid = Process.spawn(env_vars, command.join(' '))
+      pid = Process.spawn(env_vars, exec.join(' '))
       Process.wait pid
       exit 1 if Process.last_status.exitstatus.positive?
     rescue Errno::ENOENT => e
@@ -456,7 +456,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
 
     comp_lines = comp_line[0..(comp_point_str.to_i)].split
 
-    comp_type, sub_cmd = comp_type(comp_lines: comp_lines, prev: prev)
+    comp_type, sub_cmd = comp_type(comp_lines: comp_lines, prev: prev, curr: curr)
     list = fetch_auto_resp(comp_type, sub_cmd)
     puts list.select { |elem| elem.start_with?(curr) }.sort!.join("\n")
   end
@@ -473,7 +473,7 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
   end
 
   # determine the type of completion needed
-  def comp_type(comp_lines:, prev:)
+  def comp_type(comp_lines:, prev:, curr:)
     sub_cmd = sub_command(comp_lines)
     comp_idx = comp_lines.rindex(prev)
 
@@ -484,19 +484,19 @@ class AwskeyringCommand < Thor # rubocop:disable Metrics/ClassLength
       comp_type = :browser_type
     else
       comp_type = :command
-      comp_type = param_type(comp_idx, sub_cmd) unless sub_cmd.empty?
+      comp_type = param_type(comp_idx, sub_cmd, curr) unless sub_cmd.empty?
     end
 
     [comp_type, sub_cmd]
   end
 
   # check params for named params or fall back to flags
-  def param_type(comp_idx, sub_cmd)
-    types = %i[opt req]
+  def param_type(comp_idx, sub_cmd, curr)
+    types = %i[opt req rest]
     param_list = method(sub_cmd).parameters.select { |elem| types.include? elem[0] }
     if comp_idx.zero?
       :command
-    elsif comp_idx > param_list.length
+    elsif comp_idx > param_list.length || curr.start_with?('-')
       :flag
     else
       param_list[comp_idx - 1][1]
