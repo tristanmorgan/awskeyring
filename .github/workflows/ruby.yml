@@ -17,7 +17,7 @@ jobs:
   test:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -33,3 +33,10 @@ jobs:
         run: bundle exec rake ronn
       - name: Run Yard Doc
         run: bundle exec rake yard
+      - name: Run build Package
+        run: bundle exec rake build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: awskeyring_gem
+          path: pkg/awskeyring*.gem
+          if-no-files-found: error
