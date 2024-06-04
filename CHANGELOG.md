@@ -1,8 +1,8 @@
 # Changelog
 
-## [1.12.0](https://github.com/tristanmorgan/awskeyring/tree/1.12.0) (2023-12-04)
+## [v1.12.0](https://github.com/tristanmorgan/awskeyring/tree/v1.12.0) (2023-12-04)
 
-[Full Changelog](https://github.com/tristanmorgan/awskeyring/compare/v1.11.0...1.12.0)
+[Full Changelog](https://github.com/tristanmorgan/awskeyring/compare/v1.11.0...v1.12.0)
 
 **Merged pull requests:**
 
