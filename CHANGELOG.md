@@ -1,5 +1,9 @@
 # Changelog
 
+## [v1.12.1](https://github.com/tristanmorgan/awskeyring/tree/v1.12.1) (2024-06-04)
+
+[Full Changelog](https://github.com/tristanmorgan/awskeyring/compare/v1.12.0...v1.12.1)
+
 ## [v1.12.0](https://github.com/tristanmorgan/awskeyring/tree/v1.12.0) (2023-12-04)
 
 [Full Changelog](https://github.com/tristanmorgan/awskeyring/compare/v1.11.0...v1.12.0)
