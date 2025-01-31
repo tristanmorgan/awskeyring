@@ -50,7 +50,8 @@ The commands are as follows:
 
     -f, --force: Force output to a tty.<br>
     -n, --no-token: Do not use saved token.<br>
-    -u, --unset, --no-unset: Unset environment variables.
+    -t, --test: Generate test credentials.<br>
+    -u, --unset: Unset environment variables.
 
 * exec ACCOUNT command...:
 
@@ -80,7 +81,8 @@ The commands are as follows:
     Outputs AWS CLI compatible JSON for an ACCOUNT<br>
 
     -f, --force:    Force output to a tty.<br>
-    -n, --no-token: Do not use saved token.
+    -n, --no-token: Do not use saved token.<br>
+    -t, --test: Generate test credentials.
 
 * list:
 

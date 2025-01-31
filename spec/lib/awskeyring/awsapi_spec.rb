@@ -536,5 +536,11 @@ describe Awskeyring::Awsapi do
     it 'calls get_account_id with an invalid token' do
       expect(awsapi.get_account_id(key: key)).to eq('000000000000')
     end
+
+    it 'generates test credentials' do
+      creds = awsapi.gen_test_credentials(account: 'testaccount')
+      expect { Awskeyring::Validate.access_key(creds[:key]) }.not_to raise_error
+      expect { Awskeyring::Validate.secret_access_key(creds[:secret]) }.not_to raise_error
+    end
   end
 end

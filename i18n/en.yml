@@ -33,6 +33,7 @@ en:
     notoken: 'Do not use saved token.'
     noremote: 'Do not validate with remote api.'
     path: 'The service PATH to open.'
+    test: 'Generate test credentials.'
     browser: 'Specify an alternative browser.'
     secret: 'AWS account secret.'
     unset: 'Unset environment variables.'
