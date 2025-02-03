@@ -169,7 +169,7 @@ describe AwskeyringCommand do
       ENV['COMP_POINT'] = ENV['COMP_LINE'].size.to_s
       allow(ARGF).to receive(:argv).and_return(['awskeyring', '--', 'test'])
       expect { described_class.start(%w[autocomplete test]) }
-        .to output(/--force\n--no-token\n--unset/).to_stdout
+        .to output(/--force\n--no-token\n--test\n--unset/).to_stdout
       ENV['COMP_LINE'] = nil
     end
 
@@ -243,6 +243,12 @@ unset AWS_SECRET_KEY
 unset AWS_SECURITY_TOKEN
 unset AWS_SESSION_TOKEN
 )).to_stdout
+      expect(Awskeyring).not_to have_received(:get_valid_creds)
+    end
+
+    it 'export a fake AWS Access key' do
+      expect { described_class.start(%w[env test --test]) }
+        .to output(/export AWS_DEFAULT_REGION="us-east-1"/).to_stdout
       expect(Awskeyring).not_to have_received(:get_valid_creds)
     end
   end
@@ -348,6 +354,12 @@ unset AWS_SESSION_TOKEN
         )}\n").to_stdout
       expect(Awskeyring).to have_received(:account_exists).with('test')
       expect(Awskeyring).to have_received(:get_valid_creds).with(account: 'test', no_token: false)
+    end
+
+    it 'provides a test account via JSON' do
+      expect { described_class.start(%w[json test --test]) }
+        .to output(/  "Version": 1,/).to_stdout
+      expect(Awskeyring).not_to have_received(:get_valid_creds).with(account: 'test', no_token: false)
     end
 
     it 'runs an external command' do

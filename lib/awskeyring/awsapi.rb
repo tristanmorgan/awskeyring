@@ -3,6 +3,7 @@
 require 'aws-sdk-iam'
 require 'cgi'
 require 'json'
+require 'securerandom'
 
 # Awskeyring Module,
 # gives you an interface to access keychains and items.
@@ -176,6 +177,23 @@ module Awskeyring
         secret: creds.credentials.secret_access_key,
         token: creds.credentials.session_token,
         expiry: Time.new + TWELVE_HOUR,
+        role: nil
+      }
+    end
+
+    # Generate test credentials for AWS
+    #
+    # @return [Hash] with the new credentials
+    #    key The aws_access_key_id
+    #    secret The aws_secret_access_key
+    #    expiry expiry time
+    def self.gen_test_credentials(account:)
+      {
+        account: account,
+        key: "AKIA#{Array.new(16) { [*'A'..'Z', *'2'..'7'].sample }.join}",
+        secret: SecureRandom.base64(30),
+        token: nil,
+        expiry: nil,
         role: nil
       }
     end
