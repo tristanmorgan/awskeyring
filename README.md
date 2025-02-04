@@ -12,6 +12,11 @@
 Awskeyring is a small tool to manage AWS account keys in the macOS Keychain. It has
 grown to incorporate a lot of [features](https://github.com/tristanmorgan/awskeyring/wiki/Awskeyring-features).
 
+## Project Status
+
+Awskeyring is a fairly mature project so it it doesn't see frequent updates but is still being maintained.
+It is tested against the version of Ruby that is shipped with the latest version of macOS, but that ruby version is dated.
+
 ## Motivation
 
 The motivation of this application is to provide a local secure store of AWS

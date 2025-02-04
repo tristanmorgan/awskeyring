@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.13.0](https://github.com/tristanmorgan/awskeyring/tree/1.13.0) (2025-02-04)
+
+[Full Changelog](https://github.com/tristanmorgan/awskeyring/compare/v1.12.1...1.13.0)
+
+**Merged pull requests:**
+
+- Generate fake creds for testing. [\#94](https://github.com/tristanmorgan/awskeyring/pull/94) ([tristanmorgan](https://github.com/tristanmorgan))
+
 ## [v1.12.1](https://github.com/tristanmorgan/awskeyring/tree/v1.12.1) (2024-06-04)
 
 [Full Changelog](https://github.com/tristanmorgan/awskeyring/compare/v1.12.0...v1.12.1)

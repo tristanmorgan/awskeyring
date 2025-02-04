@@ -195,7 +195,7 @@ access your "awskeyring" keychain. Use a strong password and keep the unlock tim
 
 ## AUTHOR
 
-Tristan Morgan <tristan.morgan@gmail.com> is the maintainer of Awskeyring.
+Tristan Morgan <tristan.morgan@gmail.com> is the maintainer and author of Awskeyring.
 
 ## CONTRIBUTORS
 
