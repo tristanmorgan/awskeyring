@@ -50,6 +50,19 @@ describe Awskeyring::Validate do
     end
   end
 
+  context 'when validating Keys for Garage' do
+    let(:test_key) { 'GK0123456789abcdef01234567' }
+    let(:test_secret) { '0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef' }
+
+    it 'validates a garage secret access key' do
+      expect { validate.secret_access_key(test_secret) }.not_to raise_error
+    end
+
+    it 'validates a garage access key' do
+      expect { validate.access_key(test_key) }.not_to raise_error
+    end
+  end
+
   context 'when validating inputs ARNs' do
     let(:mfa_arn) { 'arn:aws:iam::012345678901:mfa/ec2-user' }
     let(:bad_mfa_arn) { 'arn:azure:iamnot::ABCD45678901:Administrators' }

@@ -20,7 +20,7 @@ module Awskeyring
     #
     # @param [String] aws_access_key The aws_access_key_id
     def self.access_key(aws_access_key)
-      raise 'Invalid Access Key' unless /\AAKIA[A-Z234567]{16}\z/.match?(aws_access_key)
+      raise 'Invalid Access Key' unless /\AAKIA[A-Z234567]{16}\z|\AGK[a-f0-9]{24}\z/.match?(aws_access_key)
 
       aws_access_key
     end
@@ -29,6 +29,8 @@ module Awskeyring
     #
     # @param [String] aws_secret_access_key The aws_secret_access_key
     def self.secret_access_key(aws_secret_access_key)
+      return aws_secret_access_key if /\A[a-f0-9]{64}\z/.match?(aws_secret_access_key)
+
       begin
         raise 'Invalid Secret Access Key' unless Base64.strict_decode64(aws_secret_access_key).length == 30
       rescue ArgumentError
