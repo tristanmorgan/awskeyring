@@ -14,8 +14,8 @@ describe Awskeyring::Validate do
     let(:test_mfa_code) { '321654' }
     let(:test_broken_secret) { 'hI7XqAiaR_XJxKgCqG0Wo79jm2+GcRYP' }
     let(:test_secret) { 'vbkEXAMPLEa3TlCP2Fvmcbdp83LSaeDHtx13xc+M' }
-    let(:test_broken_key) { 'AKIA1234567890' }
     let(:test_key) { 'AKIA234567ABCDEFGHIJ' }
+    let(:test_session_key) { 'ASIA234567ABCDEFGHIJ' }
 
     it 'validates an account name' do
       expect { validate.account_name(test_account) }.not_to raise_error
@@ -30,7 +30,15 @@ describe Awskeyring::Validate do
     end
 
     it 'invalidates an access key' do
-      expect { validate.access_key(test_broken_key) }.to raise_error('Invalid Access Key')
+      expect { validate.access_key(test_session_key) }.to raise_error('Invalid Access Key')
+    end
+
+    it 'validates an session key' do
+      expect { validate.session_key(test_session_key) }.not_to raise_error
+    end
+
+    it 'invalidates an session key' do
+      expect { validate.session_key(test_key) }.to raise_error('Invalid Session Key')
     end
 
     it 'validates an secret access key' do
