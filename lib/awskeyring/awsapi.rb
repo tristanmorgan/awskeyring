@@ -5,6 +5,8 @@ require 'cgi'
 require 'json'
 require 'securerandom'
 
+require 'awskeyring/validate'
+
 # Awskeyring Module,
 # gives you an interface to access keychains and items.
 module Awskeyring
@@ -92,8 +94,8 @@ module Awskeyring
       end
 
       {
-        key: response.credentials[:access_key_id],
-        secret: response.credentials[:secret_access_key],
+        key: Awskeyring::Validate.session_key(response.credentials[:access_key_id]),
+        secret: Awskeyring::Validate.secret_access_key(response.credentials[:secret_access_key]),
         token: response.credentials[:session_token],
         expiry: response.credentials[:expiration]
       }

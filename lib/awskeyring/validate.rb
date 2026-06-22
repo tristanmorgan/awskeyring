@@ -25,6 +25,15 @@ module Awskeyring
       aws_access_key
     end
 
+    # Validate an AWS Session Key ID
+    #
+    # @param [String] aws_session_key The aws_session_key_id
+    def self.session_key(aws_session_key)
+      raise 'Invalid Session Key' unless /\AASIA[A-Z234567]{16}\z/.match?(aws_session_key)
+
+      aws_session_key
+    end
+
     # Validate an AWS Secret Key ID
     #
     # @param [String] aws_secret_access_key The aws_secret_access_key

@@ -25,7 +25,7 @@ describe Awskeyring::Awsapi do
           credentials: {
             access_key_id: 'ASIAIOSFODNN7EXAMPLE',
             expiration: Time.parse('2011-07-11T19:55:29.611Z'),
-            secret_access_key: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+            secret_access_key: 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ',
             session_token: mfa_token
           }
         )
@@ -46,7 +46,7 @@ describe Awskeyring::Awsapi do
           credentials: {
             access_key_id: 'ASIAIOSFODNN7EXAMPLE',
             expiration: Time.parse('2011-07-15T23:28:33.359Z'),
-            secret_access_key: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+            secret_access_key: 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ',
             session_token: role_token
           },
           packed_policy_size: 6
@@ -68,7 +68,7 @@ describe Awskeyring::Awsapi do
           credentials: {
             access_key_id: 'ASIAIOSFODNN7EXAMPLE',
             expiration: Time.parse('2011-07-15T23:28:33.359Z'),
-            secret_access_key: 'wJalrXUtnFEMI/MFADENG/bPxRfiCYzEXAMPLEKEY',
+            secret_access_key: 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ',
             session_token: rofa_token
           },
           packed_policy_size: 6
@@ -84,7 +84,7 @@ describe Awskeyring::Awsapi do
           credentials: {
             access_key_id: 'ASIAIUGFODNN7EXAMPLE',
             expiration: Time.parse('2012-07-11T19:55:29.611Z'),
-            secret_access_key: 'wJalrXUXvFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+            secret_access_key: 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ',
             session_token: fed_token
           }
         )
@@ -100,7 +100,7 @@ describe Awskeyring::Awsapi do
                user: 'rspec-user'
              )).to eq(
                key: 'ASIAIOSFODNN7EXAMPLE',
-               secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+               secret: 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ',
                token: role_token,
                expiry: Time.parse('2011-07-15T23:28:33.359Z')
              )
@@ -115,7 +115,7 @@ describe Awskeyring::Awsapi do
                user: 'rspec-user'
              )).to eq(
                key: 'ASIAIOSFODNN7EXAMPLE',
-               secret: 'wJalrXUtnFEMI/MFADENG/bPxRfiCYzEXAMPLEKEY',
+               secret: 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ',
                token: rofa_token,
                expiry: Time.parse('2011-07-15T23:28:33.359Z')
              )
@@ -130,7 +130,7 @@ describe Awskeyring::Awsapi do
                user: 'rspec-user'
              )).to eq(
                key: 'ASIAIOSFODNN7EXAMPLE',
-               secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+               secret: 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ',
                token: mfa_token,
                expiry: Time.parse('2011-07-11T19:55:29.611Z')
              )
@@ -145,7 +145,7 @@ describe Awskeyring::Awsapi do
                user: 'rspec-user'
              )).to eq(
                key: 'ASIAIUGFODNN7EXAMPLE',
-               secret: 'wJalrXUXvFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+               secret: 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ',
                token: fed_token,
                expiry: Time.parse('2012-07-11T19:55:29.611Z')
              )
@@ -154,13 +154,13 @@ describe Awskeyring::Awsapi do
     it 'returns a JSON formatted Credential' do
       expect(awsapi.get_cred_json(
                key: 'ASIAIOSFODNN7EXAMPLE',
-               secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+               secret: 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ',
                token: role_token,
                expiry: Time.parse('2011-07-11T19:55:29.611Z')
              )).to eq(%({
   "Version": 1,
   "AccessKeyId": "ASIAIOSFODNN7EXAMPLE",
-  "SecretAccessKey": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY",
+  "SecretAccessKey": "HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ",
   "SessionToken": "AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi",
   "Expiration": "2011-07-11 19:55:29 UTC"
 }))
@@ -179,8 +179,8 @@ describe Awskeyring::Awsapi do
           instance_double(
             Aws::STS::Types::GetFederationTokenResponse,
             credentials: {
-              access_key_id: 'ASIATESTETSTTETS',
-              secret_access_key: 'verybiglonghexkey',
+              access_key_id: 'ASIA234567ABCDEFGHIJ',
+              secret_access_key: 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ',
               session_token: 'evenlongerbiglonghexkey',
               expiration: 5
             }
@@ -255,7 +255,7 @@ describe Awskeyring::Awsapi do
     let(:key) { 'AKIA234567ABCDEFGHIJ' }
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     let(:new_key) { 'AKIAIOSFODNN7EXAMPLE' }
-    let(:new_secret) { 'wJalrXUtnFEMI/K7MDENG/bPxRiCYzEXAMPLEKEY' }
+    let(:new_secret) { 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ' }
     let(:key_message) { '# You have two access keys for account test' }
 
     let(:iam_client) { instance_double(Aws::IAM::Client) }
@@ -344,7 +344,7 @@ describe Awskeyring::Awsapi do
     let(:key) { 'AKIA234567ABCDEFGHIJ' }
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     let(:new_key) { 'AKIAIOSFODNN7EXAMPLE' }
-    let(:new_secret) { 'wJalrXUtnFEMI/K7MDENG/bPxRiCYzEXAMPLEKEY' }
+    let(:new_secret) { 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ' }
     let(:key_message) { '# You have two access keys for account test' }
 
     let(:iam_client) { instance_double(Aws::IAM::Client) }
@@ -411,7 +411,7 @@ describe Awskeyring::Awsapi do
                account: 'test',
                expiry: 1_489_305_329,
                key: 'ASIA234567ABCDEFGHIJ',
-               secret: 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+               secret: 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ',
                token: role_token
              )).to eq(
                'AWS_ACCESS_KEY' => 'ASIA234567ABCDEFGHIJ',
@@ -420,8 +420,8 @@ describe Awskeyring::Awsapi do
                'AWS_ACCOUNT_ID' => '747118721026',
                'AWS_CREDENTIAL_EXPIRATION' => Time.at(1_489_305_329).iso8601,
                'AWS_DEFAULT_REGION' => 'us-east-1',
-               'AWS_SECRET_ACCESS_KEY' => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
-               'AWS_SECRET_KEY' => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYzEXAMPLEKEY',
+               'AWS_SECRET_ACCESS_KEY' => 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ',
+               'AWS_SECRET_KEY' => 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ',
                'AWS_SECURITY_TOKEN' => role_token,
                'AWS_SESSION_TOKEN' => role_token
              )
@@ -433,7 +433,7 @@ describe Awskeyring::Awsapi do
     let(:secret) { 'AbCkTEsTAAAi8ni0987ASDFwer23j14FEQW3IUJV' }
     let(:token) { 'AQoDYXdzEPT//////////wEXAMPLEtc764assume_roleDOk4x4HIZ8j4FZTwdQWLWsKWHGBuFqwAeMi' }
     let(:account_key) { 'AKIAIOSFODNN7EXAMPLE' }
-    let(:account_secret) { 'wJalrXUtnFEMI/K7MDENG/bPxRiCYzEXAMPLEKEY' }
+    let(:account_secret) { 'HLrn4MiOqBJy9HTC5EUZ0qnoaWiO66swOV0QazjJ' }
     let(:sharedcfg) do
       instance_double(
         Aws::SharedConfig,
